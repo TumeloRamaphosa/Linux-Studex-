@@ -150,6 +150,54 @@ export default class BaseAgent {
     return result;
   }
 
+  // ── Sandbox code execution ──────────────────────────────────────────
+
+  /**
+   * Run code in an ephemeral sandbox.
+   * Uses the SandboxManager if available (via orchestrator).
+   */
+  async runCode(code, options = {}) {
+    if (!this._orchestrator || !this._orchestrator.sandboxManager) {
+      throw new Error('Sandbox manager not available');
+    }
+    const sm = this._orchestrator.sandboxManager;
+    const template = options.template || 'python';
+
+    // Spawn a sandbox, run code, auto-destroy
+    const sb = sm.spawn(template, 60_000);
+    try {
+      const result = sm.run(sb.id, code, { language: options.language || template, timeout: options.timeout || 30_000 });
+      this.logger.command(`runCode (${template})`, result.exitCode === 0 ? 'OK' : `Exit: ${result.exitCode}`);
+      return { sandboxId: sb.id, ...result };
+    } finally {
+      // Clean up after a brief delay to allow reading output files
+      setTimeout(() => sm.destroy(sb.id), 2000);
+    }
+  }
+
+  /**
+   * Spawn a persistent sandbox and return its ID.
+   * Agent can use it for multiple commands.
+   */
+  async spawnSandbox(template = 'python', ttlMs = 300_000) {
+    if (!this._orchestrator || !this._orchestrator.sandboxManager) {
+      throw new Error('Sandbox manager not available');
+    }
+    const sb = this._orchestrator.sandboxManager.spawn(template, ttlMs);
+    this.logger.decision('Sandbox', `Spawned ${sb.id} (${template})`);
+    return sb;
+  }
+
+  /**
+   * Run code in an existing sandbox by ID.
+   */
+  async sandboxRun(sandboxId, code, options = {}) {
+    if (!this._orchestrator || !this._orchestrator.sandboxManager) {
+      throw new Error('Sandbox manager not available');
+    }
+    return this._orchestrator.sandboxManager.run(sandboxId, code, options);
+  }
+
   /**
    * Clean up intervals.
    */

@@ -1219,6 +1219,79 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     </div>
   </section>
 
+  <!-- Sandbox Playground -->
+  <section class="section animate">
+    <div class="section-header">
+      <h2>⬡ Sandbox Playground</h2>
+      <p>Ephemeral code execution environments. Spawn sandboxes, run code, read output. Docker-backed with filesystem isolation. Agents can use <code style="color:var(--gold);">runCode()</code> to execute Python, Node, Shell, or Go.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;">
+      <div>
+        <h4 style="margin-bottom:8px;">Active Sandboxes</h4>
+        <div id="sandbox-list" class="config-block" style="margin:0;min-height:100px;">
+          <div style="color:var(--text-muted);font-size:0.8rem;">Loading...</div>
+        </div>
+      </div>
+      <div>
+        <h4 style="margin-bottom:8px;">Templates</h4>
+        <div id="sandbox-stats" class="config-block" style="margin:0;min-height:100px;">
+          <div style="color:var(--text-muted);font-size:0.8rem;">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <select id="sandbox-template" style="background:var(--obsidian-3);border:1px solid var(--obsidian-5);padding:10px 16px;color:var(--text-primary);font-family:var(--font-mono);font-size:0.8rem;">
+        <option value="python">Python 3.12</option>
+        <option value="node">Node.js 22</option>
+        <option value="shell">Shell (Alpine)</option>
+        <option value="go">Go 1.22</option>
+      </select>
+      <button class="btn" onclick="spawnSandbox()">SPAWN</button>
+      <button class="btn" onclick="refreshSandboxes()">REFRESH</button>
+    </div>
+
+    <div style="margin-top:16px;">
+      <h4 style="margin-bottom:8px;">Run Code</h4>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        <input type="text" id="sandbox-id-input" placeholder="sandbox ID" style="width:200px;background:var(--obsidian-3);border:1px solid var(--obsidian-5);padding:10px 16px;color:var(--text-primary);font-family:var(--font-mono);font-size:0.8rem;">
+        <input type="text" id="sandbox-code-input" placeholder="code to run (e.g. print('hello world'))" style="flex:1;background:var(--obsidian-3);border:1px solid var(--obsidian-5);padding:10px 16px;color:var(--text-primary);font-family:var(--font-mono);font-size:0.8rem;">
+        <button class="btn" onclick="runSandboxCode()">RUN</button>
+      </div>
+    </div>
+
+    <div id="sandbox-result" class="config-block" style="margin-top:16px;display:none;">
+      <pre id="sandbox-result-content" style="font-size:0.8rem;"></pre>
+    </div>
+  </section>
+
+  <!-- MCP Tools -->
+  <section class="section animate">
+    <div class="section-header">
+      <h2>▸ MCP Tools</h2>
+      <p>Model Context Protocol — external agents and LLMs can discover and call all agent tools dynamically.</p>
+    </div>
+
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px;">
+      <div class="config-block" style="flex:2;margin:0;">
+        <h4 style="margin:0 0 12px;">Available Tools (<span id="mcp-tool-count">0</span>)</h4>
+        <div id="mcp-tools-list" style="font-size:0.8rem;">
+          <div style="color:var(--text-muted);">Loading...</div>
+        </div>
+      </div>
+      <div class="config-block" style="flex:1;margin:0;">
+        <h4 style="margin:0 0 12px;">Call a Tool</h4>
+        <select id="mcp-tool-select" style="width:100%;background:var(--obsidian-2);border:1px solid var(--obsidian-5);padding:8px 12px;color:var(--text-primary);font-family:var(--font-mono);font-size:0.8rem;margin-bottom:8px;">
+          <option>Select a tool...</option>
+        </select>
+        <input type="text" id="mcp-tool-args" placeholder='args JSON (e.g. {"message":"hello"})' style="width:100%;background:var(--obsidian-2);border:1px solid var(--obsidian-5);padding:8px 12px;color:var(--text-primary);font-family:var(--font-mono);font-size:0.8rem;margin-bottom:8px;">
+        <button class="btn" onclick="callMcpTool()" style="width:100%;">CALL TOOL</button>
+        <div id="mcp-result" style="margin-top:8px;font-size:0.8rem;color:var(--text-secondary);display:none;"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- Tmux Cheatsheet -->
   <section class="section animate">
     <div class="section-header">
@@ -1802,11 +1875,143 @@ async function routeMeshTask() {
   }
 }
 
+// ── Sandbox ────────────────────────────────────────────────────────────────
+
+async function refreshSandboxes() {
+  try {
+    const data = await api('/sandbox');
+    const listEl = document.getElementById('sandbox-list');
+    const statsEl = document.getElementById('sandbox-stats');
+
+    if (data.sandboxes && data.sandboxes.length > 0) {
+      listEl.innerHTML = data.sandboxes.map(sb => {
+        const remaining = Math.round(sb.remainingMs / 1000);
+        return '<div style="padding:6px 0;border-bottom:1px solid var(--obsidian-5);font-size:0.8rem;display:flex;gap:8px;">' +
+          '<span style="color:var(--info);font-family:var(--font-mono);">' + sb.id.slice(-12) + '</span>' +
+          '<span style="color:var(--gold);">' + sb.template + '</span>' +
+          '<span style="color:var(--text-muted);">' + sb.commands + 'cmds</span>' +
+          '<span style="color:var(--text-muted);">' + remaining + 's</span>' +
+          '</div>';
+      }).join('');
+    } else {
+      listEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">No active sandboxes. Spawn one above.</div>';
+    }
+
+    if (data.stats) {
+      statsEl.innerHTML =
+        '<div style="margin-bottom:8px;"><span style="color:var(--text-muted);">Docker:</span> ' + (data.stats.dockerAvailable ? '<span style="color:var(--success);">✓ Available</span>' : '<span style="color:var(--warning);">Fallback mode</span>') + '</div>' +
+        '<div style="margin-bottom:8px;"><span style="color:var(--text-muted);">Active:</span> ' + data.stats.active + '/' + data.stats.max + '</div>' +
+        '<div><span style="color:var(--text-muted);">Templates:</span> ' + data.stats.templates + '</div>';
+    }
+  } catch (e) {
+    document.getElementById('sandbox-list').innerHTML = '<div style="color:var(--error);font-size:0.8rem;">Sandbox offline</div>';
+  }
+}
+
+async function spawnSandbox() {
+  const template = document.getElementById('sandbox-template').value;
+  try {
+    const result = await api('/sandbox/spawn', {
+      method: 'POST',
+      body: JSON.stringify({ template }),
+    });
+    document.getElementById('sandbox-id-input').value = result.id;
+    document.getElementById('sandbox-result').style.display = 'block';
+    document.getElementById('sandbox-result-content').textContent = 'Spawned ' + result.id + ' (' + template + ')';
+    refreshSandboxes();
+  } catch (err) {
+    document.getElementById('sandbox-result').style.display = 'block';
+    document.getElementById('sandbox-result-content').textContent = 'Error: ' + err.message;
+  }
+}
+
+async function runSandboxCode() {
+  const id = document.getElementById('sandbox-id-input').value.trim();
+  const code = document.getElementById('sandbox-code-input').value.trim();
+  if (!id || !code) { alert('Enter sandbox ID and code'); return; }
+
+  const resultEl = document.getElementById('sandbox-result');
+  const contentEl = document.getElementById('sandbox-result-content');
+  resultEl.style.display = 'block';
+  contentEl.textContent = 'Running...';
+
+  try {
+    const result = await api('/sandbox/' + id + '/run', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    });
+    let text = 'Exit code: ' + result.exitCode + '\n';
+    if (result.stdout) text += '\n--- STDOUT ---\n' + result.stdout;
+    if (result.stderr) text += '\n--- STDERR ---\n' + result.stderr;
+    if (result.files && result.files.length) text += '\n--- FILES ---\n' + result.files.join('\n');
+    contentEl.textContent = text;
+    refreshSandboxes();
+  } catch (err) {
+    contentEl.textContent = 'Error: ' + err.message;
+  }
+}
+
+// ── MCP Tools ──────────────────────────────────────────────────────────────
+
+async function refreshMcpTools() {
+  try {
+    const data = await api('/mcp/tools');
+    document.getElementById('mcp-tool-count').textContent = data.count;
+
+    const listEl = document.getElementById('mcp-tools-list');
+    listEl.innerHTML = data.tools.map(t => {
+      const params = t.inputSchema?.properties ? Object.keys(t.inputSchema.properties).join(', ') : '—';
+      return '<div style="padding:8px 0;border-bottom:1px solid var(--obsidian-5);">' +
+        '<div style="color:var(--gold);font-weight:600;font-family:var(--font-mono);font-size:0.85rem;">' + t.name + '</div>' +
+        '<div style="color:var(--text-secondary);font-size:0.75rem;margin:2px 0;">' + t.description + '</div>' +
+        '<div style="color:var(--text-muted);font-size:0.65rem;font-family:var(--font-mono);">params: ' + params + '</div>' +
+        '</div>';
+    }).join('');
+
+    // Populate tool selector
+    const select = document.getElementById('mcp-tool-select');
+    select.innerHTML = '<option value="">Select a tool...</option>' +
+      data.tools.map(t => '<option value="' + t.name + '">' + t.name + '</option>').join('');
+  } catch (e) {
+    document.getElementById('mcp-tools-list').innerHTML = '<div style="color:var(--error);font-size:0.8rem;">MCP offline</div>';
+  }
+}
+
+async function callMcpTool() {
+  const name = document.getElementById('mcp-tool-select').value;
+  const argsText = document.getElementById('mcp-tool-args').value.trim();
+  if (!name) { alert('Select a tool'); return; }
+
+  let args = {};
+  if (argsText) {
+    try { args = JSON.parse(argsText); }
+    catch { alert('Invalid JSON in args'); return; }
+  }
+
+  const resultEl = document.getElementById('mcp-result');
+  resultEl.style.display = 'block';
+  resultEl.textContent = 'Calling ' + name + '...';
+
+  try {
+    const result = await api('/mcp/call', {
+      method: 'POST',
+      body: JSON.stringify({ name, arguments: args }),
+    });
+    resultEl.textContent = JSON.stringify(result, null, 2);
+  } catch (err) {
+    resultEl.textContent = 'Error: ' + err.message;
+  }
+}
+
 // ── Initialise ─────────────────────────────────────────────────────────────
 setConn('connecting');
 subscribeStatus();
 setTimeout(refreshMesh, 1000);
-setInterval(refreshMesh, 15000); // Refresh mesh every 15s
+setTimeout(refreshSandboxes, 2000);
+setTimeout(refreshMcpTools, 3000);
+setInterval(refreshMesh, 15000);
+setInterval(refreshSandboxes, 20000);
+setInterval(refreshMcpTools, 30000);
 </script>
 
 </body>

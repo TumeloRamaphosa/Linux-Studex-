@@ -11,10 +11,14 @@ import CursorAgent from './agents/cursor.js';
 import FarmAgent from './agents/farm.js';
 
 import AgentOrchestrator from './lib/orchestrator.js';
+import SandboxManager from './lib/sandbox.js';
+import MCPServer from './lib/mcp.js';
 
 import agentRoutes from './routes/agents.js';
 import statusRoutes from './routes/status.js';
 import orchestrateRoutes from './routes/orchestrate.js';
+import sandboxRoutes from './routes/sandbox.js';
+import mcpRoutes from './routes/mcp.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT) || 4000;
@@ -28,11 +32,21 @@ const agents = {
   farm: new FarmAgent(),
 };
 
+// ── Initialise Orchestrator ────────────────────────────────────────────────
 const orchestrator = new AgentOrchestrator();
 Object.values(agents).forEach(a => orchestrator.register(a));
 
+// ── Initialise Sandbox Manager ─────────────────────────────────────────────
+const sandboxManager = new SandboxManager();
+orchestrator.sandboxManager = sandboxManager; // Make available to agents
+
+// ── Initialise MCP Server ──────────────────────────────────────────────────
+const mcpServer = new MCPServer(orchestrator, sandboxManager);
+
 console.log('▸ Agent OS Backend starting...');
 console.log(`  ✓ Orchestrator — ${Object.keys(orchestrator.agents).length} agents in mesh`);
+console.log(`  ✓ Sandbox — ${Object.keys(SandboxManager.TEMPLATES).length} templates, Docker: ${sandboxManager.dockerAvailable}`);
+console.log(`  ✓ MCP — ${mcpServer.tools.length} tools exposed`);
 Object.values(agents).forEach(a => {
   console.log(`  ✓ ${a.name.padEnd(10)} ${a.role.padEnd(28)} ${a.rvs}  :${a.port}`);
 });
@@ -50,6 +64,8 @@ app.use(express.static(path.resolve(__dirname, '..')));
 app.use('/api/agents', agentRoutes(agents));
 app.use('/api/status', statusRoutes(agents));
 app.use('/api/orchestrate', orchestrateRoutes(orchestrator));
+app.use('/api/sandbox', sandboxRoutes(sandboxManager));
+app.use('/api/mcp', mcpRoutes(mcpServer));
 
 // POST /api/tmux — execute a tmux command
 app.post('/api/tmux', async (req, res) => {
@@ -88,4 +104,6 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`▸ Dashboard: http://localhost:${PORT}/dashboard.html`);
   console.log(`▸ Agents:    http://localhost:${PORT}/api/agents`);
   console.log(`▸ Mesh:      http://localhost:${PORT}/api/orchestrate`);
+  console.log(`▸ Sandbox:   http://localhost:${PORT}/api/sandbox`);
+  console.log(`▸ MCP Tools: http://localhost:${PORT}/api/mcp/tools`);
 });
