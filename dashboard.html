@@ -1167,6 +1167,58 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     </div>
   </section>
 
+  <!-- Agent Mesh — Inter-Agent Collaboration -->
+  <section class="section animate">
+    <div class="section-header">
+      <h2>◈ Agent Mesh</h2>
+      <p>All 5 agents connected via the orchestrator. Each agent can send messages, share facts, and coordinate on multi-agent tasks through Hermes.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin:32px 0;">
+      <!-- Mesh Visualization -->
+      <div class="config-block" style="margin:0;">
+        <h4 style="margin:0 0 16px;">Message Flow</h4>
+        <div id="mesh-messages" style="font-size:0.8rem;max-height:280px;overflow-y:auto;">
+          <div style="color:var(--text-muted);padding:8px 0;">Waiting for orchestrator data...</div>
+        </div>
+      </div>
+      <!-- Blackboard -->
+      <div class="config-block" style="margin:0;">
+        <h4 style="margin:0 0 16px;">Shared Blackboard</h4>
+        <div id="mesh-blackboard" style="font-size:0.8rem;max-height:280px;overflow-y:auto;">
+          <div style="color:var(--text-muted);padding:8px 0;">No facts shared yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mesh Control -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:24px;">
+      <input type="text" id="mesh-task-input" placeholder="route a multi-agent task (e.g. deploy the dashboard)" style="flex:1;background:var(--obsidian-3);border:1px solid var(--obsidian-5);padding:12px 16px;color:var(--text-primary);font-family:var(--font-mono);font-size:0.8rem;outline:none;">
+      <button class="btn" onclick="routeMeshTask()">ROUTE</button>
+      <button class="btn" onclick="refreshMesh()">REFRESH</button>
+    </div>
+
+    <!-- Task Result -->
+    <div id="mesh-result" class="config-block" style="margin-top:16px;display:none;">
+      <pre id="mesh-result-content"></pre>
+    </div>
+
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;">
+      <div style="flex:1;">
+        <h4 style="margin-bottom:8px;">Agents in Mesh</h4>
+        <div id="mesh-agents" style="display:flex;gap:12px;flex-wrap:wrap;">
+          <span style="background:var(--obsidian-4);padding:4px 12px;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);">Waiting...</span>
+        </div>
+      </div>
+      <div style="flex:1;">
+        <h4 style="margin-bottom:8px;">Orchestrator Stats</h4>
+        <div id="mesh-stats" style="display:flex;gap:16px;">
+          <span style="background:var(--obsidian-4);padding:4px 12px;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);">Loading...</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Tmux Cheatsheet -->
   <section class="section animate">
     <div class="section-header">
@@ -1400,6 +1452,8 @@ function setConn(state) {
   if (state === 'connected') {
     connEl.className = 'connection-status connected';
     connEl.innerHTML = '<span class="dot"></span> Live';
+    // Refresh mesh when connection is restored
+    if (typeof refreshMesh === 'function') refreshMesh();
   } else if (state === 'connecting') {
     connEl.className = 'connection-status connecting';
     connEl.innerHTML = '<span class="dot"></span> Connecting';
@@ -1625,9 +1679,134 @@ function scrollToSection(id) {
   document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// ── Agent Mesh ─────────────────────────────────────────────────────────────
+
+async function refreshMesh() {
+  // Don't fetch if server is offline
+  if (connEl.classList.contains('disconnected')) return;
+
+  const msgEl = document.getElementById('mesh-messages');
+  const boardEl = document.getElementById('mesh-blackboard');
+  const agentsEl = document.getElementById('mesh-agents');
+  const statsEl = document.getElementById('mesh-stats');
+
+  // Fetch orchestrator status
+  try {
+    const orch = await api('/orchestrate');
+    statsEl.innerHTML = [
+      '<span style="background:var(--obsidian-4);padding:4px 12px;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);">' + orch.agents + ' agents</span>',
+      '<span style="background:var(--obsidian-4);padding:4px 12px;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);">' + orch.messagesLogged + ' msgs</span>',
+      '<span style="background:var(--obsidian-4);padding:4px 12px;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);">' + orch.blackboardKeys + ' facts</span>',
+      '<span style="background:var(--obsidian-4);padding:4px 12px;font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);">' + orch.activeWorkflows + ' workflows</span>',
+    ].join('');
+  } catch (e) {
+    statsEl.innerHTML = '<span style="color:var(--error);font-size:0.8rem;">Orchestrator offline</span>';
+  }
+
+  // Fetch agent list
+  try {
+    const agentList = await api('/orchestrate/agents');
+    agentsEl.innerHTML = agentList.map(a =>
+      '<span style="background:var(--obsidian-4);padding:4px 12px;font-family:var(--font-mono);font-size:0.8rem;border-left:2px solid ' + getAgentColor(a.name) + ';color:var(--text-primary);">' + a.name + ' <span style="color:var(--text-muted);">' + a.rvs + '</span></span>'
+    ).join('');
+  } catch (e) {}
+
+  // Fetch message log
+  try {
+    const log = await api('/orchestrate/log?count=20');
+    if (log.messages && log.messages.length > 0) {
+      msgEl.innerHTML = log.messages.slice().reverse().map(m => {
+        const ts = new Date(m.timestamp).toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        const arrow = m.to === '__blackboard__' ? '◆' : m.to === '__self__' ? '→' : '→';
+        return '<div style="padding:4px 0;border-bottom:1px solid var(--obsidian-5);display:flex;gap:8px;font-size:0.75rem;">' +
+          '<span style="color:var(--text-muted);flex-shrink:0;">' + ts + '</span>' +
+          '<span style="color:' + getAgentColor(m.from) + ';font-weight:600;flex-shrink:0;">' + m.from + '</span>' +
+          '<span style="color:var(--text-muted);">' + arrow + '</span>' +
+          '<span style="color:' + getAgentColor(m.to === '__blackboard__' ? 'hermes' : m.to === '__self__' ? 'system' : m.to) + ';font-weight:600;flex-shrink:0;">' + (m.to === '__blackboard__' ? 'blackboard' : m.to === '__self__' ? 'self' : m.to) + '</span>' +
+          '<span style="color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(m.message.substring(0, 60)) + '</span>' +
+          '</div>';
+      }).join('');
+    } else {
+      msgEl.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:0.8rem;">No inter-agent messages yet. Try routing a task below.</div>';
+    }
+  } catch (e) {
+    msgEl.innerHTML = '<div style="color:var(--error);padding:8px 0;font-size:0.8rem;">Could not fetch message log</div>';
+  }
+
+  // Fetch blackboard
+  try {
+    const facts = await api('/orchestrate/blackboard');
+    const keys = Object.keys(facts);
+    if (keys.length > 0) {
+      boardEl.innerHTML = keys.map(k => {
+        const f = facts[k];
+        const val = typeof f.value === 'object' ? JSON.stringify(f.value) : f.value;
+        return '<div style="padding:6px 0;border-bottom:1px solid var(--obsidian-5);font-size:0.75rem;">' +
+          '<span style="color:var(--gold);font-weight:600;">' + k + '</span>' +
+          '<span style="color:var(--text-muted);margin:0 8px;">=</span>' +
+          '<span style="color:var(--text-secondary);">' + escapeHtml(String(val).substring(0, 80)) + '</span>' +
+          '<span style="color:var(--text-muted);float:right;font-size:0.65rem;">by ' + f.source + '</span>' +
+          '</div>';
+      }).join('');
+    } else {
+      boardEl.innerHTML = '<div style="color:var(--text-muted);padding:8px 0;font-size:0.8rem;">No facts shared yet. Agents will post facts as they work together.</div>';
+    }
+  } catch (e) {
+    boardEl.innerHTML = '<div style="color:var(--error);padding:8px 0;font-size:0.8rem;">Could not fetch blackboard</div>';
+  }
+}
+
+function getAgentColor(name) {
+  const colors = { cashclaw: '#FF6B35', hermes: '#7B61FF', openhuman: '#00C9A7', cursor: '#00A3FF', farm: '#888888', system: '#C9A84C', workflow: '#C9A84C', user: '#F0EDE8' };
+  return colors[name] || '#C9A84C';
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+async function routeMeshTask() {
+  const input = document.getElementById('mesh-task-input');
+  const resultEl = document.getElementById('mesh-result');
+  const contentEl = document.getElementById('mesh-result-content');
+  const task = input.value.trim();
+  if (!task) return;
+
+  resultEl.style.display = 'block';
+  contentEl.textContent = 'Routing task through Hermes...';
+
+  try {
+    const data = await api('/orchestrate/task', {
+      method: 'POST',
+      body: JSON.stringify({ from: 'user', task }),
+    });
+    contentEl.innerHTML = '';
+    if (data.plan) {
+      contentEl.textContent += 'Plan: ' + data.plan + '\n';
+    }
+    if (data.assignments) {
+      data.assignments.forEach(a => {
+        contentEl.textContent += '  → ' + a.agent + ': ' + a.task + '\n';
+      });
+    }
+    if (data.results) {
+      contentEl.textContent += '\nResults:\n';
+      Object.entries(data.results).forEach(([agent, r]) => {
+        contentEl.textContent += '  ' + agent + ': ' + r.response.substring(0, 100) + '\n';
+      });
+    }
+    // Refresh mesh view
+    setTimeout(refreshMesh, 500);
+  } catch (err) {
+    contentEl.textContent = 'Error: ' + err.message;
+  }
+}
+
 // ── Initialise ─────────────────────────────────────────────────────────────
 setConn('connecting');
 subscribeStatus();
+setTimeout(refreshMesh, 1000);
+setInterval(refreshMesh, 15000); // Refresh mesh every 15s
 </script>
 
 </body>

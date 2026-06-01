@@ -10,13 +10,16 @@ import OpenHumanAgent from './agents/openhuman.js';
 import CursorAgent from './agents/cursor.js';
 import FarmAgent from './agents/farm.js';
 
+import AgentOrchestrator from './lib/orchestrator.js';
+
 import agentRoutes from './routes/agents.js';
 import statusRoutes from './routes/status.js';
+import orchestrateRoutes from './routes/orchestrate.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT) || 4000;
 
-// ── Initialise Agents ──────────────────────────────────────────────────────
+// ── Initialise Agents & Orchestrator ───────────────────────────────────────
 const agents = {
   cashclaw: new CashclawAgent(),
   hermes: new HermesAgent(),
@@ -25,7 +28,11 @@ const agents = {
   farm: new FarmAgent(),
 };
 
+const orchestrator = new AgentOrchestrator();
+Object.values(agents).forEach(a => orchestrator.register(a));
+
 console.log('▸ Agent OS Backend starting...');
+console.log(`  ✓ Orchestrator — ${Object.keys(orchestrator.agents).length} agents in mesh`);
 Object.values(agents).forEach(a => {
   console.log(`  ✓ ${a.name.padEnd(10)} ${a.role.padEnd(28)} ${a.rvs}  :${a.port}`);
 });
@@ -42,6 +49,7 @@ app.use(express.static(path.resolve(__dirname, '..')));
 // API routes
 app.use('/api/agents', agentRoutes(agents));
 app.use('/api/status', statusRoutes(agents));
+app.use('/api/orchestrate', orchestrateRoutes(orchestrator));
 
 // POST /api/tmux — execute a tmux command
 app.post('/api/tmux', async (req, res) => {
@@ -69,6 +77,7 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     uptime: process.uptime(),
     agents: Object.keys(agents).length,
+    orchestrator: orchestrator.messageLog.length,
     timestamp: new Date().toISOString(),
   });
 });
@@ -77,5 +86,6 @@ app.get('/api/health', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`▸ Server running at http://localhost:${PORT}`);
   console.log(`▸ Dashboard: http://localhost:${PORT}/dashboard.html`);
-  console.log(`▸ API:       http://localhost:${PORT}/api/status`);
+  console.log(`▸ Agents:    http://localhost:${PORT}/api/agents`);
+  console.log(`▸ Mesh:      http://localhost:${PORT}/api/orchestrate`);
 });
