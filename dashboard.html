@@ -30,6 +30,9 @@
   --font-heading: 'Bebas Neue', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'Space Mono', monospace;
+  --neon-purple: #B026FF;
+  --neon-purple-light: #D580FF;
+  --neon-purple-dark: #7A00CC;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -61,9 +64,26 @@ p { margin-bottom: 16px; }
 
 /* Header */
 .header {
-  background: linear-gradient(180deg, var(--obsidian) 0%, var(--obsidian-2) 100%);
-  border-bottom: 2px solid var(--gold-dark);
-  padding: 24px 0 16px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 2px solid var(--neon-purple);
+  box-shadow: 0 0 40px rgba(176, 38, 255, 0.15);
+}
+.header-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('hero-bg.png') center center / cover no-repeat;
+  filter: brightness(0.35) saturate(1.2);
+  z-index: 0;
+}
+.header-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(10,10,10,0.7) 0%, rgba(10,10,10,0.3) 100%);
+  z-index: 1;
+}
+.header {
+  padding: 32px 0 24px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -74,6 +94,8 @@ p { margin-bottom: 16px; }
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
+  position: relative;
+  z-index: 2;
 }
 .logo {
   display: flex;
@@ -81,19 +103,36 @@ p { margin-bottom: 16px; }
   gap: 16px;
 }
 .logo-icon {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-purple-dark));
   clip-path: polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-heading);
-  font-size: 1.6rem;
-  color: var(--obsidian);
+  font-size: 1.4rem;
+  color: #fff;
+  box-shadow: 0 0 20px rgba(176, 38, 255, 0.4);
 }
-.logo-text h1 { margin-bottom: 0; line-height: 1; }
-.logo-text span { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
+.logo-text h1 {
+  margin-bottom: 0;
+  line-height: 1;
+  color: #fff;
+  text-shadow:
+    0 0 10px var(--neon-purple),
+    0 0 20px var(--neon-purple),
+    0 0 40px var(--neon-purple),
+    0 0 80px var(--neon-purple-light);
+  font-size: 3.2rem;
+  letter-spacing: 3px;
+  animation: neonPulse 2s ease-in-out infinite alternate;
+}
+@keyframes neonPulse {
+  from { text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple), 0 0 40px var(--neon-purple); }
+  to { text-shadow: 0 0 15px var(--neon-purple), 0 0 30px var(--neon-purple-light), 0 0 60px var(--neon-purple-light), 0 0 90px #fff; }
+}
+.logo-text span { font-family: var(--font-mono); font-size: 0.75rem; color: rgba(255,255,255,0.6); }
 .header-status {
   display: flex;
   align-items: center;
@@ -642,13 +681,15 @@ p { margin-bottom: 16px; }
 </head>
 <body>
 
-<!-- Header -->
+<!-- Hero Header with Neon Purple Heading -->
 <header class="header">
+  <div class="header-bg"></div>
+  <div class="header-overlay"></div>
   <div class="container header-inner">
     <div class="logo">
-      <div class="logo-icon">LX</div>
+      <div class="logo-icon">SV</div>
       <div class="logo-text">
-        <h1>Linux StudEx</h1>
+        <h1>StudEx Linux VM Command</h1>
         <span>Agent Operating System v1.0</span>
       </div>
     </div>
