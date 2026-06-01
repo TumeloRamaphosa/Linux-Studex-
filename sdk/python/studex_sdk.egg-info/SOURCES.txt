@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+studex_sdk/__init__.py
+studex_sdk/agent.py
+studex_sdk/cli.py
+studex_sdk/client.py
+studex_sdk/mcp.py
+studex_sdk/orchestrator.py
+studex_sdk/sandbox.py
+studex_sdk.egg-info/PKG-INFO
+studex_sdk.egg-info/SOURCES.txt
+studex_sdk.egg-info/dependency_links.txt
+studex_sdk.egg-info/entry_points.txt
+studex_sdk.egg-info/top_level.txt

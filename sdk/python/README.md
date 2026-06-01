@@ -1,0 +1,213 @@
+# StudEx Python SDK
+
+Programmatic client for the **StudEx Agent Operating System** — sandbox, MCP,
+orchestration, and agent APIs from Python.
+
+Agents use this SDK to execute code in isolated sandboxes, discover and call MCP
+tools, chat with each other, share state via the blackboard, and coordinate
+multi-agent workflows.
+
+## Quick Start
+
+```bash
+# Install
+pip install studex-sdk
+
+# Or from source
+cd sdk/python
+pip install -e .
+```
+
+## Usage
+
+### Connect
+
+```python
+from studex_sdk import StudExClient
+
+# Connect to the StudEx backend
+client = StudExClient("http://localhost:4000")
+
+# Check the server is alive
+print(client.health())
+```
+
+### Sandbox — Run Code in Isolated Environments
+
+```python
+# Spawn a Python sandbox
+sb = client.sandbox.spawn("python")
+print(f"Sandbox ID: {sb['id']}")
+
+# Run code
+result = client.sandbox.run(sb["id"], """
+import numpy as np
+print(f"numpy version: {np.__version__}")
+data = [1, 2, 3, 4, 5]
+print(f"mean: {np.mean(data)}")
+""")
+print(result["stdout"])
+
+# Write files and read them back
+client.sandbox.write_file(sb["id"], "hello.txt", "Hello from StudEx!")
+content = client.sandbox.read_file(sb["id"], "hello.txt")
+print(content)
+
+# List files in the workspace
+files = client.sandbox.list_files(sb["id"])
+for f in files:
+    print(f"  {f['name']} ({f['size']} bytes)")
+
+# Destroy when done
+client.sandbox.destroy(sb["id"])
+
+# Or use it as a context manager (auto-destroys all on exit)
+with client.sandbox as sb_api:
+    sb = sb_api.spawn("python")
+    result = sb_api.run(sb["id"], "print('hello')")
+    print(result["stdout"])
+```
+
+### Chat with Agents
+
+```python
+# Talk to Cashclaw (trading agent)
+resp = client.agents.chat("cashclaw", "check positions")
+print(resp["response"])
+
+# Talk to Hermes (orchestrator)
+resp = client.agents.chat("hermes", "route status")
+print(resp["response"])
+
+# Talk to Cursor (dev agent)
+resp = client.agents.chat("cursor", "run tests on dashboard")
+print(resp["response"])
+
+# Get agent status
+status = client.agents.status("hermes")
+print(f"Hermes uptime: {status['uptime']}m, messages: {status['messages']}")
+
+# List all agents
+for a in client.agents.list():
+    print(f"{a['name']:12} {a['role']:30} {a['status']}")
+
+# Subscript-style access
+resp = client.agents["cashclaw"].chat("show btc position")
+print(resp["response"])
+```
+
+### MCP — Discover and Call Tools
+
+```python
+# Discover all tools
+tools = client.mcp.list_tools()
+for t in tools:
+    params = list(t["inputSchema"]["properties"].keys())
+    print(f"  {t['name']}: {t['description']} ({', '.join(params)})")
+
+# Call a tool
+result = client.mcp.call_tool("sandbox_spawn", {"template": "node"})
+print(result)
+
+# Convenience methods
+resp = client.mcp.chat_with_agent("cashclaw", "check positions")
+client.mcp.blackboard_set("last_action", "checked positions")
+fact = client.mcp.blackboard_get("last_action")
+```
+
+### Orchestrator — Multi-Agent Coordination
+
+```python
+# Route a multi-agent task through Hermes
+task = client.orchestrator.route_task("deploy the dashboard")
+print(f"Plan: {task['plan']}")
+for a in task['assignments']:
+    print(f"  → {a['agent']}: {a['task']}")
+
+# Send a message from one agent to another
+resp = client.orchestrator.send("cashclaw", "hermes", "route my trade alert")
+
+# Broadcast to all agents
+resp = client.orchestrator.broadcast("user", "system health check")
+
+# Run a multi-step workflow
+wf = client.orchestrator.workflow("deploy-app", [
+    {"agent": "cursor", "task": "run tests on dashboard"},
+    {"agent": "openhuman", "task": "deploy to production"},
+    {"agent": "farm", "task": "verify health on all nodes"},
+])
+
+# Shared blackboard
+client.orchestrator.blackboard_set("btc_price", 67200, source="cashclaw")
+price = client.orchestrator.blackboard_get("btc_price")
+all_facts = client.orchestrator.blackboard_get_all()
+```
+
+## CLI
+
+The SDK comes with a `studex` CLI for quick terminal access:
+
+```bash
+# Health check
+studex health
+
+# Sandbox
+studex sandbox spawn --template python
+studex sandbox run <id> "print('hello')"
+studex sandbox list
+studex sandbox destroy <id>
+
+# Agent chat
+studex agent list
+studex agent chat cashclaw "check positions"
+studex agent status hermes
+
+# MCP discovery
+studex mcp tools
+studex mcp call sandbox_spawn '{"template": "python"}'
+
+# Orchestrator
+studex mesh task "deploy the dashboard"
+studex mesh status
+studex mesh send cashclaw hermes "route my alert"
+studex mesh broadcast "system check"
+
+# Blackboard
+studex blackboard get
+studex blackboard set btc_price 67200
+studex blackboard get btc_price
+
+# Custom URL
+STUDEX_URL=http://my-server:4000 studex health
+```
+
+## Development
+
+```bash
+cd sdk/python
+pip install -e .
+studex health
+```
+
+## API Reference
+
+| Method | Description |
+|--------|-------------|
+| `client.sandbox.spawn(template)` | Spawn an ephemeral code sandbox |
+| `client.sandbox.run(id, code)` | Execute code in a sandbox |
+| `client.sandbox.destroy(id)` | Destroy a sandbox |
+| `client.sandbox.list_files(id)` | List workspace files |
+| `client.sandbox.read_file(id, path)` | Read a workspace file |
+| `client.sandbox.write_file(id, path, content)` | Write a workspace file |
+| `client.agents.chat(name, msg)` | Talk to an agent |
+| `client.agents.status(name)` | Get agent status |
+| `client.agents.list()` | List all agents |
+| `client.agents[name].chat(msg)` | Subscript-style agent chat |
+| `client.mcp.list_tools()` | Discover all MCP tools |
+| `client.mcp.call_tool(name, args)` | Call an MCP tool |
+| `client.orchestrator.route_task(task)` | Route task via Hermes |
+| `client.orchestrator.send(from, to, msg)` | Agent-to-agent message |
+| `client.orchestrator.broadcast(from, msg)` | Broadcast to all |
+| `client.orchestrator.workflow(name, steps)` | Multi-step workflow |
+| `client.orchestrator.blackboard_set(key, val)` | Write shared fact |
+| `client.orchestrator.blackboard_get(key)` | Read shared fact |
