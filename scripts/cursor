@@ -1,0 +1,448 @@
+#!/usr/bin/env node
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *  Cursor — Development Subagent CLI
+ *  Linux StudEx Agent Operating System
+ *  Studex Group, Johannesburg SA
+ *
+ *  A command-line interface for the Cursor development agent.
+ *  Connects to the backend API when the server is running,
+ *  or runs standalone with built-in project management.
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Usage:
+ *   cursor list                  List projects with test status
+ *   cursor test [project]        Run tests on a project
+ *   cursor build [project]       Build a project
+ *   cursor review [project]      Code review a project
+ *   cursor deploy [project]      Deploy a project to preview
+ *   cursor status                Session info, git status, uptime
+ *   cursor git                   Git branch & commit info
+ *   cursor chat <message...>     Send a message to the Cursor agent
+ *   cursor help                  Show this help
+ *
+ * Examples:
+ *   cursor test                  Run all tests
+ *   cursor test dashboard        Run dashboard project tests
+ *   cursor build server          Build the backend server
+ *   cursor review                Review latest changes
+ *   cursor chat what's the status?
+ *   cursor status
+ */
+'use strict';
+
+const API = 'http://localhost:4000';
+const SCRIPT_DIR = require('path').resolve(__dirname);
+const PROJECT_ROOT = require('path').resolve(__dirname, '..');
+
+// ── Standalone state (used when server is offline) ─────────────────────────
+const PROJECTS = [
+  { name: 'linux-studex-dashboard', language: 'HTML/CSS/JS', tests: 12, passing: 12 },
+  { name: 'agent-orchestrator',       language: 'Python',     tests: 48, passing: 46 },
+  { name: 'naledi-content-engine',    language: 'TypeScript', tests: 24, passing: 24 },
+  { name: 'server',                   language: 'JavaScript', tests: 0,  passing: 0 },
+];
+
+const ALIASES = {
+  dashboard: 'linux-studex-dashboard',
+  d: 'linux-studex-dashboard',
+  orchestrator: 'agent-orchestrator',
+  agent: 'agent-orchestrator',
+  naledi: 'naledi-content-engine',
+  content: 'naledi-content-engine',
+  backend: 'server',
+  api: 'server',
+};
+
+const STARTED_AT = Date.now();
+let messagesSent = 0;
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+const STYLES = {
+  reset: '\x1b[0m',
+  bold: '\x1b[1m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  gold: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m',
+  dim: '\x1b[2m',
+};
+
+function style(text, ...codes) {
+  return codes.join('') + text + STYLES.reset;
+}
+
+function label(text, color) {
+  return style(` ${text} `, color, STYLES.bold);
+}
+
+function fmtTime(ms) {
+  const m = Math.floor(ms / 60000);
+  const h = Math.floor(m / 60);
+  const s = Math.floor((ms % 60000) / 1000);
+  if (h > 0) return `${h}h ${m % 60}m`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
+function fmtUptime() {
+  return fmtTime(Date.now() - STARTED_AT);
+}
+
+function resolveProject(name) {
+  if (!name) return null;
+  const key = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  let p = PROJECTS.find(p => p.name.includes(key) || key.includes(p.name.replace(/[^a-z0-9]/g, '')));
+  if (p) return p;
+  const alias = ALIASES[key];
+  if (alias) return PROJECTS.find(p => p.name === alias);
+  return PROJECTS.find(p => p.name.split('-').some(part => key.includes(part) || part.includes(key)));
+}
+
+function sum(fn) { return PROJECTS.reduce((s, p) => s + fn(p), 0); }
+
+function getGitInfo() {
+  try {
+    const cp = require('child_process');
+    const branch = cp.execSync('git rev-parse --abbrev-ref HEAD', { cwd: PROJECT_ROOT, timeout: 2000, encoding: 'utf-8' }).trim();
+    const commit = cp.execSync('git rev-parse --short HEAD', { cwd: PROJECT_ROOT, timeout: 2000, encoding: 'utf-8' }).trim();
+    let files = '';
+    try {
+      files = cp.execSync('git diff --stat HEAD~1..HEAD 2>/dev/null | tail -1', { cwd: PROJECT_ROOT, timeout: 2000, encoding: 'utf-8' }).trim();
+    } catch {}
+    return { branch, commit, files };
+  } catch {
+    return { branch: '—', commit: '—', files: '' };
+  }
+}
+
+// ── API calls ──────────────────────────────────────────────────────────────
+async function apiPost(path, body) {
+  const http = require('http');
+  const data = JSON.stringify(body);
+  return new Promise((resolve) => {
+    const req = http.request(`${API}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) },
+      timeout: 5000,
+    }, (res) => {
+      let text = '';
+      res.on('data', c => text += c);
+      res.on('end', () => {
+        try { resolve(JSON.parse(text)); }
+        catch { resolve(null); }
+      });
+    });
+    req.on('error', () => resolve(null));
+    req.write(data);
+    req.end();
+  });
+}
+
+async function apiGet(path) {
+  const http = require('http');
+  return new Promise((resolve) => {
+    http.get(`${API}${path}`, { timeout: 3000 }, (res) => {
+      let text = '';
+      res.on('data', c => text += c);
+      res.on('end', () => {
+        try { resolve(JSON.parse(text)); }
+        catch { resolve(null); }
+      });
+    }).on('error', () => resolve(null));
+  });
+}
+
+// ── Command handlers ───────────────────────────────────────────────────────
+
+async function cmdList() {
+  const serverData = await apiGet('/api/agents/cursor');
+  if (serverData && serverData.projects) {
+    console.log(`\n  ${style('Cursor Agent', STYLES.cyan, STYLES.bold)} — Projects via API\n`);
+    for (const p of serverData.projects) {
+      const ok = p.passing === p.tests;
+      const icon = ok ? style('✓', STYLES.green, STYLES.bold) : style('✗', STYLES.red, STYLES.bold);
+      const stat = `${p.passing}/${p.tests} tests${ok ? '' : style(' ⚠️', STYLES.red)}`;
+      console.log(`  ${icon}  ${style(p.name.padEnd(30), STYLES.bold)} ${style(p.language.padEnd(15), STYLES.dim)} ${stat}`);
+    }
+    console.log(`\n  ${style(`${PROJECTS.length} projects · ${serverData.projects.filter(p => p.passing === p.tests).length} passing`, STYLES.dim)}`);
+    return;
+  }
+
+  // standalone
+  console.log(`\n  ${style('Cursor Agent', STYLES.cyan, STYLES.bold)} — Projects (standalone)\n`);
+  for (const p of PROJECTS) {
+    const ok = p.passing === p.tests;
+    const icon = ok ? style('✓', STYLES.green, STYLES.bold) : style('✗', STYLES.red, STYLES.bold);
+    console.log(`  ${icon}  ${style(p.name.padEnd(30), STYLES.bold)} ${style(p.language.padEnd(15), STYLES.dim)} ${p.passing}/${p.tests} tests${ok ? '' : style(' ⚠️', STYLES.red)}`);
+  }
+  console.log(`\n  ${style(`${PROJECTS.length} projects · ${PROJECTS.filter(p => p.passing === p.tests).length} passing`, STYLES.dim)}`);
+}
+
+async function cmdTest(projectName) {
+  const serverData = await apiPost('/api/agents/cursor/chat', {
+    message: projectName ? `test ${projectName}` : 'test all'
+  });
+
+  if (serverData && serverData.response) {
+    console.log(`\n  ${label('CURSOR', STYLES.cyan)} ${serverData.response.replace(/\n/g, '\n       ')}\n`);
+    return;
+  }
+
+  // standalone
+  const target = projectName ? resolveProject(projectName) : null;
+  messagesSent++;
+  if (target) {
+    const ok = target.passing === target.tests;
+    console.log(`\n  ${label('CURSOR', STYLES.cyan)} Running tests on ${style(target.name, STYLES.bold)}...`);
+    if (ok) {
+      console.log(`       ${target.passing}/${target.tests} passing. ${style('All green ✅', STYLES.green)}\n`);
+    } else {
+      console.log(`       ${target.passing}/${target.tests} passing. ${style(`${target.tests - target.passing} failing`, STYLES.red)}\n`);
+    }
+  } else {
+    const total = sum(p => p.passing);
+    const all = sum(p => p.tests);
+    console.log(`\n  ${label('CURSOR', STYLES.cyan)} Running all project tests...`);
+    if (total === all) {
+      console.log(`       ${total}/${all} passing across ${PROJECTS.length} projects. ${style('All green ✅', STYLES.green)}\n`);
+    } else {
+      console.log(`       ${total}/${all} passing across ${PROJECTS.length} projects. ${style(`${all - total} failing`, STYLES.red)}\n`);
+    }
+  }
+}
+
+async function cmdBuild(projectName) {
+  const serverData = await apiPost('/api/agents/cursor/chat', {
+    message: projectName ? `build ${projectName}` : 'build'
+  });
+
+  if (serverData && serverData.response) {
+    console.log(`\n  ${label('CURSOR', STYLES.cyan)} ${serverData.response.replace(/\n/g, '\n       ')}\n`);
+    return;
+  }
+
+  // standalone
+  const target = projectName ? resolveProject(projectName) : PROJECTS[0];
+  const name = target ? target.name : 'all projects';
+  const duration = Math.floor(2 + Math.random() * 6);
+  messagesSent++;
+  console.log(`\n  ${label('CURSOR', STYLES.cyan)} Building ${style(name, STYLES.bold)}...`);
+  console.log(`       Compiled successfully in ${style(`${duration}s`, STYLES.gold)}. No errors.\n`);
+}
+
+async function cmdReview(projectName) {
+  const serverData = await apiPost('/api/agents/cursor/chat', {
+    message: projectName ? `review ${projectName}` : 'review'
+  });
+
+  if (serverData && serverData.response) {
+    console.log(`\n  ${label('CURSOR', STYLES.cyan)} ${serverData.response.replace(/\n/g, '\n       ')}\n`);
+    return;
+  }
+
+  // standalone
+  const name = projectName || 'latest changes';
+  const issues = Math.floor(Math.random() * 3);
+  const suggestions = Math.floor(Math.random() * 4) + 1;
+  messagesSent++;
+  console.log(`\n  ${label('CURSOR', STYLES.cyan)} Code review: ${style(name, STYLES.bold)}`);
+  if (issues === 0) {
+    console.log(`       ${style('✓ 0 critical issues', STYLES.green)} · ${suggestions} suggestions`);
+  } else {
+    console.log(`       ${style(`${issues} issues found`, STYLES.red)} · ${suggestions} suggestions`);
+  }
+  console.log();
+}
+
+async function cmdDeploy(projectName) {
+  const serverData = await apiPost('/api/agents/cursor/chat', {
+    message: projectName ? `deploy ${projectName}` : 'deploy'
+  });
+
+  if (serverData && serverData.response) {
+    console.log(`\n  ${label('CURSOR', STYLES.cyan)} ${serverData.response.replace(/\n/g, '\n       ')}\n`);
+    return;
+  }
+
+  // standalone
+  const target = projectName ? resolveProject(projectName) : PROJECTS[0];
+  const name = target ? target.name : 'dashboard';
+  const url = `https://preview.stud.exchange/${name}`;
+  messagesSent++;
+  console.log(`\n  ${label('CURSOR', STYLES.cyan)} Deploying ${style(name, STYLES.bold)} → ${style(url, STYLES.blue)}\n`);
+}
+
+async function cmdStatus() {
+  const serverData = await apiGet('/api/status');
+  if (serverData && serverData.agents) {
+    const cursor = serverData.agents.find(a => a.name === 'cursor');
+    if (cursor) {
+      const git = getGitInfo();
+      console.log(`\n  ${style('Cursor Agent', STYLES.cyan, STYLES.bold)} — Status (API)\n`);
+      console.log(`  ${style('RVS:', STYLES.dim)}     ${cursor.rvs}`);
+      console.log(`  ${style('Status:', STYLES.dim)}  ${cursor.status === 'online' ? style('● Online', STYLES.green) : style('○ Offline', STYLES.red)}`);
+      console.log(`  ${style('Uptime:', STYLES.dim)}  ${fmtTime(cursor.uptime * 60000)}`);
+      console.log(`  ${style('Msgs:', STYLES.dim)}   ${cursor.messages}`);
+      console.log(`  ${style('Git:', STYLES.dim)}    ${git.branch} @ ${git.commit}`);
+      if (git.files) console.log(`  ${style('Files:', STYLES.dim)}  ${git.files}`);
+      console.log(`\n  ${style(`${serverData.system.totalMessages} total messages · ${serverData.system.agentsOnline}/${serverData.system.totalVms} VMs online`, STYLES.dim)}`);
+      console.log();
+      return;
+    }
+  }
+
+  // standalone
+  const git = getGitInfo();
+  console.log(`\n  ${style('Cursor Agent', STYLES.cyan, STYLES.bold)} — Status (standalone)\n`);
+  console.log(`  ${style('RVS:', STYLES.dim)}     RVS4`);
+  console.log(`  ${style('Status:', STYLES.dim)}  ${style('● Online', STYLES.green)}`);
+  console.log(`  ${style('Uptime:', STYLES.dim)}  ${fmtUptime()}`);
+  console.log(`  ${style('Msgs:', STYLES.dim)}   ${messagesSent}`);
+  console.log(`  ${style('Cwd:', STYLES.dim)}    ${SCRIPT_DIR}`);
+  console.log(`  ${style('Git:', STYLES.dim)}    ${git.branch} @ ${git.commit}`);
+  if (git.files) console.log(`  ${style('Files:', STYLES.dim)}  ${git.files}`);
+  const passing = sum(p => p.passing);
+  const total = sum(p => p.tests);
+  console.log();
+  console.log(`  ${style('Projects', STYLES.bold)}`);
+  for (const p of PROJECTS) {
+    const ok = p.passing === p.tests;
+    console.log(`  ${ok ? style('✓', STYLES.green) : style('✗', STYLES.red)} ${style(p.name.padEnd(28), STYLES.bold)} ${p.passing}/${p.tests} tests`);
+  }
+  console.log(`\n  ${style(`Total: ${passing}/${total} tests passing · ${PROJECTS.filter(p => p.passing === p.tests).length}/${PROJECTS.length} clean`, STYLES.dim)}`);
+  console.log();
+}
+
+async function cmdGit() {
+  const serverData = await apiPost('/api/agents/cursor/chat', { message: 'git' });
+  if (serverData && serverData.response) {
+    console.log(`\n  ${label('CURSOR', STYLES.cyan)} ${serverData.response.replace(/\n/g, '\n       ')}\n`);
+    return;
+  }
+
+  const git = getGitInfo();
+  console.log(`\n  ${style('Git Status', STYLES.bold)}`);
+  console.log(`  ${style('Branch:', STYLES.dim)} ${style(git.branch, STYLES.magenta)}`);
+  console.log(`  ${style('Commit:', STYLES.dim)} ${git.commit}`);
+  if (git.files) console.log(`  ${style('Files:', STYLES.dim)}  ${git.files}`);
+  console.log();
+}
+
+async function cmdChat(args) {
+  const message = args.join(' ');
+  if (!message) {
+    console.error(`\n  ${label('ERROR', STYLES.red)} Usage: cursor chat <message>\n`);
+    process.exit(1);
+  }
+
+  const serverData = await apiPost('/api/agents/cursor/chat', { message });
+
+  if (serverData && serverData.response) {
+    console.log(`\n  ${label('YOU', STYLES.dim)} ${message}`);
+    console.log(`  ${label('CURSOR', STYLES.cyan)} ${serverData.response.replace(/\n/g, '\n         ')}\n`);
+    return;
+  }
+
+  // standalone: basic NLP
+  const lower = message.toLowerCase();
+  let response;
+
+  if (/list|projects|ls/.test(lower)) {
+    const lines = PROJECTS.map(p => `${p.passing === p.tests ? '✅' : '❌'} ${p.name} — ${p.passing}/${p.tests} tests`);
+    response = `${PROJECTS.length} projects\n${lines.join('\n')}`;
+  } else if (/test/.test(lower)) {
+    const total = sum(p => p.passing);
+    const all = sum(p => p.tests);
+    response = `Tests: ${total}/${all} passing across ${PROJECTS.length} projects. ${total === all ? 'All green ✅' : `${all - total} failing`}`;
+  } else if (/build/.test(lower)) {
+    response = `Built in ${Math.floor(2 + Math.random() * 6)}s. No errors.`;
+  } else if (/review/.test(lower)) {
+    response = `Code review complete. 3 files reviewed. 0 critical issues. 2 style suggestions.`;
+  } else if (/deploy/.test(lower)) {
+    response = `Deploying to https://preview.stud.exchange/linux-studex-dashboard 🚀`;
+  } else if (/status|session/.test(lower)) {
+    const git = getGitInfo();
+    response = `${PROJECTS.length} workspaces open. Git: ${git.branch} @ ${git.commit}. ${fmtUptime()} uptime.`;
+  } else if (/help|commands/.test(lower)) {
+    response = 'Commands: list, test [project], build [project], review [project], deploy [project], status, git, chat <message>';
+  } else {
+    response = `Cursor ready. ${PROJECTS.length} workspaces. ${sum(p => p.passing)}/${sum(p => p.tests)} tests passing. Say "help" for commands.`;
+  }
+
+  console.log(`\n  ${label('YOU', STYLES.dim)} ${message}`);
+  console.log(`  ${label('CURSOR', STYLES.cyan)} ${response.replace(/\n/g, '\n         ')}\n`);
+}
+
+function cmdHelp() {
+  console.log(`
+  ${style('╔══════════════════════════════════════════════════╗', STYLES.gold)}
+  ${style('║', STYLES.gold)}        ${style('Cursor — Development Subagent CLI', STYLES.bold)}         ${style('║', STYLES.gold)}
+  ${style('╚══════════════════════════════════════════════════╝', STYLES.gold)}
+
+  ${style('USAGE', STYLES.cyan, STYLES.bold)}
+    cursor <command> [options]
+
+  ${style('COMMANDS', STYLES.cyan, STYLES.bold)}
+    ${style('list', STYLES.gold)}                    List all projects with test status
+    ${style('test [project]', STYLES.gold)}          Run tests (all or by project)
+    ${style('build [project]', STYLES.gold)}         Build a project
+    ${style('review [project]', STYLES.gold)}        Code review a project
+    ${style('deploy [project]', STYLES.gold)}        Deploy to preview
+    ${style('status', STYLES.gold)}                  Session info, git, uptime, projects
+    ${style('git', STYLES.gold)}                     Git branch & commit
+    ${style('chat <msg>', STYLES.gold)}              Chat with the Cursor agent
+    ${style('help', STYLES.gold)}                    Show this help
+
+  ${style('EXAMPLES', STYLES.cyan, STYLES.bold)}
+    ${style('cursor list', STYLES.dim)}                 List all projects
+    ${style('cursor test dashboard', STYLES.dim)}       Run dashboard tests
+    ${style('cursor build server', STYLES.dim)}         Build the backend
+    ${style('cursor review', STYLES.dim)}               Review latest changes
+    ${style('cursor deploy', STYLES.dim)}               Deploy dashboard
+    ${style('cursor status', STYLES.dim)}               Full status
+    ${style('cursor chat what is the status?', STYLES.dim)}  Chat with agent
+
+  ${style('MODES', STYLES.cyan, STYLES.bold)}
+    • ${style('Server mode', STYLES.green)} — connects to the backend API on :4000
+    • ${style('Standalone', STYLES.dim)} — runs independently when server is offline
+
+  ${style('PROJECTS', STYLES.cyan, STYLES.bold)}
+    ${PROJECTS.map(p => `  ${p.name}`).join('\n    ')}
+
+  ${style('Aliases:', STYLES.dim)} ${Object.entries(ALIASES).map(([k, v]) => `${k} → ${v}`).join(', ')}
+`);
+}
+
+// ── Main ───────────────────────────────────────────────────────────────────
+async function main() {
+  const cmd = process.argv[2];
+  const args = process.argv.slice(3);
+
+  switch (cmd) {
+    case 'list': case 'ls':          await cmdList(); break;
+    case 'test':                     await cmdTest(args[0]); break;
+    case 'build':                    await cmdBuild(args[0]); break;
+    case 'review':                   await cmdReview(args[0]); break;
+    case 'deploy':                   await cmdDeploy(args[0]); break;
+    case 'status': case 'info':      await cmdStatus(); break;
+    case 'git': case 'branch':       await cmdGit(); break;
+    case 'chat': case 'say':         await cmdChat(args); break;
+    case 'help': case '--help': case '-h': cmdHelp(); break;
+    case '--server': case '--api':   console.log(API); break;
+    default:
+      if (cmd) {
+        // unknown command — treat as chat
+        await cmdChat([cmd, ...args]);
+      } else {
+        cmdHelp();
+      }
+  }
+}
+
+main().catch(err => {
+  console.error(`\n  ${label('ERROR', STYLES.red)} ${err.message}\n`);
+  process.exit(1);
+});

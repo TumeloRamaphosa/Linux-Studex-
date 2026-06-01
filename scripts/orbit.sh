@@ -3,11 +3,13 @@
 # Orbit — Linux StudEx VM Deployer & Orchestrator
 # =============================================================================
 # Usage:
-#   ./orbit --status          Show all VM statuses
-#   ./orbit --deploy <vm>     Deploy a specific VM (cashclaw|hermes|openhuman|cursor|all)
-#   ./orbit --stop <vm>       Stop a VM
-#   ./orbit --ssh <vm>        SSH into a VM
-#   ./orbit --logs <vm>       Tail VM logs
+#   ./orbit --status            Show all VM statuses
+#   ./orbit --deploy <vm>       Deploy a VM (cashclaw|hermes|openhuman|cursor|all)
+#   ./orbit --stop <vm>         Stop a VM
+#   ./orbit --ssh <vm>          SSH into a VM
+#   ./orbit --logs <vm>         Tail VM logs
+#   ./orbit --cursor <cmd>      Cursor dev agent CLI (e.g. --cursor list)
+#   ./orbit --naledi            Naledi content agent setup
 # =============================================================================
 
 set -euo pipefail
@@ -107,6 +109,18 @@ case "${1:-}" in
   --ssh)
     ssh_vm "${2:-}"
     ;;
+  --cursor|-c)
+    shift
+    if [ $# -eq 0 ]; then
+      node "$SCRIPT_DIR/cursor" help
+    else
+      node "$SCRIPT_DIR/cursor" "$@"
+    fi
+    ;;
+  --naledi)
+    shift
+    bash "$SCRIPT_DIR/setup-naledi.sh" "$@"
+    ;;
   --logs|-l)
     local vm="${2:-}"
     if [ -n "$vm" ]; then
@@ -119,11 +133,13 @@ case "${1:-}" in
     echo "Orbit — Linux StudEx VM Orchestrator"
     echo ""
     echo "Commands:"
-    echo "  --status          Show all VM statuses"
-    echo "  --deploy <vm>     Deploy a VM (cashclaw|hermes|openhuman|cursor|all)"
-    echo "  --stop <vm>       Stop a VM"
-    echo "  --ssh <vm>        SSH into a VM"
-    echo "  --logs [vm]       Tail VM logs"
+    echo "  --status            Show all VM statuses"
+    echo "  --deploy <vm>       Deploy a VM (cashclaw|hermes|openhuman|cursor|all)"
+    echo "  --stop <vm>         Stop a VM"
+    echo "  --ssh <vm>          SSH into a VM"
+    echo "  --logs [vm]         Tail VM logs"
+    echo "  --cursor <cmd>      Cursor dev agent CLI (e.g. --cursor list)"
+    echo "  --naledi            Naledi content agent setup"
     ;;
   *)
     show_status
