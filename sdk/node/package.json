@@ -1,22 +1,17 @@
 {
-  "name": "studex-sdk",
-  "version": "0.1.0",
-  "description": "Node.js SDK for the StudEx Agent Operating System — sandbox, MCP, orchestration, and agent APIs",
-  "main": "index.js",
+  "name": "studex",
+  "version": "0.2.0",
+  "description": "Node.js SDK for the StudEx Agent Operating System — sandbox, MCP, orchestration, and agent APIs. Patterns from Anthropic SDK + Google ADK.",
+  "main": "studex.js",
   "bin": {
     "studex": "./cli.js"
   },
   "files": [
-    "index.js",
-    "client.js",
-    "sandbox.js",
-    "mcp.js",
-    "agent.js",
-    "orchestrator.js",
+    "studex.js",
     "cli.js",
     "README.md"
   ],
-  "keywords": ["studex", "agent", "sandbox", "mcp", "ai", "orchestration"],
+  "keywords": ["studex", "agent", "sandbox", "mcp", "ai", "orchestration", "vertex-ai", "anthropic"],
   "license": "MIT",
   "repository": {
     "type": "git",
