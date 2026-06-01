@@ -1,3 +1,8 @@
 auto-push.log
 server/node_modules/
 server/logs/*.md
+sdk/python/*.egg-info/
+sdk/python/**/__pycache__/
+sdk/node/node_modules/
+*.pyc
+__pycache__/

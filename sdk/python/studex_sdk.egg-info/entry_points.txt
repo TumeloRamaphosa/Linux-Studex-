@@ -1,2 +1,0 @@
-[console_scripts]
-studex = studex_sdk.cli:main

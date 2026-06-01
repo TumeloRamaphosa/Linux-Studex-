@@ -1,0 +1,28 @@
+{
+  "name": "studex-sdk",
+  "version": "0.1.0",
+  "description": "Node.js SDK for the StudEx Agent Operating System — sandbox, MCP, orchestration, and agent APIs",
+  "main": "index.js",
+  "bin": {
+    "studex": "./cli.js"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "sandbox.js",
+    "mcp.js",
+    "agent.js",
+    "orchestrator.js",
+    "cli.js",
+    "README.md"
+  ],
+  "keywords": ["studex", "agent", "sandbox", "mcp", "ai", "orchestration"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TumeloRamaphosa/Linux-StudEx-.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
