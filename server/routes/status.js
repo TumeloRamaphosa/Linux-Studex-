@@ -17,24 +17,44 @@ export default function statusRoutes(agents) {
     });
 
     const interval = setInterval(() => {
-      const payload = Object.values(agents).map(a => ({
-        name: a.name,
-        status: a.state.status,
-        uptime: Math.floor((Date.now() - a.state.startedAt) / 60000),
-        messages: a.state.messages,
-        rvs: a.rvs,
-      }));
+      const payload = Object.values(agents).map(a => {
+        const uptime = Math.floor((Date.now() - a.state.startedAt) / 60000);
+        return {
+          name: a.name,
+          status: a.state.status,
+          uptime,
+          messages: a.state.messages,
+          rvs: a.rvs,
+          tokenUsage: {
+            inputTokens: a.state.tokens?.inputTokens || 0,
+            outputTokens: a.state.tokens?.outputTokens || 0,
+            totalTokens: a.state.tokens?.totalTokens || 0,
+            estimatedCost: a.state.tokens?.estimatedCost || 0,
+            lastMessageTokens: a.state.tokens?.lastMessageTokens || 0,
+          },
+        };
+      });
       res.write(`data: ${JSON.stringify(payload)}\n\n`);
     }, 5000);
 
     // Send immediately on connect
-    const initial = Object.values(agents).map(a => ({
-      name: a.name,
-      status: a.state.status,
-      uptime: Math.floor((Date.now() - a.state.startedAt) / 60000),
-      messages: a.state.messages,
-      rvs: a.rvs,
-    }));
+    const initial = Object.values(agents).map(a => {
+      const uptime = Math.floor((Date.now() - a.state.startedAt) / 60000);
+      return {
+        name: a.name,
+        status: a.state.status,
+        uptime,
+        messages: a.state.messages,
+        rvs: a.rvs,
+        tokenUsage: {
+          inputTokens: a.state.tokens?.inputTokens || 0,
+          outputTokens: a.state.tokens?.outputTokens || 0,
+          totalTokens: a.state.tokens?.totalTokens || 0,
+          estimatedCost: a.state.tokens?.estimatedCost || 0,
+          lastMessageTokens: a.state.tokens?.lastMessageTokens || 0,
+        },
+      };
+    });
     res.write(`data: ${JSON.stringify(initial)}\n\n`);
 
     req.on('close', () => {

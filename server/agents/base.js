@@ -1,6 +1,16 @@
 import AgentLogger from '../lib/logger.js';
 
 /**
+ * Approximate token cost per 1K tokens (USD).
+ * These are rough estimates for local + API models.
+ */
+const TOKEN_COST_PER_1K_INPUT = 0.00015;    // $0.15 per 1M input tokens
+const TOKEN_COST_PER_1K_OUTPUT = 0.00060;   // $0.60 per 1M output tokens
+
+/** Estimation: 1 token ≈ 4 characters of English text */
+const CHARS_PER_TOKEN = 4;
+
+/**
  * Base Agent class.
  * Every agent has a name, role, VM spec, state, a logger, and
  * cross-agent communication via the AgentOrchestrator.
@@ -28,6 +38,15 @@ export default class BaseAgent {
         scenarios: 0,
         persona: personality,
       },
+      // ── Token & cost tracking ──────────────────────────────────────────
+      tokens: {
+        inputTokens: 0,
+        outputTokens: 0,
+        totalTokens: 0,
+        estimatedCost: 0,         // USD
+        lastMessageTokens: 0,
+        peakTokens: 0,
+      },
     };
 
     /** Cross-agent refs — set by AgentOrchestrator.register() */
@@ -43,6 +62,7 @@ export default class BaseAgent {
   }
 
   get status() {
+    const uptime = Math.floor((Date.now() - this.state.startedAt) / 60000);
     const base = {
       name: this.name,
       role: this.role,
@@ -53,7 +73,15 @@ export default class BaseAgent {
       port: this.port,
       color: this.color,
       ...this.state,
-      uptime: Math.floor((Date.now() - this.state.startedAt) / 60000),
+      uptime,
+      tokenUsage: {
+        inputTokens: this.state.tokens.inputTokens,
+        outputTokens: this.state.tokens.outputTokens,
+        totalTokens: this.state.tokens.totalTokens,
+        estimatedCost: this.state.tokens.estimatedCost,
+        lastMessageTokens: this.state.tokens.lastMessageTokens,
+        peakTokens: this.state.tokens.peakTokens,
+      },
     };
     // Include orchestrator info if connected
     if (this._orchestrator) {
@@ -74,6 +102,38 @@ export default class BaseAgent {
   }
 
   /**
+   * Estimate tokens from text.
+   * Rough: 1 token ≈ 4 chars for English text.
+   */
+  _estimateTokens(text) {
+    if (!text) return 0;
+    return Math.ceil(text.length / CHARS_PER_TOKEN);
+  }
+
+  /**
+   * Track token usage for a chat interaction.
+   * Estimates tokens from input message + system context + output response.
+   */
+  _trackTokens(inputText, outputText) {
+    const systemTokens = 50; // base system prompt overhead
+    const inputTokens = this._estimateTokens(inputText) + systemTokens;
+    const outputTokens = this._estimateTokens(outputText);
+    const totalTokens = inputTokens + outputTokens;
+    const inputCost = (inputTokens / 1000) * TOKEN_COST_PER_1K_INPUT;
+    const outputCost = (outputTokens / 1000) * TOKEN_COST_PER_1K_OUTPUT;
+    const totalCost = inputCost + outputCost;
+
+    this.state.tokens.inputTokens += inputTokens;
+    this.state.tokens.outputTokens += outputTokens;
+    this.state.tokens.totalTokens += totalTokens;
+    this.state.tokens.estimatedCost += totalCost;
+    this.state.tokens.lastMessageTokens = totalTokens;
+    if (totalTokens > this.state.tokens.peakTokens) {
+      this.state.tokens.peakTokens = totalTokens;
+    }
+  }
+
+  /**
    * Record a chat interaction.
    */
   async chat(userMessage) {
@@ -83,6 +143,7 @@ export default class BaseAgent {
     }
     this.state.messages++;
     const response = await this.handleMessage(userMessage);
+    this._trackTokens(userMessage, response);
     this.logger.chat(userMessage, response);
     this.logger.memorySync(
       Math.floor(Math.random() * 5) + 1,

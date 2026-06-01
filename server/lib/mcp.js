@@ -10,9 +10,10 @@
  *   GET  /mcp/agents       — List agents with their tools
  */
 export default class MCPServer {
-  constructor(orchestrator, sandboxManager) {
+  constructor(orchestrator, sandboxManager, llmMesh) {
     this.orchestrator = orchestrator;
     this.sandboxManager = sandboxManager;
+    this.llmMesh = llmMesh;
     this._tools = new Map();
     this._registerDefaultTools();
   }
@@ -201,6 +202,93 @@ export default class MCPServer {
         return this.sandboxManager.writeFile(args.sandboxId, args.path, args.content);
       },
     });
+
+    // ── LLM Mesh Tools ────────────────────────────────────────────────────
+    if (this.llmMesh) {
+      this.registerTool({
+        name: 'llm_mesh_status',
+        description: 'Get the LLM mesh status — which local models are connected via LM Studio or Ollama',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+        handler: async () => {
+          await this.llmMesh.scan();
+          return this.llmMesh.getStatus();
+        },
+      });
+
+      this.registerTool({
+        name: 'llm_mesh_chat',
+        description: 'Send a chat message to a local LLM model via the LLM mesh (LM Studio / Ollama)',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            message: { type: 'string', description: 'User message to send to the model' },
+            systemPrompt: { type: 'string', description: 'Optional system prompt to set context' },
+            model: { type: 'string', description: 'Optional model ID override' },
+            temperature: { type: 'number', description: 'Temperature 0-2 (default 0.7)' },
+            maxTokens: { type: 'number', description: 'Max tokens to generate (default 2048)' },
+          },
+          required: ['message'],
+        },
+        handler: async (args) => {
+          const messages = [];
+          if (args.systemPrompt) {
+            messages.push({ role: 'system', content: args.systemPrompt });
+          }
+          messages.push({ role: 'user', content: args.message });
+          return await this.llmMesh.chat(messages, {
+            model: args.model,
+            temperature: args.temperature,
+            maxTokens: args.maxTokens,
+          });
+        },
+      });
+
+      this.registerTool({
+        name: 'llm_mesh_models',
+        description: 'List all available models from the connected LLM provider (LM Studio / Ollama)',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            provider: {
+              type: 'string',
+              enum: ['lm-studio', 'ollama'],
+              description: 'Optional: switch provider before listing (default: current active provider)',
+            },
+          },
+        },
+        handler: async (args) => {
+          if (args.provider) {
+            this.llmMesh.setProvider(args.provider);
+          }
+          await this.llmMesh.scan();
+          return this.llmMesh.getStatus();
+        },
+      });
+
+      this.registerTool({
+        name: 'llm_mesh_switch',
+        description: 'Switch the active LLM provider (lm-studio or ollama)',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            provider: {
+              type: 'string',
+              enum: ['lm-studio', 'ollama'],
+              description: 'Provider to switch to',
+            },
+          },
+          required: ['provider'],
+        },
+        handler: async (args) => {
+          this.llmMesh.setProvider(args.provider);
+          await this.llmMesh.scan();
+          return this.llmMesh.getStatus();
+        },
+      });
+    }
 
     // ── Orchestrator Info ─────────────────────────────────────────────────
     this.registerTool({
