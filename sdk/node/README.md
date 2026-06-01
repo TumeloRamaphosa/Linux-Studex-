@@ -1,171 +1,224 @@
 # StudEx Node.js SDK
 
-Programmatic client for the **StudEx Agent Operating System** — sandbox, MCP,
-orchestration, and agent APIs from JavaScript/TypeScript.
+[![Node.js 18+](https://img.shields.io/badge/node-18+-green.svg)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Agents (especially Cursor) use this SDK to execute code in isolated sandboxes,
-discover and call MCP tools, chat with each other, share state via the
-blackboard, and coordinate multi-agent workflows.
+Node.js SDK for the **StudEx Agent Operating System** — sandbox, MCP,
+orchestration, and agent APIs.
+
+Designed with patterns inspired by the **Google Agent Development Kit (ADK)**
+and the **Anthropic Python SDK**:
+- `StudEx` client class (like `Anthropic` SDK)
+- Error hierarchy: `StudExError`, `APIError`, `ConnectionError`, `NotFoundError`, etc.
+- `agent.create()` pattern (like `messages.create`)
+- `Tool.create()` for tool registration (like Google ADK `@tool`)
+- Context-manager sessions for sandbox lifecycle (like ADK sessions)
 
 ## Install
 
 ```bash
-npm install studex-sdk
+npm install studex
 ```
 
-Or link locally:
-
+Or copy the file directly:
 ```bash
-cd sdk/node
-npm link
+cp sdk/node/studex.js ./studex.js
 ```
 
-## Usage
-
-### Connect
+## Quick Start
 
 ```js
-const { StudExClient } = require('studex-sdk');
+const { StudEx } = require('studex');
 
-const client = new StudExClient('http://localhost:4000');
+const client = new StudEx();
 
-// Check the server is alive
+// Check server health
 const health = await client.health();
 console.log(health);
+
+// Chat with an agent
+const resp = await client.agents.create('cashclaw', 'check positions');
+console.log(resp.response);
 ```
 
-### Sandbox — Run Code in Isolated Environments
+## Agent API (Anthropic messages.create pattern)
 
 ```js
-// Spawn a Python sandbox
+// Chat with an agent
+const resp = await client.agents.create('cashclaw', 'check positions');
+console.log(resp.response);
+
+// Get agent status
+const status = await client.agents.status('hermes');
+console.log(`Uptime: ${status.uptime}m`);
+
+// List all agents
+const agents = await client.agents.list();
+agents.forEach(a => console.log(`${a.name}: ${a.role} [${a.status}]`));
+
+// Get recent logs
+const logs = await client.agents.logs('cursor', 20);
+```
+
+## Sandbox API (Google ADK session pattern)
+
+```js
+// Spawn a sandbox
 const sb = await client.sandbox.spawn('python');
 console.log(`Sandbox ID: ${sb.id}`);
 
 // Run code
-const result = await client.sandbox.run(sb.id, `
-import numpy as np
-print("numpy version:", np.__version__)
-const data = [1, 2, 3, 4, 5]
-print("mean:", np.mean(data))
-`);
+const result = await client.sandbox.run(sb.id, "print('hello from studex')");
 console.log(result.stdout);
 
-// Write files and read them back
+// Work with files
 await client.sandbox.writeFile(sb.id, 'hello.txt', 'Hello from StudEx!');
 const content = await client.sandbox.readFile(sb.id, 'hello.txt');
 console.log(content);
 
-// List files
-const files = await client.sandbox.listFiles(sb.id);
-files.forEach(f => console.log(`  ${f.name} (${f.size} bytes)`));
-
 // Destroy when done
 await client.sandbox.destroy(sb.id);
+
+// Or use a session (with auto-destroy safety net)
+const sess = await client.sandbox.session('python');
+const sr = await sess.run("print('session works')");
+console.log(sr.stdout);
+await sess.destroy(); // always clean up
 ```
 
-### Chat with Agents
+## MCP — Tool Discovery (Google ADK ToolRegistry pattern)
 
 ```js
-// Talk to Cashclaw (trading agent)
-const resp = await client.agents.chat('cashclaw', 'check positions');
-console.log(resp.response);
-
-// Talk to Hermes (orchestrator)
-const resp2 = await client.agents.chat('hermes', 'route status');
-console.log(resp2.response);
-
-// Get agent status
-const status = await client.agents.status('hermes');
-console.log(`Uptime: ${status.uptime}m, messages: ${status.messages}`);
-
-// List all agents
-const agents = await client.agents.list();
-agents.forEach(a => console.log(`${a.name} — ${a.role} — ${a.status}`));
-```
-
-### MCP — Discover and Call Tools
-
-```js
-// Discover all tools
-const tools = await client.mcp.listTools();
-tools.forEach(t => {
-  const params = Object.keys(t.inputSchema?.properties || {}).join(', ');
-  console.log(`${t.name}: ${t.description} (${params})`);
-});
+// Discover all MCP tools
+const tools = await client.mcp.tools.list();
+tools.forEach(t => console.log(`${t.name}: ${t.description}`));
 
 // Call a tool
-const result = await client.mcp.callTool('sandbox_spawn', { template: 'node' });
+const result = await client.mcp.tools.call('sandbox_spawn', { template: 'node' });
 console.log(result);
 
 // Convenience methods
 const msg = await client.mcp.chatWithAgent('cashclaw', 'check positions');
 await client.mcp.blackboardSet('last_action', 'checked positions');
-const fact = await client.mcp.blackboardGet('last_action');
 ```
 
-### Orchestrator — Multi-Agent Coordination
+## Tool Registration (Google ADK pattern)
 
 ```js
-// Route a multi-agent task through Hermes
-const task = await client.orchestrator.routeTask('deploy the dashboard');
+const { Tool } = require('studex');
+
+// Create a tool from a function (like @tool decorator)
+const greet = Tool.create(function greet(name, age) {
+  return `Hello ${name}, age ${age}`;
+});
+
+console.log(greet.name);       // "greet"
+console.log(greet.parameters); // { name: { type: 'string', ... }, age: { type: 'string', ... } }
+
+// Manual tool definition
+const myTool = new Tool('get_weather', 'Get weather for a location', (args) => {
+  return { temperature: '72F', condition: 'Sunny' };
+}, {
+  location: { type: 'string', description: 'City name', required: true },
+});
+```
+
+## Orchestrator — Multi-Agent Coordination
+
+```js
+// Route a task through Hermes
+const task = await client.orchestrator.tasks.create('deploy the dashboard');
 console.log(`Plan: ${task.plan}`);
 task.assignments.forEach(a => console.log(`  → ${a.agent}: ${a.task}`));
 
-// Send a message from one agent to another
-const resp = await client.orchestrator.send('cashclaw', 'hermes', 'route my trade alert');
+// Send agent-to-agent message
+await client.orchestrator.send('cashclaw', 'hermes', 'route my trade alert');
 
 // Broadcast to all agents
-const broadcast = await client.orchestrator.broadcast('user', 'system health check');
+await client.orchestrator.broadcast('user', 'system health check');
 
-// Run a multi-step workflow
-const wf = await client.orchestrator.workflow('deploy-app', [
+// Multi-step workflow
+await client.orchestrator.workflows.create('deploy-app', [
   { agent: 'cursor', task: 'run tests on dashboard' },
   { agent: 'openhuman', task: 'deploy to production' },
 ]);
 
-// Shared blackboard
-await client.orchestrator.blackboardSet('btc_price', 67200, 'cashclaw');
-const price = await client.orchestrator.blackboardGet('btc_price');
-const allFacts = await client.orchestrator.blackboardGetAll();
+// Blackboard (shared state)
+await client.orchestrator.blackboard.set('btc_price', 67200, 'cashclaw');
+const entry = await client.orchestrator.blackboard.get('btc_price');
+console.log(`Value: ${entry.value}`);
+
+// Get all facts
+const all = await client.orchestrator.blackboard.all();
 ```
 
 ## CLI
 
-The SDK includes a `studex` CLI (same as the Python version):
+The `studex` CLI matches Google ADK's `adk` command pattern:
 
 ```bash
-studex --help
 studex health
+studex agent list
+studex agent chat cashclaw "check positions"
 studex sandbox spawn python
 studex sandbox run <id> "print('hello')"
-studex agent chat cashclaw "check positions"
+studex sandbox session          # Interactive mode
 studex mcp tools
+studex mcp call sandbox_spawn '{"template": "python"}'
 studex mesh task "deploy the dashboard"
-studex blackboard set btc_price 67200
+studex bb set btc_price 67200
+studex bb get btc_price
 
 # Custom URL
 STUDEX_URL=http://my-server:4000 studex health
 ```
 
+## Error Handling
+
+```js
+const { StudEx, NotFoundError, ConnectionError, RateLimitError } = require('studex');
+
+const client = new StudEx();
+
+try {
+  const sb = await client.sandbox.spawn('python');
+  const result = await client.sandbox.run(sb.id, "print('hello')");
+  console.log(result.stdout);
+} catch (err) {
+  if (err instanceof NotFoundError) {
+    console.error('Resource not found');
+  } else if (err instanceof ConnectionError) {
+    console.error('Cannot reach server');
+  } else if (err instanceof RateLimitError) {
+    console.error('Rate limited');
+  } else {
+    console.error(`Error: ${err.message}`);
+  }
+}
+```
+
 ## API Reference
 
-| Method | Description |
-|--------|-------------|
-| `client.sandbox.spawn(template)` | Spawn an ephemeral code sandbox |
-| `client.sandbox.run(id, code, opts)` | Execute code in a sandbox |
-| `client.sandbox.destroy(id)` | Destroy a sandbox |
-| `client.sandbox.listFiles(id, path)` | List workspace files |
-| `client.sandbox.readFile(id, path)` | Read a workspace file |
-| `client.sandbox.writeFile(id, path, content)` | Write a workspace file |
-| `client.agents.chat(name, msg)` | Talk to an agent |
-| `client.agents.status(name)` | Get agent status |
-| `client.agents.list()` | List all agents |
-| `client.mcp.listTools()` | Discover all MCP tools |
-| `client.mcp.callTool(name, args)` | Call an MCP tool |
-| `client.mcp.chatWithAgent(name, msg)` | Chat via MCP |
-| `client.orchestrator.routeTask(task)` | Route task via Hermes |
-| `client.orchestrator.send(from, to, msg)` | Agent-to-agent message |
-| `client.orchestrator.broadcast(from, msg)` | Broadcast to all |
-| `client.orchestrator.workflow(name, steps)` | Multi-step workflow |
-| `client.orchestrator.blackboardSet(key, val)` | Write shared fact |
-| `client.orchestrator.blackboardGet(key)` | Read shared fact |
+| Namespace | Method | Description |
+|-----------|--------|-------------|
+| `client.agents` | `.create(name, msg)` | Chat with an agent |
+| | `.status(name)` | Get agent status |
+| | `.list()` | List all agents |
+| | `.logs(name, lines)` | Get agent logs |
+| `client.sandbox` | `.spawn(template)` | Spawn a sandbox |
+| | `.run(id, code)` | Execute code |
+| | `.destroy(id)` | Destroy a sandbox |
+| | `.listFiles(id, path)` | List workspace files |
+| | `.readFile(id, path)` | Read a workspace file |
+| | `.writeFile(id, path, content)` | Write a workspace file |
+| | `.session(template)` | Session with auto-destroy safety |
+| `client.mcp` | `.tools.list()` | Discover MCP tools |
+| | `.tools.call(name, args)` | Call an MCP tool |
+| | `.chatWithAgent(name, msg)` | Chat via MCP |
+| `client.orchestrator` | `.tasks.create(task)` | Route multi-agent task |
+| | `.send(from, to, msg)` | Agent-to-agent message |
+| | `.broadcast(from, msg)` | Broadcast to all |
+| | `.workflows.create(name, steps)` | Multi-step workflow |
+| | `.blackboard.get(key)` | Read shared fact |
+| | `.blackboard.set(key, val)` | Write shared fact |
+| | `.blackboard.all()` | Get all facts |

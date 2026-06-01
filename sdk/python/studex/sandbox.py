@@ -14,6 +14,7 @@ Pattern matches Google ADK's tool-oriented design + Anthropic's context managers
 
 from __future__ import annotations
 
+import time
 from typing import Any, Dict, List, Optional
 
 from studex._client import StudExClient
@@ -61,7 +62,7 @@ class SandboxAPI:
             template=data.get("template", template),
             work_dir=data.get("workDir", ""),
             commands=data.get("commands", 0),
-            created_at=int(time.time() * 1000) if hasattr(__builtins__, 'time') else 0,
+            created_at=int(time.time() * 1000),
             remaining_ms=ttl_ms,
         )
 
@@ -229,9 +230,6 @@ class SandboxAPI:
 
     def __repr__(self) -> str:
         return "<SandboxAPI>"
-
-
-import time  # noqa: E402 (import after class definition for type clarity)
 
 
 class SandboxSession:
