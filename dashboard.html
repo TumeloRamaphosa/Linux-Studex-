@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux StudEx — Agent Operating System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8D48B;
+  --gold-dark: #A68B2E;
+  --obsidian: #0A0A0A;
+  --obsidian-2: #111111;
+  --obsidian-3: #1A1A1A;
+  --obsidian-4: #242424;
+  --obsidian-5: #2E2E2E;
+  --text-primary: #F0EDE8;
+  --text-secondary: #A09888;
+  --text-muted: #6B6560;
+  --accent: #C9A84C;
+  --success: #4CAF50;
+  --warning: #FF9800;
+  --error: #F44336;
+  --info: #2196F3;
+  --terminal-bg: #0D0D0D;
+  --pixel-size: 4px;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-heading: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--obsidian);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--obsidian-2); }
+::-webkit-scrollbar-thumb { background: var(--obsidian-5); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dark); }
+
+/* Layout */
+.container { max-width: 1440px; margin: 0 auto; padding: 0 32px; }
+
+/* Typography */
+h1 { font-family: var(--font-heading); font-size: 4rem; letter-spacing: 2px; color: var(--gold); margin-bottom: 8px; }
+h2 { font-family: var(--font-heading); font-size: 2.8rem; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 24px; }
+h3 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; }
+h4 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 500; color: var(--gold-light); margin-bottom: 12px; }
+p { margin-bottom: 16px; }
+
+/* Header */
+.header {
+  background: linear-gradient(180deg, var(--obsidian) 0%, var(--obsidian-2) 100%);
+  border-bottom: 2px solid var(--gold-dark);
+  padding: 24px 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.logo-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  clip-path: polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  color: var(--obsidian);
+}
+.logo-text h1 { margin-bottom: 0; line-height: 1; }
+.logo-text span { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); }
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.status-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  display: inline-block; margin-right: 6px;
+}
+.status-dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+.status-dot.offline { background: var(--error); }
+.status-dot.busy { background: var(--warning); }
+
+/* TMUX Terminal Bar */
+.tmux-bar {
+  background: var(--terminal-bg);
+  border: 1px solid var(--obsidian-5);
+  border-radius: 8px;
+  margin: 32px 0;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+.tmux-statusline {
+  background: #1A1A2E;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--obsidian-5);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tmux-windows { display: flex; gap: 4px; }
+.tmux-win {
+  padding: 2px 10px;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tmux-win.active {
+  background: var(--gold-dark);
+  color: var(--obsidian);
+}
+.tmux-win:hover:not(.active) { background: var(--obsidian-5); color: var(--text-primary); }
+.tmux-clock { color: var(--text-muted); font-size: 0.75rem; }
+.tmux-terminal {
+  background: var(--terminal-bg);
+  padding: 20px;
+  min-height: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.tmux-line { color: var(--text-secondary); margin-bottom: 2px; }
+.tmux-line .prompt { color: var(--success); }
+.tmux-line .cmd { color: var(--text-primary); }
+.tmux-line .output { color: var(--text-muted); }
+.tmux-line .highlight { color: var(--gold); }
+.tmux-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.tmux-input .prompt-char { color: var(--success); font-family: var(--font-mono); }
+.tmux-input input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  caret-color: var(--gold);
+}
+.tmux-input input::placeholder { color: var(--text-muted); }
+
+/* Agent Grid */
+.agent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin: 32px 0;
+}
+
+.agent-card {
+  background: linear-gradient(180deg, var(--obsidian-3) 0%, var(--obsidian-2) 100%);
+  border: 1px solid var(--obsidian-5);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.agent-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.agent-card:hover {
+  border-color: var(--gold-dark);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(201, 168, 76, 0.1);
+}
+.agent-card:hover::before { opacity: 1; }
+
+/* Pixel Agent Sprite */
+.pixel-agent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.pixel-art {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pixel-body {
+  width: 48px;
+  height: 64px;
+  position: relative;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.pixel-head {
+  width: 32px; height: 32px;
+  margin: 0 auto;
+  border-radius: 4px;
+  position: relative;
+}
+.pixel-eyes {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 10px;
+}
+.pixel-eye {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  animation: blink 4s infinite;
+}
+@keyframes blink {
+  0%, 96%, 100% { transform: scaleY(1); }
+  98% { transform: scaleY(0.1); }
+}
+.pixel-torso {
+  width: 48px; height: 24px;
+  margin: 0 auto;
+  border-radius: 2px;
+  position: relative;
+}
+.pixel-arms {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px;
+  position: absolute;
+  width: 100%;
+  top: 8px;
+}
+.pixel-arm {
+  width: 8px; height: 16px;
+  border-radius: 2px;
+  animation: wave 2s ease-in-out infinite;
+}
+.pixel-arm.right { animation-delay: 0.5s; }
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg); }
+  75% { transform: rotate(-10deg); }
+}
+.pixel-legs {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 2px;
+}
+.pixel-leg {
+  width: 12px; height: 12px;
+  border-radius: 2px;
+}
+.agent-name {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-top: 8px;
+}
+.agent-role {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.agent-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  justify-content: center;
+}
+.agent-stat {
+  text-align: center;
+}
+.agent-stat-value {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  color: var(--gold);
+  line-height: 1;
+}
+.agent-stat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Agent Chat */
+.agent-chat {
+  background: var(--obsidian-2);
+  border: 1px solid var(--obsidian-5);
+  border-radius: 8px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+.chat-messages {
+  padding: 12px;
+  min-height: 120px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+.chat-msg {
+  margin-bottom: 8px;
+  display: flex;
+  gap: 8px;
+}
+.chat-msg .sender {
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+.chat-msg .msg-text { color: var(--text-secondary); }
+.chat-msg.system .msg-text { color: var(--text-muted); font-style: italic; }
+.chat-input-bar {
+  display: flex;
+  border-top: 1px solid var(--obsidian-5);
+}
+.chat-input-bar input {
+  flex: 1;
+  background: var(--obsidian-3);
+  border: none;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  outline: none;
+}
+.chat-input-bar button {
+  background: var(--gold-dark);
+  border: none;
+  color: var(--obsidian);
+  padding: 10px 16px;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.chat-input-bar button:hover { background: var(--gold); }
+
+/* Agent Colors */
+.agent-cashclaw .pixel-head { background: #FF6B35; }
+.agent-cashclaw .pixel-eye { background: #fff; }
+.agent-cashclaw .pixel-torso { background: #E55A2B; }
+.agent-cashclaw .pixel-arm { background: #FF6B35; }
+.agent-cashclaw .pixel-leg { background: #CC4F22; }
+
+.agent-hermes .pixel-head { background: #7B61FF; }
+.agent-hermes .pixel-eye { background: #fff; }
+.agent-hermes .pixel-torso { background: #6A4FE0; }
+.agent-hermes .pixel-arm { background: #7B61FF; }
+.agent-hermes .pixel-leg { background: #5A3FCC; }
+
+.agent-openhuman .pixel-head { background: #00C9A7; }
+.agent-openhuman .pixel-eye { background: #fff; }
+.agent-openhuman .pixel-torso { background: #00B090; }
+.agent-openhuman .pixel-arm { background: #00C9A7; }
+.agent-openhuman .pixel-leg { background: #00997A; }
+
+.agent-cursor .pixel-head { background: #00A3FF; }
+.agent-cursor .pixel-eye { background: #fff; }
+.agent-cursor .pixel-torso { background: #008FE0; }
+.agent-cursor .pixel-arm { background: #00A3FF; }
+.agent-cursor .pixel-leg { background: #007ACC; }
+
+.agent-farm .pixel-head { background: #888888; }
+.agent-farm .pixel-eye { background: #fff; }
+.agent-farm .pixel-torso { background: #777777; }
+.agent-farm .pixel-arm { background: #888888; }
+.agent-farm .pixel-leg { background: #666666; }
+
+/* Section Styling */
+.section {
+  padding: 48px 0;
+  border-bottom: 1px solid var(--obsidian-5);
+}
+.section:last-child { border-bottom: none; }
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.section-header p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Tmux Cheatsheet Table */
+.cheatsheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  margin: 24px 0;
+}
+.cheatsheet-table th {
+  background: var(--gold-dark);
+  color: var(--obsidian);
+  padding: 12px 16px;
+  text-align: left;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+.cheatsheet-table th:first-child { border-radius: 8px 0 0 0; }
+.cheatsheet-table th:last-child { border-radius: 0 8px 0 0; }
+.cheatsheet-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--obsidian-5);
+  color: var(--text-secondary);
+}
+.cheatsheet-table tr:hover td { background: var(--obsidian-3); }
+.cheatsheet-table .key {
+  color: var(--gold);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.cheatsheet-table .desc { color: var(--text-primary); }
+.cheatsheet-table .cat {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.cat-session { background: #7B61FF33; color: #7B61FF; }
+.cat-window { background: #00C9A733; color: #00C9A7; }
+.cat-pane { background: #FF6B3533; color: #FF6B35; }
+.cat-misc { background: #88888833; color: #888; }
+
+/* Obsidian & Integrations */
+.integration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin: 32px 0;
+}
+.integration-card {
+  background: var(--obsidian-3);
+  border: 1px solid var(--obsidian-5);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.integration-card:hover {
+  border-color: var(--gold-dark);
+  transform: translateY(-2px);
+}
+.integration-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 16px;
+}
+.int-obsidian { background: #7B61FF33; color: #7B61FF; }
+.int-tencent { background: #0066FF33; color: #0066FF; }
+.int-feedhive { background: #FF6B3533; color: #FF6B35; }
+.int-openclaw { background: #00C9A733; color: #00C9A7; }
+.integration-card h4 { margin-bottom: 8px; }
+.integration-card p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0; }
+
+/* FeedHive Config */
+.config-block {
+  background: var(--obsidian-3);
+  border: 1px solid var(--obsidian-5);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 24px 0;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  overflow-x: auto;
+}
+.config-block .comment { color: var(--text-muted); }
+.config-block .code { color: var(--gold); }
+.config-block .string { color: var(--success); }
+.config-block pre {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}
+.copy-btn {
+  background: var(--gold-dark);
+  border: none;
+  color: var(--obsidian);
+  padding: 8px 16px;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  transition: background 0.2s;
+}
+.copy-btn:hover { background: var(--gold); }
+
+/* VM Spec Table */
+.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+}
+.spec-table th {
+  background: var(--gold-dark);
+  color: var(--obsidian);
+  padding: 12px 16px;
+  text-align: left;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+.spec-table th:first-child { border-radius: 8px 0 0 0; }
+.spec-table th:last-child { border-radius: 0 8px 0 0; }
+.spec-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--obsidian-5);
+  color: var(--text-secondary);
+}
+.spec-table tr:hover td { background: var(--obsidian-3); }
+.spec-table .vm-name { color: var(--gold); font-weight: 600; }
+
+/* Footer */
+.footer {
+  background: var(--obsidian-2);
+  border-top: 1px solid var(--obsidian-5);
+  padding: 48px 0;
+  text-align: center;
+}
+.footer p { color: var(--text-muted); font-size: 0.85rem; }
+.footer .gold { color: var(--gold); }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 2px solid var(--gold-dark);
+  background: transparent;
+  color: var(--gold);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  letter-spacing: 1.5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.btn:hover {
+  background: var(--gold-dark);
+  color: var(--obsidian);
+}
+.btn-primary {
+  background: var(--gold-dark);
+  color: var(--obsidian);
+}
+.btn-primary:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.btn-group { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin: 24px 0; }
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate { animation: fadeInUp 0.6s ease forwards; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  h1 { font-size: 2.4rem; }
+  h2 { font-size: 1.8rem; }
+  h3 { font-size: 1.4rem; }
+  .container { padding: 0 16px; }
+  .agent-grid { grid-template-columns: 1fr; }
+  .header-inner { flex-direction: column; text-align: center; }
+  .header-status { justify-content: center; }
+  .tmux-windows { flex-wrap: wrap; }
+  .cheatsheet-table { font-size: 0.75rem; }
+  .integration-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1.4rem; }
+  body { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="container header-inner">
+    <div class="logo">
+      <div class="logo-icon">LX</div>
+      <div class="logo-text">
+        <h1>Linux StudEx</h1>
+        <span>Agent Operating System v1.0</span>
+      </div>
+    </div>
+    <div class="header-status">
+      <span><span class="status-dot online"></span>14 VMs Online</span>
+      <span><span class="status-dot online"></span>tmux Active</span>
+      <span><span class="status-dot busy"></span>Naledi Posting</span>
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted)" id="clock">00:00 SAST</span>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- TMUX Master Terminal -->
+  <section class="section animate" style="padding-top:32px;">
+    <div class="section-header">
+      <h2>⨠ Master Terminal</h2>
+      <p>tmux session controlling all 14 agent VMs. Click a window to switch agent terminals.</p>
+    </div>
+    <div class="tmux-bar" id="master-terminal">
+      <div class="tmux-statusline">
+        <div class="tmux-windows">
+          <span class="tmux-win active" onclick="switchTmuxWindow(this, 'main')">0:bash*</span>
+          <span class="tmux-win" onclick="switchTmuxWindow(this, 'cashclaw')">1:cashclaw</span>
+          <span class="tmux-win" onclick="switchTmuxWindow(this, 'hermes')">2:hermes</span>
+          <span class="tmux-win" onclick="switchTmuxWindow(this, 'openhuman')">3:openhuman</span>
+          <span class="tmux-win" onclick="switchTmuxWindow(this, 'cursor')">4:cursor</span>
+          <span class="tmux-win" onclick="switchTmuxWindow(this, 'farm')">5:farm*</span>
+        </div>
+        <span class="tmux-clock" id="tmux-clock">"Linux-StudEx" 00:00 01-Jun-26</span>
+      </div>
+      <div class="tmux-terminal" id="tmux-output">
+        <div class="tmux-line"><span class="prompt">studex@agent-os:~$</span> <span class="cmd">tmux new -s linux-studex</span></div>
+        <div class="tmux-line"><span class="output">[14 panes] [4 agents] [10 farm] [uptime 0:42]</span></div>
+        <div class="tmux-line"><span class="prompt">studex@agent-os:~$</span> <span class="cmd">./orbit --status</span></div>
+        <div class="tmux-line"><span class="highlight">╔═══════════════════════════════════════════╗</span></div>
+        <div class="tmux-line"><span class="highlight">║  RVS1  cashclaw   ● Online  20GB   v1.3  ║</span></div>
+        <div class="tmux-line"><span class="highlight">║  RVS2  hermes     ● Online  20GB   v2.1  ║</span></div>
+        <div class="tmux-line"><span class="highlight">║  RVS3  openhuman  ● Online  20GB   v1.0  ║</span></div>
+        <div class="tmux-line"><span class="highlight">║  RVS4  cursor     ● Online  20GB   v0.9  ║</span></div>
+        <div class="tmux-line"><span class="highlight">║  RVS5-14 farm     ● Online  5GB×10 v1.0  ║</span></div>
+        <div class="tmux-line"><span class="highlight">╚═══════════════════════════════════════════╝</span></div>
+        <div class="tmux-line"><span class="prompt">studex@agent-os:~$</span> <span class="cmd" id="tmux-cursor">_</span></div>
+        <div class="tmux-input">
+          <span class="prompt-char">$</span>
+          <input type="text" id="tmux-input" placeholder="send command to all agents..." autocomplete="off" onkeydown="handleTmuxInput(event)">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VM Specs -->
+  <section class="section animate">
+    <div class="section-header">
+      <h2>Virtual Machines</h2>
+      <p>14 VMs across 4 agent nodes + 10 farm nodes. Total: 130GB disk, 28GB RAM.</p>
+    </div>
+    <table class="spec-table">
+      <thead>
+        <tr><th>RVS</th><th>Agent</th><th>Size</th><th>Status</th><th>CPU</th><th>RAM</th><th>Services</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="vm-name">RVS1</td><td>Cashclaw Agent</td><td>20GB</td>
+          <td><span class="status-dot online"></span> Online</td><td>2 vCPU</td><td>4GB</td><td>Ollama, n8n</td>
+        </tr>
+        <tr>
+          <td class="vm-name">RVS2</td><td>Hermes Agent</td><td>20GB</td>
+          <td><span class="status-dot online"></span> Online</td><td>2 vCPU</td><td>4GB</td><td>Hermes Gateway, MCP</td>
+        </tr>
+        <tr>
+          <td class="vm-name">RVS3</td><td>OpenHuman Platform</td><td>20GB</td>
+          <td><span class="status-dot online"></span> Online</td><td>2 vCPU</td><td>4GB</td><td>OpenHuman, LiteLLM</td>
+        </tr>
+        <tr>
+          <td class="vm-name">RVS4</td><td>Cursor IDE</td><td>20GB</td>
+          <td><span class="status-dot busy"></span> Busy</td><td>2 vCPU</td><td>4GB</td><td>Cursor, Codex CLI</td>
+        </tr>
+        <tr>
+          <td class="vm-name">RVS5-14</td><td>Agent Farm (×10)</td><td>5GB each</td>
+          <td><span class="status-dot online"></span> Online</td><td>1 vCPU</td><td>1GB</td><td>Ollama, n8n workers</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Pixel Agents -->
+  <section class="section animate">
+    <div class="section-header">
+      <h2>Agent Fleet</h2>
+      <p>Click any agent to chat with it directly. Each agent has its own terminal and personality.</p>
+    </div>
+    <div class="agent-grid">
+
+      <!-- Cashclaw -->
+      <div class="agent-card agent-cashclaw">
+        <div class="pixel-agent">
+          <div class="pixel-art">
+            <div class="pixel-body">
+              <div class="pixel-head">
+                <div class="pixel-eyes"><div class="pixel-eye"></div><div class="pixel-eye"></div></div>
+              </div>
+              <div class="pixel-torso">
+                <div class="pixel-arms"><div class="pixel-arm"></div><div class="pixel-arm right"></div></div>
+              </div>
+              <div class="pixel-legs"><div class="pixel-leg"></div><div class="pixel-leg"></div></div>
+            </div>
+          </div>
+          <div class="agent-name">Cashclaw</div>
+          <div class="agent-role">FINANCIAL AGENT / TRADING</div>
+        </div>
+        <div class="agent-stats">
+          <div class="agent-stat"><div class="agent-stat-value">97%</div><div class="agent-stat-label">Uptime</div></div>
+          <div class="agent-stat"><div class="agent-stat-value">1.3k</div><div class="agent-stat-label">Trades</div></div>
+          <div class="agent-stat"><div class="agent-stat-value">4GB</div><div class="agent-stat-label">RAM</div></div>
+        </div>
+        <div class="agent-chat">
+          <div class="chat-messages">
+            <div class="chat-msg"><span class="sender">cashclaw&gt;</span><span class="msg-text">Watching BTC/USD — channel holds.</span></div>
+            <div class="chat-msg"><span class="sender">you&gt;</span><span class="msg-text">check positions</span></div>
+            <div class="chat-msg"><span class="sender">cashclaw&gt;</span><span class="msg-text">3 open. +2.4% today. Stop losses set.</span></div>
+            <div class="chat-msg system"><span class="sender">system&gt;</span><span class="msg-text">Logged to Obsidian · Memory synced</span></div>
+          </div>
+          <div class="chat-input-bar">
+            <input type="text" placeholder="Message Cashclaw..." onkeydown="handleAgentChat(this, 'cashclaw', event)">
+            <button onclick="handleAgentChatBtn(this, 'cashclaw')">SEND</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hermes -->
+      <div class="agent-card agent-hermes">
+        <div class="pixel-agent">
+          <div class="pixel-art">
+            <div class="pixel-body">
+              <div class="pixel-head">
+                <div class="pixel-eyes"><div class="pixel-eye"></div><div class="pixel-eye"></div></div>
+              </div>
+              <div class="pixel-torso">
+                <div class="pixel-arms"><div class="pixel-arm"></div><div class="pixel-arm right"></div></div>
+              </div>
+              <div class="pixel-legs"><div class="pixel-leg"></div><div class="pixel-leg"></div></div>
+            </div>
+          </div>
+          <div class="agent-name">Hermes</div>
+          <div class="agent-role">ORCHESTRATOR / GATEWAY</div>
+        </div>
+        <div class="agent-stats">
+          <div class="agent-stat"><div class="agent-stat-value">8420</div><div class="agent-stat-label">Gateway</div></div>
+          <div class="agent-stat"><div class="agent-stat-value">12</div><div class="agent-stat-label">Routes</div></div>
+          <div class="agent-stat"><div class="agent-stat-value">99%</div><div class="agent-stat-label">Uptime</div></div>
+        </div>
+        <div class="agent-chat">
+          <div class="chat-messages">
+            <div class="chat-msg"><span class="sender">hermes&gt;</span><span class="msg-text">All gateways healthy. 12 active routes.</span></div>
+            <div class="chat-msg"><span class="sender">you&gt;</span><span class="msg-text">route cashclaw through premium</span></div>
+            <div class="chat-msg"><span class="sender">hermes&gt;</span><span class="msg-text">Cashclaw → premium tier. Done.</span></div>
+          </div>
+          <div class="chat-input-bar">
+            <input type="text" placeholder="Message Hermes..." onkeydown="handleAgentChat(this, 'hermes', event)">
+            <button onclick="handleAgentChatBtn(this, 'hermes')">SEND</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OpenHuman -->
+      <div class="agent-card agent-openhuman">
+        <div class="pixel-agent">
+          <div class="pixel-art">
+            <div class="pixel-body">
+              <div class="pixel-head">
+                <div class="pixel-eyes"><div class="pixel-eye"></div><div class="pixel-eye"></div></div>
+              </div>
+              <div class="pixel-torso">
+                <div class="pixel-arms"><div class="pixel-arm"></div><div class="pixel-arm right"></div></div>
+              </div>
+              <div class="pixel-legs"><div class="pixel-leg"></div><div class="pixel-leg"></div></div>
+            </div>
+          </div>
+          <div class="agent-name">OpenHuman</div>
+          <div class="agent-role">PLATFORM / DEPLOYMENT</div>
+        </div>
+        <div class="agent-stats">
+          <div class="agent-stat"><div class="agent-stat-value">8</div><div class="agent-stat-label">Containers</div></div>
+          <div class="agent-stat"><div class="agent-stat-value">3</div><div class="agent-stat-label">Networks</div></div>
+          <div class="agent-stat"><div class="agent-stat-value">2GB</div><div class="agent-stat-label">Cache</div></div>
+        </div>
+        <div class="agent-chat">
+          <div class="chat-messages">
+            <div class="chat-msg"><span class="sender">openhuman&gt;</span><span class="msg-text">Platform stable. 8 containers running.</span></div>
+            <div class="chat-msg"><span class="sender">you&gt;</span><span class="msg-text">deploy farm node 6</span></div>
+            <div class="chat-msg"><span class="sender">openhuman&gt;</span><span class="msg-text">Deploying RVS6... 47s ETA. Done.</span></div>
+          </div>
+          <div class="chat-input-bar">
+            <input type="text" placeholder="Message OpenHuman..." onkeydown="handleAgentChat(this, 'openhuman', event)">
+            <button onclick="handleAgentChatBtn(this, 'openhuman')">SEND</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cursor -->
+      <div class="agent-card agent-cursor">
+        <div class="pixel-agent">
+          <div class="pixel-art">
+            <div class="pixel-body">
+              <div class="pixel-head">
+                <div class="pixel-eyes"><div class="pixel-eye"></div><div class="pixel-eye"></div></div>
+              </div>
+              <div class="pixel-torso">
+                <div class="pixel-arms"><div class="pixel-arm"></div><div class="pixel-arm right"></div></div>
+              </div>
+              <div class="pixel-legs"><div class="pixel-leg"></div><div class="pixel-leg"></div></div>
+            </div>
+          </div>
+          <div class="agent-name">Cursor</div>
+          <div class="agent-role">IDE / DEVELOPMENT</div>
+        </div>
+        <div class="agent-stats">
+          <div class="agent-stat"><div class="agent-stat-value">3</div><div class="agent-stat-label">Projects</div></div>
+          <div class="agent-stat"><div class="agent-stat-value">2</div><div class="agent-stat-label">Sessions</div></div>
+          <div class="agent-stat"><div class="agent-stat-value">v0.9</div><div class="agent-stat-label">Version</div></div>
+        </div>
+        <div class="agent-chat">
+          <div class="chat-messages">
+            <div class="chat-msg"><span class="sender">cursor&gt;</span><span class="msg-text">3 workspaces open. Ready for code.</span></div>
+            <div class="chat-msg"><span class="sender">you&gt;</span><span class="msg-text">run tests on dashboard</span></div>
+            <div class="chat-msg"><span class="sender">cursor&gt;</span><span class="msg-text">Running `npm test`... 12/12 passing.</span></div>
+          </div>
+          <div class="chat-input-bar">
+            <input type="text" placeholder="Message Cursor..." onkeydown="handleAgentChat(this, 'cursor', event)">
+            <button onclick="handleAgentChatBtn(this, 'cursor')">SEND</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Agent Farm Collapsed -->
+  <section class="section animate">
+    <div class="section-header">
+      <h2>Agent Farm (RVS5 → RVS14)</h2>
+      <p>10 lightweight agent nodes. 5GB each, 1 vCPU, 1GB RAM. Each runs Ollama + n8n workers.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;">
+      <div class="agent-card agent-farm" style="padding:16px;text-align:center;">
+        <div class="pixel-agent" style="margin-bottom:8px;">
+          <div class="pixel-art" style="width:64px;height:64px;">
+            <div class="pixel-body" style="width:32px;height:44px;">
+              <div class="pixel-head" style="width:24px;height:24px;">
+                <div class="pixel-eyes" style="gap:4px;padding-top:8px;"><div class="pixel-eye" style="width:4px;height:4px;"></div><div class="pixel-eye" style="width:4px;height:4px;"></div></div>
+              </div>
+              <div class="pixel-torso" style="width:32px;height:16px;">
+                <div class="pixel-arms" style="top:4px;"><div class="pixel-arm" style="width:6px;height:10px;"></div><div class="pixel-arm right" style="width:6px;height:10px;"></div></div>
+              </div>
+              <div class="pixel-legs" style="gap:2px;"><div class="pixel-leg" style="width:8px;height:8px;"></div><div class="pixel-leg" style="width:8px;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="agent-name" style="font-size:0.9rem;">RVS5</div>
+          <div class="agent-role" style="font-size:0.65rem;">Worker α</div>
+        </div>
+        <span class="status-dot online"></span> Online
+      </div>
+      <div class="agent-card agent-farm" style="padding:16px;text-align:center;">
+        <div class="pixel-agent" style="margin-bottom:8px;">
+          <div class="pixel-art" style="width:64px;height:64px;">
+            <div class="pixel-body" style="width:32px;height:44px;">
+              <div class="pixel-head" style="width:24px;height:24px;">
+                <div class="pixel-eyes" style="gap:4px;padding-top:8px;"><div class="pixel-eye" style="width:4px;height:4px;"></div><div class="pixel-eye" style="width:4px;height:4px;"></div></div>
+              </div>
+              <div class="pixel-torso" style="width:32px;height:16px;">
+                <div class="pixel-arms" style="top:4px;"><div class="pixel-arm" style="width:6px;height:10px;"></div><div class="pixel-arm right" style="width:6px;height:10px;"></div></div>
+              </div>
+              <div class="pixel-legs" style="gap:2px;"><div class="pixel-leg" style="width:8px;height:8px;"></div><div class="pixel-leg" style="width:8px;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="agent-name" style="font-size:0.9rem;">RVS6</div>
+          <div class="agent-role" style="font-size:0.65rem;">Worker β</div>
+        </div>
+        <span class="status-dot online"></span> Online
+      </div>
+      <div class="agent-card agent-farm" style="padding:16px;text-align:center;">
+        <div class="pixel-agent" style="margin-bottom:8px;">
+          <div class="pixel-art" style="width:64px;height:64px;">
+            <div class="pixel-body" style="width:32px;height:44px;">
+              <div class="pixel-head" style="width:24px;height:24px;">
+                <div class="pixel-eyes" style="gap:4px;padding-top:8px;"><div class="pixel-eye" style="width:4px;height:4px;"></div><div class="pixel-eye" style="width:4px;height:4px;"></div></div>
+              </div>
+              <div class="pixel-torso" style="width:32px;height:16px;">
+                <div class="pixel-arms" style="top:4px;"><div class="pixel-arm" style="width:6px;height:10px;"></div><div class="pixel-arm right" style="width:6px;height:10px;"></div></div>
+              </div>
+              <div class="pixel-legs" style="gap:2px;"><div class="pixel-leg" style="width:8px;height:8px;"></div><div class="pixel-leg" style="width:8px;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="agent-name" style="font-size:0.9rem;">RVS7</div>
+          <div class="agent-role" style="font-size:0.65rem;">Worker γ</div>
+        </div>
+        <span class="status-dot online"></span> Online
+      </div>
+      <div class="agent-card agent-farm" style="padding:16px;text-align:center;">
+        <div class="pixel-agent" style="margin-bottom:8px;">
+          <div class="pixel-art" style="width:64px;height:64px;">
+            <div class="pixel-body" style="width:32px;height:44px;">
+              <div class="pixel-head" style="width:24px;height:24px;">
+                <div class="pixel-eyes" style="gap:4px;padding-top:8px;"><div class="pixel-eye" style="width:4px;height:4px;"></div><div class="pixel-eye" style="width:4px;height:4px;"></div></div>
+              </div>
+              <div class="pixel-torso" style="width:32px;height:16px;">
+                <div class="pixel-arms" style="top:4px;"><div class="pixel-arm" style="width:6px;height:10px;"></div><div class="pixel-arm right" style="width:6px;height:10px;"></div></div>
+              </div>
+              <div class="pixel-legs" style="gap:2px;"><div class="pixel-leg" style="width:8px;height:8px;"></div><div class="pixel-leg" style="width:8px;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="agent-name" style="font-size:0.9rem;">RVS8</div>
+          <div class="agent-role" style="font-size:0.65rem;">Worker δ</div>
+        </div>
+        <span class="status-dot online"></span> Online
+      </div>
+      <div class="agent-card agent-farm" style="padding:16px;text-align:center;">
+        <div class="pixel-agent" style="margin-bottom:8px;">
+          <div class="pixel-art" style="width:64px;height:64px;">
+            <div class="pixel-body" style="width:32px;height:44px;">
+              <div class="pixel-head" style="width:24px;height:24px;">
+                <div class="pixel-eyes" style="gap:4px;padding-top:8px;"><div class="pixel-eye" style="width:4px;height:4px;"></div><div class="pixel-eye" style="width:4px;height:4px;"></div></div>
+              </div>
+              <div class="pixel-torso" style="width:32px;height:16px;">
+                <div class="pixel-arms" style="top:4px;"><div class="pixel-arm" style="width:6px;height:10px;"></div><div class="pixel-arm right" style="width:6px;height:10px;"></div></div>
+              </div>
+              <div class="pixel-legs" style="gap:2px;"><div class="pixel-leg" style="width:8px;height:8px;"></div><div class="pixel-leg" style="width:8px;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="agent-name" style="font-size:0.9rem;">RVS9</div>
+          <div class="agent-role" style="font-size:0.65rem;">Worker ε</div>
+        </div>
+        <span class="status-dot online"></span> Online
+      </div>
+      <div class="agent-card agent-farm" style="padding:16px;text-align:center;">
+        <div class="pixel-agent" style="margin-bottom:8px;">
+          <div class="pixel-art" style="width:64px;height:64px;">
+            <div class="pixel-body" style="width:32px;height:44px;">
+              <div class="pixel-head" style="width:24px;height:24px;">
+                <div class="pixel-eyes" style="gap:4px;padding-top:8px;"><div class="pixel-eye" style="width:4px;height:4px;"></div><div class="pixel-eye" style="width:4px;height:4px;"></div></div>
+              </div>
+              <div class="pixel-torso" style="width:32px;height:16px;">
+                <div class="pixel-arms" style="top:4px;"><div class="pixel-arm" style="width:6px;height:10px;"></div><div class="pixel-arm right" style="width:6px;height:10px;"></div></div>
+              </div>
+              <div class="pixel-legs" style="gap:2px;"><div class="pixel-leg" style="width:8px;height:8px;"></div><div class="pixel-leg" style="width:8px;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="agent-name" style="font-size:0.9rem;">RVS10</div>
+          <div class="agent-role" style="font-size:0.65rem;">Worker ζ</div>
+        </div>
+        <span class="status-dot online"></span> Online
+      </div>
+      <div class="agent-card agent-farm" style="padding:16px;text-align:center;">
+        <div class="pixel-agent" style="margin-bottom:8px;">
+          <div class="pixel-art" style="width:64px;height:64px;">
+            <div class="pixel-body" style="width:32px;height:44px;">
+              <div class="pixel-head" style="width:24px;height:24px;">
+                <div class="pixel-eyes" style="gap:4px;padding-top:8px;"><div class="pixel-eye" style="width:4px;height:4px;"></div><div class="pixel-eye" style="width:4px;height:4px;"></div></div>
+              </div>
+              <div class="pixel-torso" style="width:32px;height:16px;">
+                <div class="pixel-arms" style="top:4px;"><div class="pixel-arm" style="width:6px;height:10px;"></div><div class="pixel-arm right" style="width:6px;height:10px;"></div></div>
+              </div>
+              <div class="pixel-legs" style="gap:2px;"><div class="pixel-leg" style="width:8px;height:8px;"></div><div class="pixel-leg" style="width:8px;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="agent-name" style="font-size:0.9rem;">RVS11</div>
+          <div class="agent-role" style="font-size:0.65rem;">Worker η</div>
+        </div>
+        <span class="status-dot online"></span> Online
+      </div>
+      <div class="agent-card agent-farm" style="padding:16px;text-align:center;">
+        <div class="pixel-agent" style="margin-bottom:8px;">
+          <div class="pixel-art" style="width:64px;height:64px;">
+            <div class="pixel-body" style="width:32px;height:44px;">
+              <div class="pixel-head" style="width:24px;height:24px;">
+                <div class="pixel-eyes" style="gap:4px;padding-top:8px;"><div class="pixel-eye" style="width:4px;height:4px;"></div><div class="pixel-eye" style="width:4px;height:4px;"></div></div>
+              </div>
+              <div class="pixel-torso" style="width:32px;height:16px;">
+                <div class="pixel-arms" style="top:4px;"><div class="pixel-arm" style="width:6px;height:10px;"></div><div class="pixel-arm right" style="width:6px;height:10px;"></div></div>
+              </div>
+              <div class="pixel-legs" style="gap:2px;"><div class="pixel-leg" style="width:8px;height:8px;"></div><div class="pixel-leg" style="width:8px;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="agent-name" style="font-size:0.9rem;">RVS12</div>
+          <div class="agent-role" style="font-size:0.65rem;">Worker θ</div>
+        </div>
+        <span class="status-dot online"></span> Online
+      </div>
+      <div class="agent-card agent-farm" style="padding:16px;text-align:center;">
+        <div class="pixel-agent" style="margin-bottom:8px;">
+          <div class="pixel-art" style="width:64px;height:64px;">
+            <div class="pixel-body" style="width:32px;height:44px;">
+              <div class="pixel-head" style="width:24px;height:24px;">
+                <div class="pixel-eyes" style="gap:4px;padding-top:8px;"><div class="pixel-eye" style="width:4px;height:4px;"></div><div class="pixel-eye" style="width:4px;height:4px;"></div></div>
+              </div>
+              <div class="pixel-torso" style="width:32px;height:16px;">
+                <div class="pixel-arms" style="top:4px;"><div class="pixel-arm" style="width:6px;height:10px;"></div><div class="pixel-arm right" style="width:6px;height:10px;"></div></div>
+              </div>
+              <div class="pixel-legs" style="gap:2px;"><div class="pixel-leg" style="width:8px;height:8px;"></div><div class="pixel-leg" style="width:8px;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="agent-name" style="font-size:0.9rem;">RVS13</div>
+          <div class="agent-role" style="font-size:0.65rem;">Worker ι</div>
+        </div>
+        <span class="status-dot online"></span> Online
+      </div>
+      <div class="agent-card agent-farm" style="padding:16px;text-align:center;">
+        <div class="pixel-agent" style="margin-bottom:8px;">
+          <div class="pixel-art" style="width:64px;height:64px;">
+            <div class="pixel-body" style="width:32px;height:44px;">
+              <div class="pixel-head" style="width:24px;height:24px;">
+                <div class="pixel-eyes" style="gap:4px;padding-top:8px;"><div class="pixel-eye" style="width:4px;height:4px;"></div><div class="pixel-eye" style="width:4px;height:4px;"></div></div>
+              </div>
+              <div class="pixel-torso" style="width:32px;height:16px;">
+                <div class="pixel-arms" style="top:4px;"><div class="pixel-arm" style="width:6px;height:10px;"></div><div class="pixel-arm right" style="width:6px;height:10px;"></div></div>
+              </div>
+              <div class="pixel-legs" style="gap:2px;"><div class="pixel-leg" style="width:8px;height:8px;"></div><div class="pixel-leg" style="width:8px;height:8px;"></div></div>
+            </div>
+          </div>
+          <div class="agent-name" style="font-size:0.9rem;">RVS14</div>
+          <div class="agent-role" style="font-size:0.65rem;">Worker κ</div>
+        </div>
+        <span class="status-dot online"></span> Online
+      </div>
+    </div>
+  </section>
+
+  <!-- Tmux Cheatsheet -->
+  <section class="section animate">
+    <div class="section-header">
+      <h2>tmux Cheatsheet</h2>
+      <p>Master tmux with these essential commands. Prefix: <code style="color:var(--gold);background:var(--obsidian-4);padding:2px 8px;border-radius:4px;">Ctrl+B</code></p>
+    </div>
+    <table class="cheatsheet-table">
+      <thead><tr><th>Command</th><th>Action</th><th>Category</th></tr></thead>
+      <tbody>
+        <tr><td><span class="key">Ctrl+B c</span></td><td class="desc">Create a new window</td><td><span class="cat cat-window">Window</span></td></tr>
+        <tr><td><span class="key">Ctrl+B ,</span></td><td class="desc">Rename current window</td><td><span class="cat cat-window">Window</span></td></tr>
+        <tr><td><span class="key">Ctrl+B &</span></td><td class="desc">Close current window</td><td><span class="cat cat-window">Window</span></td></tr>
+        <tr><td><span class="key">Ctrl+B w</span></td><td class="desc">List windows / session preview</td><td><span class="cat cat-window">Window</span></td></tr>
+        <tr><td><span class="key">Ctrl+B n / p</span></td><td class="desc">Next / Previous window</td><td><span class="cat cat-window">Window</span></td></tr>
+        <tr><td><span class="key">Ctrl+B 0-9</span></td><td class="desc">Switch to window by number</td><td><span class="cat cat-window">Window</span></td></tr>
+        <tr><td><span class="key">Ctrl+B %</span></td><td class="desc">Split pane vertically</td><td><span class="cat cat-pane">Pane</span></td></tr>
+        <tr><td><span class="key">Ctrl+B "</span></td><td class="desc">Split pane horizontally</td><td><span class="cat cat-pane">Pane</span></td></tr>
+        <tr><td><span class="key">Ctrl+B ←↑↓→</span></td><td class="desc">Navigate to pane in direction</td><td><span class="cat cat-pane">Pane</span></td></tr>
+        <tr><td><span class="key">Ctrl+B o</span></td><td class="desc">Switch to next pane</td><td><span class="cat cat-pane">Pane</span></td></tr>
+        <tr><td><span class="key">Ctrl+B q</span></td><td class="desc">Show pane numbers</td><td><span class="cat cat-pane">Pane</span></td></tr>
+        <tr><td><span class="key">Ctrl+B z</span></td><td class="desc">Toggle pane zoom (fullscreen)</td><td><span class="cat cat-pane">Pane</span></td></tr>
+        <tr><td><span class="key">Ctrl+B Space</span></td><td class="desc">Cycle through pane layouts</td><td><span class="cat cat-pane">Pane</span></td></tr>
+        <tr><td><span class="key">Ctrl+B !</span></td><td class="desc">Break pane into new window</td><td><span class="cat cat-pane">Pane</span></td></tr>
+        <tr><td><span class="key">Ctrl+B x</span></td><td class="desc">Close current pane</td><td><span class="cat cat-pane">Pane</span></td></tr>
+        <tr><td><span class="key">Ctrl+B { / }</span></td><td class="desc">Swap pane left / right</td><td><span class="cat cat-pane">Pane</span></td></tr>
+        <tr><td><span class="key">Ctrl+B d</span></td><td class="desc">Detach from session</td><td><span class="cat cat-session">Session</span></td></tr>
+        <tr><td><span class="key">Ctrl+B s</span></td><td class="desc">Show all sessions</td><td><span class="cat cat-session">Session</span></td></tr>
+        <tr><td><span class="key">Ctrl+B $</span></td><td class="desc">Rename session</td><td><span class="cat cat-session">Session</span></td></tr>
+        <tr><td><span class="key">Ctrl+B ( / )</span></td><td class="desc">Previous / Next session</td><td><span class="cat cat-session">Session</span></td></tr>
+        <tr><td><span class="key">Ctrl+B [</span></td><td class="desc">Enter copy mode (scrollback)</td><td><span class="cat cat-misc">Misc</span></td></tr>
+        <tr><td><span class="key">Ctrl+B ]</span></td><td class="desc">Paste buffer contents</td><td><span class="cat cat-misc">Misc</span></td></tr>
+        <tr><td><span class="key">Ctrl+B ?</span></td><td class="desc">List all key bindings</td><td><span class="cat cat-misc">Misc</span></td></tr>
+        <tr><td><span class="key">Ctrl+B :</span></td><td class="desc">Enter command mode</td><td><span class="cat cat-misc">Misc</span></td></tr>
+        <tr><td><span class="key">Ctrl+B Ctrl+B</span></td><td class="desc">Send Ctrl+B to application</td><td><span class="cat cat-misc">Misc</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Integrations -->
+  <section class="section animate">
+    <div class="section-header">
+      <h2>Integrations</h2>
+      <p>Every agent action is recorded. Memory persists across sessions.</p>
+    </div>
+    <div class="integration-grid">
+      <div class="integration-card" onclick="scrollToSection('obsidian-setup')">
+        <div class="integration-icon int-obsidian">◆</div>
+        <h4>Obsidian Vault</h4>
+        <p>All agent activities, decisions, and logs are recorded to your Obsidian vault. Full audit trail.</p>
+      </div>
+      <div class="integration-card" onclick="scrollToSection('tencentdb-setup')">
+        <div class="integration-icon int-tencent">◈</div>
+        <h4>TencentDB Memory</h4>
+        <p>Agent Memory with symbolic short-term + layered long-term memory. Cuts tokens 61%, boosts pass rate 51%.</p>
+      </div>
+      <div class="integration-card" onclick="scrollToSection('feedhive-setup')">
+        <div class="integration-icon int-feedhive">♢</div>
+        <h4>FeedHive · Naledi</h4>
+        <p>Naledi content agent posts daily across 6 platforms. Studex brand voice, gold aesthetic.</p>
+      </div>
+      <div class="integration-card" onclick="scrollToSection('openclaw-setup')">
+        <div class="integration-icon int-openclaw">⬡</div>
+        <h4>OpenClaw Gateway</h4>
+        <p>API gateway routing all agent requests. Plugin system for memory, tools, and MCP servers.</p>
+      </div>
+    </div>
+
+    <!-- Obsidian Setup -->
+    <div id="obsidian-setup" class="config-block" style="margin-top:32px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h4 style="margin:0;">◆ Obsidian Agent Logging</h4>
+        <button class="copy-btn" onclick="copyConfig(this)">COPY</button>
+      </div>
+      <pre># Install Obsidian Skills in your vault
+# From obsidian-skills repo (kepano/obsidian-skills):
+
+cd /path/to/your/obsidian-vault
+git clone https://github.com/kepano/obsidian-skills.git .claude
+
+# Agents write to: /Agent-Logs/{agent-name}/YYYY-MM-DD.md
+# Template for each agent log:
+
+<span class="comment">---</span>
+<span class="code">agent</span>: <span class="string">cashclaw</span>
+<span class="code">date</span>: <span class="string">2026-06-01</span>
+<span class="code">session</span>: <span class="string">RVS1</span>
+<span class="code">status</span>: <span class="string">active</span>
+<span class="comment">---</span>
+
+<span class="comment">## Decisions</span>
+- <span class="string">Deployed v1.3 trading model</span>
+- <span class="string">Opened 3 new positions (BTC, ETH, SOL)</span>
+
+<span class="comment">## Memory Sync (TencentDB)</span>
+- <span class="string">L1 Atoms extracted: 12</span>
+- <span class="string">L2 Scenarios updated: 3</span>
+- <span class="string">L3 Persona refined: aggressive-conservative</span>
+
+<span class="comment">## Commands Executed</span>
+- <span class="string">./orbit --deploy cashclaw v1.3</span>
+- <span class="string">cashclaw --check-positions</span></pre>
+    </div>
+
+    <!-- TencentDB Setup -->
+    <div id="tencentdb-setup" class="config-block">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h4 style="margin:0;">◈ TencentDB Agent Memory</h4>
+        <button class="copy-btn" onclick="copyConfig(this)">COPY</button>
+      </div>
+      <pre><span class="comment"># Install TencentDB Agent Memory plugin for OpenClaw</span>
+openclaw plugins install @tencentdb-agent-memory/memory-tencentdb
+openclaw gateway restart
+
+<span class="comment"># Enable in ~/.openclaw/openclaw.json:</span>
+{
+  <span class="string">"memory-tencentdb"</span>: {
+    <span class="string">"enabled"</span>: <span class="string">true</span>,
+    <span class="string">"config"</span>: {
+      <span class="string">"offload"</span>: { <span class="string">"enabled"</span>: <span class="string">true</span> },
+      <span class="string">"recall"</span>: { <span class="string">"strategy"</span>: <span class="string">"hybrid"</span> }
+    }
+  }
+}
+
+<span class="comment"># Results: 61% fewer tokens · 51% better pass rate</span>
+<span class="comment"># Memory lives at: ~/.openclaw/memory-tdai/</span></pre>
+    </div>
+
+    <!-- FeedHive Naledi Setup -->
+    <div id="feedhive-setup" class="config-block">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h4 style="margin:0;">♢ Naledi · FeedHive Content Agent</h4>
+        <button class="copy-btn" onclick="copyConfig(this)">COPY</button>
+      </div>
+      <pre><span class="comment"># 1. Sign up at feedhive.com — free plan</span>
+<span class="comment"># Get your API key from feedhive.com/app</span>
+
+<span class="comment"># 2. Install the FeedHive skill for OpenClaw</span>
+npx @feedhive/setup-openclaw YOUR_FEEDHIVE_API_KEY
+
+<span class="comment"># 3. Connect your social accounts in FeedHive:</span>
+<span class="comment">#   Twitter/X · LinkedIn · Instagram · Facebook</span>
+
+<span class="comment"># 4. Configure Naledi content agent via OpenClaw API:</span>
+curl http://localhost:3000/message -d '{
+  <span class="string">"message"</span>: <span class="string">"You are Naledi, the Studex content agent.</span>
+<span class="string">Post daily about: founder building AI agents in SA,</span>
+<span class="string">10 years blockchain experience, product demos,</span>
+<span class="string">Harari philosophy applied to AI business.</span>
+<span class="string">Tone: confident, visionary, authentic.</span>
+<span class="string">Always include stud.exchange link."</span>
+}'</pre>
+    </div>
+
+    <!-- OpenClaw Setup -->
+    <div id="openclaw-setup" class="config-block">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h4 style="margin:0;">⬡ OpenClaw Gateway</h4>
+        <button class="copy-btn" onclick="copyConfig(this)">COPY</button>
+      </div>
+      <pre><span class="comment"># OpenClaw is the API gateway routing all agent requests.</span>
+<span class="comment"># Each VM has its own OpenClaw instance:</span>
+
+RVS1  cashclaw   → localhost:3000
+RVS2  hermes     → localhost:3001
+RVS3  openhuman  → localhost:3002
+RVS4  cursor     → localhost:3003
+RVS5  farm-α     → localhost:3004
+RVS14 farm-κ     → localhost:3013
+
+<span class="comment"># Plugins installed:</span>
+- <span class="string">@tencentdb-agent-memory/memory-tencentdb</span>  <span class="comment"># Memory layer</span>
+- <span class="string">@feedhive/setup-openclaw</span>                   <span class="comment"># Content posting</span>
+- <span class="string">obsidian-skills</span>                              <span class="comment"># Agent logging</span>
+
+<span class="comment"># Start:</span>
+openclaw gateway start --port 3000</pre>
+    </div>
+  </section>
+
+  <!-- Quick Start Commands -->
+  <section class="section animate">
+    <div class="section-header">
+      <h2>Quick Start</h2>
+      <p>Get your Agent OS running in minutes.</p>
+    </div>
+    <div class="config-block">
+      <pre><span class="comment"># 1. Install tmux (already installed: v3.6a)</span>
+<span class="comment"># 2. Configure tmux for agent monitoring:</span>
+cp .tmux.conf ~/.tmux.conf
+tmux source ~/.tmux.conf
+
+<span class="comment"># 3. Start the master session:</span>
+tmux new -s linux-studex
+
+<span class="comment"># 4. Create windows for each agent:</span>
+tmux new-window -t linux-studex:1 -n cashclaw
+tmux new-window -t linux-studex:2 -n hermes
+tmux new-window -t linux-studex:3 -n openhuman
+tmux new-window -t linux-studex:4 -n cursor
+tmux new-window -t linux-studex:5 -n farm
+
+<span class="comment"># 5. Deploy agent VMs:</span>
+./orbit --deploy all
+
+<span class="comment"># 6. Open the dashboard:</span>
+open dashboard.html</pre>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div style="font-family:var(--font-heading);font-size:1.4rem;color:var(--gold);letter-spacing:2px;margin-bottom:8px;">Linux StudEx</div>
+    <p>Agent Operating System — Studex Group, Johannesburg SA</p>
+    <p style="font-size:0.75rem;">14 VMs · QEMU/UTM · Ollama · n8n · OpenClaw · Obsidian</p>
+    <p style="font-size:0.7rem;margin-top:12px;">Auto-pushes every 30 min · <span class="gold">#goldandobsidian</span></p>
+  </div>
+</footer>
+
+<script>
+// Live clock
+function updateClock() {
+  const now = new Date();
+  const saast = new Intl.DateTimeFormat('en-ZA', {
+    timeZone: 'Africa/Johannesburg',
+    hour: '2-digit', minute: '2-digit',
+    hour12: false
+  }).format(now);
+  document.getElementById('clock').textContent = saast + ' SAST';
+  document.getElementById('tmux-clock').textContent = '"Linux-StudEx" ' + saast + ' 01-Jun-26';
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+// Tmux window switching
+function switchTmuxWindow(el, name) {
+  document.querySelectorAll('.tmux-win').forEach(w => w.classList.remove('active'));
+  el.classList.add('active');
+  const output = document.getElementById('tmux-output');
+  const lines = output.querySelectorAll('.tmux-line');
+  lines.forEach(l => l.style.display = 'none');
+  const firstLine = output.querySelector('.tmux-line:first-child');
+  if (firstLine) firstLine.style.display = '';
+  const cursorLine = document.getElementById('tmux-cursor');
+  if (cursorLine) cursorLine.textContent = 'window: ' + name;
+}
+
+// Tmux input
+function handleTmuxInput(e) {
+  if (e.key === 'Enter') {
+    const input = e.target;
+    const cmd = input.value.trim();
+    if (!cmd) return;
+    const output = document.getElementById('tmux-output');
+    const inputLine = output.querySelector('.tmux-input');
+    const newLine = document.createElement('div');
+    newLine.className = 'tmux-line';
+    newLine.innerHTML = '<span class="prompt">studex@agent-os:~$</span> <span class="cmd">' + cmd.replace(/</g,'&lt;') + '</span>';
+    output.insertBefore(newLine, inputLine);
+    // auto response
+    setTimeout(() => {
+      const respLine = document.createElement('div');
+      respLine.className = 'tmux-line';
+      respLine.innerHTML = '<span class="output">[broadcast to 14 panes] ✓ command sent to all agents</span>';
+      output.insertBefore(respLine, inputLine);
+    }, 300);
+    input.value = '';
+    output.scrollTop = output.scrollHeight;
+  }
+}
+
+// Agent chat
+function handleAgentChat(input, agent, e) {
+  if (e.key === 'Enter') {
+    const msg = input.value.trim();
+    if (!msg) return;
+    const chatContainer = input.closest('.agent-chat').querySelector('.chat-messages');
+    const youMsg = document.createElement('div');
+    youMsg.className = 'chat-msg';
+    youMsg.innerHTML = '<span class="sender">you&gt;</span><span class="msg-text">' + msg.replace(/</g,'&lt;') + '</span>';
+    chatContainer.appendChild(youMsg);
+    input.value = '';
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    // Simulate agent response
+    setTimeout(() => {
+      const responses = {
+        cashclaw: ['Processing trade data...', 'Positions updated.', 'Market analysis complete.'],
+        hermes: ['Routing updated.', 'Gateway reconfigured.', 'All services healthy.'],
+        openhuman: ['Deploying...', 'Container orchestrated.', 'Platform stable.'],
+        cursor: ['Compiling...', 'Tests passing.', 'Code review complete.']
+      };
+      const agentResps = responses[agent] || ['Acknowledged.', 'Processing...'];
+      const resp = agentResps[Math.floor(Math.random() * agentResps.length)];
+      const agentMsg = document.createElement('div');
+      agentMsg.className = 'chat-msg';
+      agentMsg.innerHTML = '<span class="sender">' + agent + '&gt;</span><span class="msg-text">' + resp + '</span>';
+      chatContainer.appendChild(agentMsg);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      // Log to system
+      const sysMsg = document.createElement('div');
+      sysMsg.className = 'chat-msg system';
+      sysMsg.innerHTML = '<span class="sender">system&gt;</span><span class="msg-text">Logged to Obsidian · Memory synced</span>';
+      chatContainer.appendChild(sysMsg);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }, 500 + Math.random() * 1000);
+  }
+}
+
+function handleAgentChatBtn(btn, agent) {
+  const input = btn.closest('.chat-input-bar').querySelector('input');
+  const event = new KeyboardEvent('keydown', { key: 'Enter' });
+  input.dispatchEvent(event);
+}
+
+// Copy config blocks
+function copyConfig(btn) {
+  const block = btn.closest('.config-block');
+  const code = block.querySelector('pre').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = 'COPIED!';
+    setTimeout(() => { btn.textContent = 'COPY'; }, 2000);
+  });
+}
+
+// Scroll to section
+function scrollToSection(id) {
+  document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+
+</body>
+</html>
