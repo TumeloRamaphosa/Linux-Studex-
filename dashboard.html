@@ -641,6 +641,34 @@ p { margin-bottom: 16px; text-wrap: pretty; }
 .footer p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.8; }
 .footer .gold { color: var(--gold); }
 
+/* Connection Status */
+.connection-status {
+  position: fixed;
+  top: 8px;
+  right: 16px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  background: var(--obsidian);
+  border: 1px solid var(--obsidian-5);
+  transition: all 0.3s var(--ease-out);
+}
+.connection-status .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.connection-status.connected .dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.connection-status.disconnected .dot { background: var(--error); }
+.connection-status.connecting .dot { background: var(--warning); animation: blink 1s infinite; }
+
 /* Buttons — Huashu: clean, minimal */
 .btn {
   display: inline-flex;
@@ -712,10 +740,10 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
         <span>Agent Operating System v1.0</span>
       </div>
     </div>
-    <div class="header-status">
-      <span><span class="status-dot online"></span>14 VMs Online</span>
-      <span><span class="status-dot online"></span>tmux Active</span>
-      <span><span class="status-dot busy"></span>Naledi Posting</span>
+    <div class="header-status" id="header-status">
+      <span id="vm-count"><span class="status-dot online"></span>14 VMs Online</span>
+      <span id="agent-count"><span class="status-dot online"></span>5 Agents Active</span>
+      <span id="msg-count" style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted)">0 msgs</span>
       <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted)" id="clock">00:00 SAST</span>
     </div>
   </div>
@@ -740,6 +768,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
           <span class="tmux-win" onclick="switchTmuxWindow(this, 'farm')">5:farm*</span>
         </div>
         <span class="tmux-clock" id="tmux-clock">"Linux-StudEx" 00:00 01-Jun-26</span>
+    <span class="connection-status disconnected" id="conn-status"><span class="dot"></span>Offline</span>
       </div>
       <div class="tmux-terminal" id="tmux-output">
         <div class="tmux-line"><span class="prompt">studex@agent-os:~$</span> <span class="cmd">tmux new -s linux-studex</span></div>
@@ -1361,7 +1390,26 @@ open dashboard.html</pre>
 </footer>
 
 <script>
-// Live clock
+// ── Configuration ──────────────────────────────────────────────────────────
+const API_BASE = window.location.origin;
+
+// ── Connection Status ──────────────────────────────────────────────────────
+const connEl = document.getElementById('conn-status');
+
+function setConn(state) {
+  if (state === 'connected') {
+    connEl.className = 'connection-status connected';
+    connEl.innerHTML = '<span class="dot"></span> Live';
+  } else if (state === 'connecting') {
+    connEl.className = 'connection-status connecting';
+    connEl.innerHTML = '<span class="dot"></span> Connecting';
+  } else {
+    connEl.className = 'connection-status disconnected';
+    connEl.innerHTML = '<span class="dot"></span> Offline';
+  }
+}
+
+// ── Live Clock ─────────────────────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
   const saast = new Intl.DateTimeFormat('en-ZA', {
@@ -1375,77 +1423,184 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 10000);
 
-// Tmux window switching
+// ── API Helper ─────────────────────────────────────────────────────────────
+async function api(path, options = {}) {
+  const url = API_BASE + '/api' + path;
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json', ...options.headers },
+    ...options,
+  });
+  if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+// ── SSE Live Status ────────────────────────────────────────────────────────
+function subscribeStatus() {
+  const evtSource = new EventSource(API_BASE + '/api/status/events');
+  
+  evtSource.onopen = () => setConn('connected');
+  evtSource.onerror = () => setConn('disconnected');
+  
+  evtSource.onmessage = (event) => {
+    try {
+      const agents = JSON.parse(event.data);
+      updateHeaderStatus(agents);
+      updateTmuxWithStatus(agents);
+    } catch (e) {
+      console.error('SSE parse error:', e);
+    }
+  };
+  
+  // Fallback: poll if SSE fails
+  setTimeout(() => {
+    if (connEl.classList.contains('disconnected')) {
+      setConn('connecting');
+      fetchStatus();
+    }
+  }, 3000);
+}
+
+// ── Update Header Status ───────────────────────────────────────────────────
+function updateHeaderStatus(agentList) {
+  const vmEl = document.getElementById('vm-count');
+  const agentEl = document.getElementById('agent-count');
+  const msgEl = document.getElementById('msg-count');
+  
+  const online = agentList.filter(a => a.status === 'online').length;
+  const totalMsgs = agentList.reduce((s, a) => s + a.messages, 0);
+  
+  vmEl.innerHTML = `<span class="status-dot ${online > 0 ? 'online' : 'offline'}"></span>14 VMs Online`;
+  agentEl.innerHTML = `<span class="status-dot ${online > 0 ? 'online' : 'offline'}"></span>${online} Agents Active`;
+  msgEl.textContent = `${totalMsgs} msgs`;
+}
+
+// ── Update Tmux Terminal ───────────────────────────────────────────────────
+function updateTmuxWithStatus(agentList) {
+  const cursor = document.getElementById('tmux-cursor');
+  if (!cursor) return;
+  
+  const lines = agentList.map(a => {
+    const dot = a.status === 'online' ? '●' : '○';
+    const uptimeH = Math.floor(a.uptime / 60);
+    const uptimeM = a.uptime % 60;
+    return `${dot} ${a.rvs.padEnd(7)} ${a.name.padEnd(10)} ${a.status.padEnd(8)} ${uptimeH}h${String(uptimeM).padStart(2, '0')}m  ${String(a.messages).padStart(4, ' ')} msgs`;
+  });
+  
+  cursor.textContent = '\n' + lines.join('\n') + '\n';
+}
+
+// ── Fetch Status (fallback) ────────────────────────────────────────────────
+async function fetchStatus() {
+  try {
+    const data = await api('/status');
+    setConn('connected');
+    updateHeaderStatus(data.agents || []);
+    
+    const agentList = (data.agents || []).map(a => ({
+      name: a.name,
+      rvs: a.rvs,
+      status: a.status,
+      uptime: a.uptime,
+      messages: a.messages,
+    }));
+    updateTmuxWithStatus(agentList);
+  } catch (err) {
+    setConn('disconnected');
+    console.warn('Status fetch failed:', err);
+  }
+}
+
+// ── Tmux Window Switching ──────────────────────────────────────────────────
 function switchTmuxWindow(el, name) {
   document.querySelectorAll('.tmux-win').forEach(w => w.classList.remove('active'));
   el.classList.add('active');
-  const output = document.getElementById('tmux-output');
-  const lines = output.querySelectorAll('.tmux-line');
-  lines.forEach(l => l.style.display = 'none');
-  const firstLine = output.querySelector('.tmux-line:first-child');
-  if (firstLine) firstLine.style.display = '';
-  const cursorLine = document.getElementById('tmux-cursor');
-  if (cursorLine) cursorLine.textContent = 'window: ' + name;
+  const cursor = document.getElementById('tmux-cursor');
+  if (cursor) cursor.textContent = 'switching to window: ' + name;
 }
 
-// Tmux input
+// ── Tmux Input (sends to backend) ──────────────────────────────────────────
 function handleTmuxInput(e) {
   if (e.key === 'Enter') {
     const input = e.target;
     const cmd = input.value.trim();
     if (!cmd) return;
+    
     const output = document.getElementById('tmux-output');
     const inputLine = output.querySelector('.tmux-input');
+    
+    // Show command in terminal
     const newLine = document.createElement('div');
     newLine.className = 'tmux-line';
     newLine.innerHTML = '<span class="prompt">studex@agent-os:~$</span> <span class="cmd">' + cmd.replace(/</g,'&lt;') + '</span>';
     output.insertBefore(newLine, inputLine);
-    // auto response
-    setTimeout(() => {
-      const respLine = document.createElement('div');
-      respLine.className = 'tmux-line';
-      respLine.innerHTML = '<span class="output">[broadcast to 14 panes] ✓ command sent to all agents</span>';
-      output.insertBefore(respLine, inputLine);
-    }, 300);
     input.value = '';
     output.scrollTop = output.scrollHeight;
+    
+    // Send to backend
+    api('/tmux', {
+      method: 'POST',
+      body: JSON.stringify({ command: cmd }),
+    }).then(data => {
+      const respLine = document.createElement('div');
+      respLine.className = 'tmux-line';
+      respLine.innerHTML = '<span class="output">' + (data.output || data.note || '✓ Sent').replace(/</g,'&lt;') + '</span>';
+      output.insertBefore(respLine, inputLine);
+      output.scrollTop = output.scrollHeight;
+    }).catch(err => {
+      const errLine = document.createElement('div');
+      errLine.className = 'tmux-line';
+      errLine.innerHTML = '<span class="output" style="color:var(--error);">✗ ' + err.message + '</span>';
+      output.insertBefore(errLine, inputLine);
+      output.scrollTop = output.scrollHeight;
+    });
   }
 }
 
-// Agent chat
+// ── Agent Chat (sends to backend) ──────────────────────────────────────────
 function handleAgentChat(input, agent, e) {
   if (e.key === 'Enter') {
     const msg = input.value.trim();
     if (!msg) return;
+    
     const chatContainer = input.closest('.agent-chat').querySelector('.chat-messages');
+    
+    // Show user message
     const youMsg = document.createElement('div');
     youMsg.className = 'chat-msg';
     youMsg.innerHTML = '<span class="sender">you&gt;</span><span class="msg-text">' + msg.replace(/</g,'&lt;') + '</span>';
     chatContainer.appendChild(youMsg);
     input.value = '';
     chatContainer.scrollTop = chatContainer.scrollHeight;
-    // Simulate agent response
-    setTimeout(() => {
-      const responses = {
-        cashclaw: ['Processing trade data...', 'Positions updated.', 'Market analysis complete.'],
-        hermes: ['Routing updated.', 'Gateway reconfigured.', 'All services healthy.'],
-        openhuman: ['Deploying...', 'Container orchestrated.', 'Platform stable.'],
-        cursor: ['Compiling...', 'Tests passing.', 'Code review complete.']
-      };
-      const agentResps = responses[agent] || ['Acknowledged.', 'Processing...'];
-      const resp = agentResps[Math.floor(Math.random() * agentResps.length)];
-      const agentMsg = document.createElement('div');
-      agentMsg.className = 'chat-msg';
-      agentMsg.innerHTML = '<span class="sender">' + agent + '&gt;</span><span class="msg-text">' + resp + '</span>';
-      chatContainer.appendChild(agentMsg);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-      // Log to system
+    
+    // Show thinking indicator
+    const thinkMsg = document.createElement('div');
+    thinkMsg.className = 'chat-msg';
+    thinkMsg.id = 'thinking-' + agent;
+    thinkMsg.innerHTML = '<span class="sender">' + agent + '&gt;</span><span class="msg-text" style="color:var(--text-muted);">...</span>';
+    chatContainer.appendChild(thinkMsg);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+    // Send to backend
+    api('/agents/' + agent + '/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message: msg }),
+    }).then(data => {
+      const thinkEl = document.getElementById('thinking-' + agent);
+      if (thinkEl) {
+        thinkEl.innerHTML = '<span class="sender">' + agent + '&gt;</span><span class="msg-text">' + data.response.replace(/</g,'&lt;').replace(/\n/g, '<br>') + '</span>';
+      }
+      // System log message
       const sysMsg = document.createElement('div');
       sysMsg.className = 'chat-msg system';
       sysMsg.innerHTML = '<span class="sender">system&gt;</span><span class="msg-text">Logged to Obsidian · Memory synced</span>';
       chatContainer.appendChild(sysMsg);
       chatContainer.scrollTop = chatContainer.scrollHeight;
-    }, 500 + Math.random() * 1000);
+    }).catch(err => {
+      const thinkEl = document.getElementById('thinking-' + agent);
+      if (thinkEl) {
+        thinkEl.innerHTML = '<span class="sender">' + agent + '&gt;</span><span class="msg-text" style="color:var(--error);">Error: ' + err.message + '</span>';
+      }
+    });
   }
 }
 
@@ -1455,7 +1610,7 @@ function handleAgentChatBtn(btn, agent) {
   input.dispatchEvent(event);
 }
 
-// Copy config blocks
+// ── Copy Config Blocks ─────────────────────────────────────────────────────
 function copyConfig(btn) {
   const block = btn.closest('.config-block');
   const code = block.querySelector('pre').textContent;
@@ -1465,10 +1620,14 @@ function copyConfig(btn) {
   });
 }
 
-// Scroll to section
+// ── Scroll to Section ──────────────────────────────────────────────────────
 function scrollToSection(id) {
   document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+// ── Initialise ─────────────────────────────────────────────────────────────
+setConn('connecting');
+subscribeStatus();
 </script>
 
 </body>
