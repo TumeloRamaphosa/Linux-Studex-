@@ -261,30 +261,33 @@ p { margin-bottom: 16px; text-wrap: pretty; }
 }
 .header-inner {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
   position: relative;
   z-index: 2;
 }
 .logo {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 4px;
 }
 .logo-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, var(--neon-purple), var(--neon-purple-dark));
   clip-path: polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-heading);
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: #fff;
-  box-shadow: 0 0 30px rgba(176, 38, 255, 0.5);
+  box-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+  margin-bottom: 4px;
 }
 .logo-text h1 {
   margin-bottom: 0;
@@ -293,16 +296,20 @@ p { margin-bottom: 16px; text-wrap: pretty; }
   text-shadow:
     0 0 8px rgba(120, 80, 180, 0.15),
     0 0 16px rgba(120, 80, 180, 0.08);
-  font-size: 2.8rem;
-  letter-spacing: 3px;
+  font-size: 2.4rem;
+  letter-spacing: 4px;
+  font-weight: 700;
 }
-.logo-text span { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); letter-spacing: 2px; }
+.logo-text span { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; }
 .header-status {
   display: flex;
   align-items: center;
-  gap: 20px;
-  font-size: 0.8rem;
+  justify-content: center;
+  gap: 16px;
+  font-size: 0.75rem;
   color: var(--text-secondary);
+  flex-wrap: wrap;
+  margin-top: 4px;
 }
 .status-dot {
   width: 10px; height: 10px; border-radius: 50%;
