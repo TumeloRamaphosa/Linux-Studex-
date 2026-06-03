@@ -21,6 +21,7 @@ import orchestrateRoutes from './routes/orchestrate.js';
 import sandboxRoutes from './routes/sandbox.js';
 import mcpRoutes from './routes/mcp.js';
 import llmMeshRoutes from './routes/llm-mesh.js';
+import networkRoutes from './routes/network.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT) || 4000;
@@ -74,6 +75,7 @@ app.use('/api/orchestrate', orchestrateRoutes(orchestrator));
 app.use('/api/sandbox', sandboxRoutes(sandboxManager));
 app.use('/api/mcp', mcpRoutes(mcpServer));
 app.use('/api/llm-mesh', llmMeshRoutes(llmMesh));
+app.use('/api/network', networkRoutes());
 
 // POST /api/tmux — execute a tmux command
 app.post('/api/tmux', async (req, res) => {

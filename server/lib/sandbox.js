@@ -178,23 +178,25 @@ export default class SandboxManager {
         exitCode = 0;
       } else {
         // Local execution fallback (no isolation)
+        // Write code to file first to avoid shell quoting issues
+        const ext = { python: 'py', node: 'js', shell: 'sh', go: 'go' }[lang] || 'sh';
+        const codeFile = `code_${Date.now()}.${ext}`;
+        const codePath = path.join(sb.workDir, codeFile);
+        fs.writeFileSync(codePath, code, 'utf-8');
+
         const runner = {
-          python: ['python3', '-c', code],
-          node: ['node', '-e', code],
-          shell: ['/bin/sh', '-c', code],
-          go: ['sh', '-c', `cat > /tmp/sb_code.go && go run /tmp/sb_code.go`],
-        }[lang] || ['/bin/sh', '-c', code];
+          python: `cd ${JSON.stringify(sb.workDir)} && python3 ${JSON.stringify(codePath)}`,
+          node: `cd ${JSON.stringify(sb.workDir)} && node ${JSON.stringify(codePath)}`,
+          shell: `cd ${JSON.stringify(sb.workDir)} && /bin/sh ${JSON.stringify(codePath)}`,
+          go: `cd ${JSON.stringify(sb.workDir)} && go run ${JSON.stringify(codePath)}`,
+        }[lang] || `cd ${JSON.stringify(sb.workDir)} && /bin/sh ${JSON.stringify(codePath)}`;
 
-        if (lang === 'go') {
-          fs.writeFileSync('/tmp/sb_code.go', code, 'utf-8');
-        }
-
-        const result = execSync(runner.join(' '), {
+        const result = execSync(runner, {
           timeout,
           stdio: 'pipe',
           encoding: 'utf-8',
           maxBuffer: 1024 * 1024,
-          shell: lang !== 'python' && lang !== 'node',
+          shell: true,
         });
         stdout = result;
         stderr = '';
