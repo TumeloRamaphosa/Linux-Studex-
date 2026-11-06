@@ -11,8 +11,8 @@ _Last library update: 2026-11-06_
 
 ## Counts by tier
 
-- **Trusted:** 133
-- **Screen first:** 15
+- **Trusted:** 145
+- **Screen first:** 26
 - **Missing:** 2
 
 ## By category
@@ -125,6 +125,7 @@ _Last library update: 2026-11-06_
 - [[docx|docx]] — Trusted — Create and edit Word documents and templates
 - [[find|find]] — Trusted — Find Notion pages/databases
 - [[find-skills|find-skills]] — Trusted — Discover and install agent skills from the ecosystem
+- [[gadget-samsung-tizen-tvs|gadget-samsung-tizen-tvs]] — Screen first — Local WebSocket control for Samsung Tizen TVs
 - [[home-assistant-best-practices|home-assistant-best-practices]] — Screen first — Home Assistant automation, dashboard, blueprint and ops best practices
 - [[knowledge-capture|knowledge-capture]] — Trusted — Capture knowledge into Notion
 - [[langmanus|langmanus]] — Missing — Community / LangManus (listed in Notion)
@@ -132,6 +133,7 @@ _Last library update: 2026-11-06_
 - [[pdf|pdf]] — Trusted — Create, read, merge and manipulate PDF files
 - [[pptx|pptx]] — Trusted — Create and edit PowerPoint / slide decks
 - [[research-documentation|research-documentation]] — Trusted — Search Notion workspace docs
+- [[samsung-smartthings-skill|samsung-smartthings-skill]] — Screen first — Samsung TV control via SmartThings OAuth
 - [[search|search]] — Trusted — Search Notion workspace
 - [[skill-creator|skill-creator]] — Trusted — Create, improve and evaluate agent skills
 - [[spec-to-implementation|spec-to-implementation]] — Trusted — Specs to implementation
@@ -153,6 +155,15 @@ _Last library update: 2026-11-06_
 
 ### Video
 
+- [[higgsfield-brandkit|higgsfield-brandkit]] — Screen first — Brand kit generation for Higgsfield
+- [[higgsfield-faceless-video|higgsfield-faceless-video]] — Screen first — Faceless video generation
+- [[higgsfield-generate|higgsfield-generate]] — Screen first — Higgsfield image/video generation workflows
+- [[higgsfield-marketplace-cards|higgsfield-marketplace-cards]] — Screen first — Marketplace card creatives
+- [[higgsfield-product-photoshoot|higgsfield-product-photoshoot]] — Screen first — Product photoshoot generation
+- [[higgsfield-soul-id|higgsfield-soul-id]] — Screen first — Higgsfield Soul ID character consistency
+- [[higgsfield-video-explainer|higgsfield-video-explainer]] — Screen first — Video explainer generation
+- [[higgsfield-websites|higgsfield-websites]] — Screen first — Website visual generation via Higgsfield
+- [[higgsfield-youtube-thumbnail|higgsfield-youtube-thumbnail]] — Screen first — YouTube thumbnail generation
 - [[hyperframes|hyperframes]] — Screen first — Write HTML and render video with Hyperframes (agent-native)
 - [[hyperframes-cli|hyperframes-cli]] — Screen first — Hyperframes CLI for agent video workflows
 - [[media-use|media-use]] — Screen first — Media-use patterns in Hyperframes video agents
@@ -169,6 +180,21 @@ _Last library update: 2026-11-06_
 - [[remotion-saas|remotion-saas]] — Trusted — Build an app with Remotion (SaaS patterns)
 - [[remotion-studio|remotion-studio]] — Trusted — Preview a Remotion video in Studio
 - [[remotion-upgrade|remotion-upgrade]] — Trusted — Upgrade Remotion and related packages safely
+
+### Voice
+
+- [[dubbing|dubbing]] — Trusted — Dub A/V preserving speakers (ElevenLabs)
+- [[elevenlabs-agents|elevenlabs-agents]] — Trusted — Conversational voice AI agents (ElevenLabs)
+- [[elevenlabs-music|elevenlabs-music]] — Trusted — AI music tracks via ElevenLabs
+- [[elevenlabs-onboarding|elevenlabs-onboarding]] — Trusted — Add ElevenLabs to a project (no secrets stored)
+- [[elevenlabs-realtime|elevenlabs-realtime]] — Trusted — ElevenLabs Realtime voice models
+- [[setup-api-key|setup-api-key]] — Trusted — Configure ElevenLabs API key flow (placeholders only)
+- [[sound-effects|sound-effects]] — Trusted — Generate sound effects from text (ElevenLabs)
+- [[speech-engine|speech-engine]] — Trusted — Real-time voice on a custom LLM/agent via ElevenLabs
+- [[speech-to-text|speech-to-text]] — Trusted — Transcription with timestamps via ElevenLabs
+- [[text-to-speech|text-to-speech]] — Trusted — Lifelike TTS / voiceovers via ElevenLabs
+- [[voice-changer|voice-changer]] — Trusted — Speech-to-speech voice transform (ElevenLabs)
+- [[voice-isolator|voice-isolator]] — Trusted — Isolate vocals / denoise (ElevenLabs)
 
 ### n8n
 
