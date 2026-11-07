@@ -7,7 +7,7 @@ tags: [index, studex]
 
 Studex Skills Library catalogue. **Catalogue only — no auto-install.** See [[README - How to add a skill]].
 
-_Last library update: 2026-11-06_
+_Last library update: 2026-11-07_
 
 ## Counts by tier
 
@@ -216,3 +216,30 @@ _Last library update: 2026-11-06_
 - [[n8n-workflow-patterns|n8n-workflow-patterns]] — Trusted — Proven n8n workflow architectural patterns
 - [[n8n-workflow-testing-fundamentals|n8n-workflow-testing-fundamentals]] — Screen first — Fundamentals of testing n8n workflows
 - [[using-n8n-mcp-skills|using-n8n-mcp-skills]] — Trusted — Build/edit/validate n8n workflows through the n8n-mcp MCP server
+
+## Changelog 2026-11-07
+
++20 catalogue entries (catalogue only — no installs):
+
+| Skill | Tier |
+|---|---|
+| academy-guide | Trusted |
+| algorithmic-art | Trusted |
+| canvas-design | Trusted |
+| discernment-nudge | Trusted |
+| internal-comms | Trusted |
+| slack-gif-creator | Trusted |
+| theme-factory | Trusted |
+| cloudflare-app-bootstrap | Trusted |
+| frameworks-on-cloudflare | Trusted |
+| workers-development | Trusted |
+| hyperframes-registry | Screen first |
+| remotion-to-hyperframes | Screen first |
+| reverse-any-video | Screen first |
+| slideshow | Screen first |
+| style-sampling | Screen first |
+| hyperframes-figma | Screen first |
+| grill-me | Screen first |
+| tdd | Screen first |
+| grill-with-docs | Screen first |
+| improve-codebase-architecture | Screen first |
