@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0.0",
+  "recordKind": "example",
+  "classification": "public-internal-summary",
+  "agent": {
+    "id": "sentinel",
+    "displayName": "Sentinel",
+    "status": "unverified",
+    "notes": "Example stub — not an accepted work record. Replace with evidence-backed file when owner approves."
+  }
+}

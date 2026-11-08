@@ -17,7 +17,9 @@
 
 ## Relationship to PR #5
 
-PR #5 owns the **operational** slice: `central-store.js`, inbox drops, `agent-central.html`, markdown protocols, Cashclaw/orbit honesty fixes, and five unit tests.
+This branch also ships **hardened** `server/lib/central-store.js` (fail-closed drop, provenance, symlink guard) and `public-static-guard.js`. PR #5 markdown assets may port after redaction; **do not merge PR #5 before** auth/PII/static fixes (`review/INTEGRATION-ORDER.md`).
+
+PR #5 owns the **operational markdown** slice on its branch: `central-store.js`, inbox drops, `agent-central.html`, markdown protocols, Cashclaw/orbit honesty fixes, and five unit tests.
 
 This folder is a **non-overlapping governance/index layer** to merge after PR #5 lands (or in parallel on `main` without duplicating server routes).
 

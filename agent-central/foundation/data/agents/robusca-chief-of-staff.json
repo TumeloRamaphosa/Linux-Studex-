@@ -1,5 +1,6 @@
 {
   "schemaVersion": "1.0.0",
+  "recordKind": "example",
   "classification": "public-internal-summary",
   "agent": {
     "id": "robusca-chief-of-staff",

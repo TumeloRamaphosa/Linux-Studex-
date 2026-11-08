@@ -1,10 +1,11 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-08T10:30:00.000Z",
+  "generatedAt": "2026-11-08T11:00:00.000Z",
   "classification": "public-internal-summary",
   "central": {
     "title": "Agent Central — Linux StudEx OS",
     "workSubmissionCount": 3,
+    "disclaimer": "Example/proposed index records unless a submission has recordKind accepted and approvalGate approved.",
     "notionCanons": {
       "projectsOwner": "Sentinel",
       "workSubmissionsOwner": "Sentinel",
@@ -36,8 +37,8 @@
       {
         "id": "stud-bot-vm-workplace",
         "displayName": "Stud-Bot VM / workplace",
-        "status": "tested",
-        "priorityNote": "RVS fleet and Express agent OS in this repo are the tested platform slice.",
+        "status": "unverified",
+        "priorityNote": "In-process Express demo exists in repo; QEMU/RVS VMs and live workplace telemetry are unverified.",
         "linkedAgents": ["hermes", "cursor", "openhuman", "farm", "stud-bot"]
       },
       {
@@ -50,8 +51,8 @@
       {
         "id": "platform-engineering",
         "displayName": "Platform engineering",
-        "status": "tested",
-        "priorityNote": "Sentinel engineering ownership; Agent Central foundation in repo.",
+        "status": "unverified",
+        "priorityNote": "Foundation JSON and server unit tests cover software only — not production runtime.",
         "linkedAgents": ["sentinel", "cursor", "hermes"]
       }
     ],
@@ -61,15 +62,17 @@
         "displayName": "Sentinel",
         "roleSummary": "Engineering owner for Notion canons and platform delivery.",
         "status": "unverified",
-        "vmAgent": false,
-        "dataRoomPath": "agent-central/foundation/data/agents/sentinel.json",
+        "runtimeBinding": "index-only",
+        "runtimeHealth": "unverified",
+        "provisionedVm": false,
+        "dataRoomPath": "agent-central/foundation/data/agents/sentinel.example.json",
         "apiDetailPath": "/api/agent-central/agents/sentinel",
         "businessLanes": ["platform-engineering"],
         "kpiReview": {
           "humanReviewRequired": true,
           "agentMetricsVerified": false,
           "fields": ["submissions_passing_acceptance", "evidence_items_tested"],
-          "notes": "Human owner; KPIs require Notion/workflow evidence outside this slice."
+          "notes": "Index-only persona; not a live server agent."
         }
       },
       {
@@ -77,7 +80,9 @@
         "displayName": "Robusca (Chief of Staff)",
         "roleSummary": "Business planning and evidence coordination (linked command home; Sentinel owns canonical project queue).",
         "status": "unverified",
-        "vmAgent": false,
+        "runtimeBinding": "index-only",
+        "runtimeHealth": "unverified",
+        "provisionedVm": false,
         "dataRoomPath": "agent-central/foundation/data/agents/robusca-chief-of-staff.json",
         "apiDetailPath": "/api/agent-central/agents/robusca-chief-of-staff",
         "businessLanes": ["meat", "coffee"],
@@ -93,7 +98,7 @@
             "decision_turnaround",
             "founder_time"
           ],
-          "notes": "Proposed KPI field names only — no baseline numbers. Notion business plan index linked in notionCanons.businessPlanEvidenceIndex."
+          "notes": "Proposed KPI field names only — no baseline numbers."
         }
       },
       {
@@ -101,59 +106,67 @@
         "displayName": "Stud-Bot",
         "roleSummary": "Workplace / VM assistant persona for Studex fleet.",
         "status": "unverified",
-        "vmAgent": false,
-        "dataRoomPath": "agent-central/foundation/data/agents/stud-bot.json",
+        "runtimeBinding": "index-only",
+        "runtimeHealth": "unverified",
+        "provisionedVm": false,
+        "dataRoomPath": "agent-central/foundation/data/agents/stud-bot.example.json",
         "apiDetailPath": "/api/agent-central/agents/stud-bot",
         "businessLanes": ["stud-bot-vm-workplace"],
         "kpiReview": {
           "humanReviewRequired": true,
           "agentMetricsVerified": false,
           "fields": ["tasks_completed_count"],
-          "notes": "Not a live runtime agent in server/agents; index entry only."
+          "notes": "Persona index only; not server/agents runtime."
         }
       },
       {
         "id": "cashclaw",
         "displayName": "Cashclaw",
-        "roleSummary": "Financial agent / trading (RVS1).",
+        "roleSummary": "Financial agent / trading (in-process demo).",
         "status": "historical",
-        "vmAgent": true,
-        "rvs": "RVS1",
-        "dataRoomPath": "agent-central/foundation/data/agents/cashclaw.json",
+        "runtimeBinding": "in-process-demo",
+        "runtimeHealth": "unverified",
+        "provisionedVm": false,
+        "rvsLabel": "RVS1 (paper spec only)",
+        "dataRoomPath": "agent-central/foundation/data/agents/cashclaw.example.json",
         "apiDetailPath": "/api/agent-central/agents/cashclaw",
         "businessLanes": ["meat", "coffee"],
         "kpiReview": {
           "humanReviewRequired": true,
           "agentMetricsVerified": false,
           "fields": ["tasks_completed_count"],
-          "notes": "Demo logs only; no live trading telemetry in repo."
+          "notes": "Demo logs only; no live trading telemetry."
         }
       },
       {
         "id": "hermes",
         "displayName": "Hermes",
-        "roleSummary": "Gateway / orchestrator (RVS2).",
-        "status": "tested",
-        "vmAgent": true,
-        "rvs": "RVS2",
-        "dataRoomPath": "agent-central/foundation/data/agents/hermes.json",
+        "roleSummary": "Gateway / orchestrator (in-process demo).",
+        "status": "historical",
+        "runtimeBinding": "in-process-demo",
+        "runtimeHealth": "unverified",
+        "provisionedVm": false,
+        "rvsLabel": "RVS2 (paper spec only)",
+        "dataRoomPath": "agent-central/foundation/data/agents/hermes.example.json",
         "apiDetailPath": "/api/agent-central/agents/hermes",
         "businessLanes": ["stud-bot-vm-workplace", "platform-engineering"],
         "kpiReview": {
           "humanReviewRequired": true,
           "agentMetricsVerified": false,
           "fields": ["repo_test_pass_rate"],
-          "notes": "Runtime tested via existing server; mesh KPIs need CI wiring."
+          "notes": "Runtime health unverified; software tests do not prove VMs online."
         }
       },
       {
         "id": "openhuman",
         "displayName": "OpenHuman",
-        "roleSummary": "Platform / deployment (RVS3).",
+        "roleSummary": "Platform / deployment (in-process demo).",
         "status": "historical",
-        "vmAgent": true,
-        "rvs": "RVS3",
-        "dataRoomPath": "agent-central/foundation/data/agents/openhuman.json",
+        "runtimeBinding": "in-process-demo",
+        "runtimeHealth": "unverified",
+        "provisionedVm": false,
+        "rvsLabel": "RVS3 (paper spec only)",
+        "dataRoomPath": "agent-central/foundation/data/agents/openhuman.example.json",
         "apiDetailPath": "/api/agent-central/agents/openhuman",
         "businessLanes": ["stud-bot-vm-workplace"],
         "kpiReview": {
@@ -166,28 +179,37 @@
       {
         "id": "cursor",
         "displayName": "Cursor",
-        "roleSummary": "IDE / development agent (RVS4).",
-        "status": "tested",
-        "vmAgent": true,
-        "rvs": "RVS4",
-        "dataRoomPath": "agent-central/foundation/data/agents/cursor.json",
+        "roleSummary": "IDE / development (in-process demo).",
+        "status": "historical",
+        "runtimeBinding": "in-process-demo",
+        "runtimeHealth": "unverified",
+        "provisionedVm": false,
+        "rvsLabel": "RVS4 (paper spec only)",
+        "dataRoomPath": "agent-central/foundation/data/agents/cursor.example.json",
         "apiDetailPath": "/api/agent-central/agents/cursor",
         "businessLanes": ["stud-bot-vm-workplace", "platform-engineering"],
+        "softwareTestEvidence": {
+          "status": "tested",
+          "scope": "repo-unit-tests-central-store-and-static-guard",
+          "path": "server/test/"
+        },
         "kpiReview": {
           "humanReviewRequired": true,
           "agentMetricsVerified": false,
           "fields": ["submissions_passing_acceptance"],
-          "notes": "Maps to development lane; evidence via PR/work submissions."
+          "notes": "softwareTestEvidence is not runtimeHealth."
         }
       },
       {
         "id": "farm",
         "displayName": "Agent Farm",
-        "roleSummary": "Worker nodes / Ollama batch (RVS5+).",
+        "roleSummary": "Worker nodes / Ollama batch (in-process demo; farm undeployed).",
         "status": "historical",
-        "vmAgent": true,
-        "rvs": "RVS5-14",
-        "dataRoomPath": "agent-central/foundation/data/agents/farm.json",
+        "runtimeBinding": "in-process-demo",
+        "runtimeHealth": "unverified",
+        "provisionedVm": false,
+        "rvsLabel": "RVS5-14 (paper spec only)",
+        "dataRoomPath": "agent-central/foundation/data/agents/farm.example.json",
         "apiDetailPath": "/api/agent-central/agents/farm",
         "businessLanes": ["stud-bot-vm-workplace", "gaming"],
         "kpiReview": {
