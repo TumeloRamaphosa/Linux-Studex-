@@ -9,6 +9,7 @@ Bounded, manual, one-way alignment between repo Agent Central and external syste
    - [Projects](https://app.notion.com/p/e9a5ca9fbd6041c9920f4982bb64864d)
    - [Work Submissions](https://app.notion.com/p/1e6946f49232443f83819e66031089d3)
    - [Fleet Wiki](https://app.notion.com/p/3a03ef07399281a5b7e3f8cd77ba4d47)
+   - [Business plan evidence index](https://app.notion.com/p/4123ef073992811a9c3dc01e9222ca71) (Robusca — pointer only)
 3. **No bulk import**, no scheduled sync jobs, no new vendor installs from reference manifest without human review.
 
 ## Stable IDs & dedupe

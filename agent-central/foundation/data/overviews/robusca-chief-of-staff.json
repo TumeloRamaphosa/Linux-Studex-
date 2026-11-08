@@ -8,7 +8,11 @@
     "sections": [
       {
         "heading": "Role",
-        "body": "Coordinates business organisation and cross-lane priorities. Does not operate live VMs in this repo."
+        "body": "Coordinates business planning and evidence. Agent Central in this repo is a linked command home, not a duplicate of Sentinel's canonical project queue."
+      },
+      {
+        "heading": "Business plan data room",
+        "body": "Notion business plan evidence index (pointer only, unverified sync): https://app.notion.com/p/4123ef073992811a9c3dc01e9222ca71"
       },
       {
         "heading": "Engineering ownership",
@@ -16,7 +20,11 @@
       },
       {
         "heading": "Commercial priorities",
-        "body": "Meat and coffee sales are stated business priorities. There is no accepted product launch evidenced in this repository slice."
+        "body": "Founder-proposed priorities include meat and coffee online sales (seasonal campaigns), Stud-Bot and VM/workplace offers. No accepted launch or sales baselines in this repository."
+      },
+      {
+        "heading": "Routines vs implementation",
+        "body": "Parent weekday hourly review instructions and daily filing guidance exist outside this repo. They do not imply implemented in-app sync, live fleet telemetry, or proof of completed product."
       },
       {
         "heading": "Paths & telemetry",

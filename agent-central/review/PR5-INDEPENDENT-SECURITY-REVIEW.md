@@ -113,7 +113,7 @@ PR #5 markdown room does **not** record:
 - Work Submissions `https://app.notion.com/p/1e6946f49232443f83819e66031089d3`
 - Fleet Wiki `https://app.notion.com/p/3a03ef07399281a5b7e3f8cd77ba4d47`
 
-Complementary addition: `agent-central/foundation/data/index.json` on this branch.
+Complementary addition: `agent-central/foundation/data/index.json` on this branch (includes Sentinel canons + Robusca business plan evidence index `4123ef073992811a9c3dc01e9222ca71` — pointer only, no Notion API sync).
 
 ### Classification / PII
 

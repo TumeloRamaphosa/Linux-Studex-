@@ -92,6 +92,13 @@
           "status": "unverified",
           "summary": "URLs recorded; no API sync or bulk import performed.",
           "href": "https://app.notion.com/p/1e6946f49232443f83819e66031089d3"
+        },
+        {
+          "id": "ev-robusca-business-plan-index",
+          "kind": "notion-canon",
+          "status": "unverified",
+          "summary": "Robusca business plan evidence index — link only, curated context 2026-11-08.",
+          "href": "https://app.notion.com/p/4123ef073992811a9c3dc01e9222ca71"
         }
       ],
       "approvalGate": {

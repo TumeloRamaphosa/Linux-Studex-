@@ -191,9 +191,11 @@
           "properties": {
             "projects": { "type": "string", "format": "uri" },
             "workSubmissions": { "type": "string", "format": "uri" },
-            "fleetWiki": { "type": "string", "format": "uri" }
+            "fleetWiki": { "type": "string", "format": "uri" },
+            "businessPlanEvidenceIndex": { "type": "string", "format": "uri" }
           }
         },
+        "businessPlanEvidenceOwner": { "type": "string" },
         "syncStatus": { "$ref": "#/$defs/evidenceStatus" }
       }
     },

@@ -27,4 +27,18 @@ Use on work submissions and per-agent `kpiReview` stubs. **Do not invent live nu
 | `lane.priorityNote` | Qualitative priority; no revenue figures without evidence |
 | `lane.status` | `unverified` until external sales telemetry is reviewed and imported via manifest |
 
+## Robusca / commercial review (names only — baselines unknown)
+
+| Field | Notes |
+|-------|--------|
+| `orders` | Verified only with receipt-linked evidence |
+| `contribution_margin` | No default numbers in repo |
+| `fulfilment_reliability` | Qualitative + evidence links only |
+| `accepted_work_with_evidence` | Tied to work submissions / Notion pointers |
+| `test_results` | CI or manual test logs only |
+| `decision_turnaround` | Human-measured |
+| `founder_time` | Human-measured |
+
+Sales, order, and conversion **baselines are unknown**. Founder interview materials are questionnaires, not completed scores.
+
 No fabricated agents, revenue, or live telemetry in this foundation slice.

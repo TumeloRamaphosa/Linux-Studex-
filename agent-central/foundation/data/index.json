@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "generatedAt": "2026-11-08T10:00:00.000Z",
+  "generatedAt": "2026-11-08T10:30:00.000Z",
   "classification": "public-internal-summary",
   "central": {
     "title": "Agent Central — Linux StudEx OS",
@@ -9,11 +9,13 @@
       "projectsOwner": "Sentinel",
       "workSubmissionsOwner": "Sentinel",
       "fleetWikiOwner": "Sentinel",
+      "businessPlanEvidenceOwner": "Robusca",
       "syncStatus": "unverified",
       "links": {
         "projects": "https://app.notion.com/p/e9a5ca9fbd6041c9920f4982bb64864d",
         "workSubmissions": "https://app.notion.com/p/1e6946f49232443f83819e66031089d3",
-        "fleetWiki": "https://app.notion.com/p/3a03ef07399281a5b7e3f8cd77ba4d47"
+        "fleetWiki": "https://app.notion.com/p/3a03ef07399281a5b7e3f8cd77ba4d47",
+        "businessPlanEvidenceIndex": "https://app.notion.com/p/4123ef073992811a9c3dc01e9222ca71"
       }
     },
     "businessLanes": [
@@ -42,7 +44,7 @@
         "id": "gaming",
         "displayName": "Gaming",
         "status": "unverified",
-        "priorityNote": "Lane reserved; no scoped deliverables in this foundation PR.",
+        "priorityNote": "December Rwanda gaming initiative proposed; dates and commitments unverified in repo.",
         "linkedAgents": ["farm"]
       },
       {
@@ -73,7 +75,7 @@
       {
         "id": "robusca-chief-of-staff",
         "displayName": "Robusca (Chief of Staff)",
-        "roleSummary": "Coordination and business organisation overview.",
+        "roleSummary": "Business planning and evidence coordination (linked command home; Sentinel owns canonical project queue).",
         "status": "unverified",
         "vmAgent": false,
         "dataRoomPath": "agent-central/foundation/data/agents/robusca-chief-of-staff.json",
@@ -82,8 +84,16 @@
         "kpiReview": {
           "humanReviewRequired": true,
           "agentMetricsVerified": false,
-          "fields": ["lane.priorityNote"],
-          "notes": "Overview sanitized; see /api/agent-central/overview/robusca-chief-of-staff"
+          "fields": [
+            "orders",
+            "contribution_margin",
+            "fulfilment_reliability",
+            "accepted_work_with_evidence",
+            "test_results",
+            "decision_turnaround",
+            "founder_time"
+          ],
+          "notes": "Proposed KPI field names only — no baseline numbers. Notion business plan index linked in notionCanons.businessPlanEvidenceIndex."
         }
       },
       {

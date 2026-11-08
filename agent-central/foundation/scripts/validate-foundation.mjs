@@ -32,7 +32,7 @@ if (dupSubs.length) {
 }
 
 const notion = index.central.notionCanons?.links;
-const required = ['projects', 'workSubmissions', 'fleetWiki'];
+const required = ['projects', 'workSubmissions', 'fleetWiki', 'businessPlanEvidenceIndex'];
 for (const key of required) {
   if (!notion?.[key]?.startsWith('https://app.notion.com/p/')) {
     console.error('Missing or invalid Notion canon:', key);
