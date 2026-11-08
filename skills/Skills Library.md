@@ -7,12 +7,12 @@ tags: [index, studex]
 
 Studex Skills Library catalogue. **Catalogue only — no auto-install.** See [[README - How to add a skill]].
 
-_Last library update: 2026-11-07_
+_Last library update: 2026-11-08_
 
 ## Counts by tier
 
-- **Trusted:** 145
-- **Screen first:** 26
+- **Trusted:** 149
+- **Screen first:** 38
 - **Missing:** 2
 
 ## By category
@@ -243,3 +243,26 @@ _Last library update: 2026-11-07_
 | tdd | Screen first |
 | grill-with-docs | Screen first |
 | improve-codebase-architecture | Screen first |
+
+## Changelog 2026-11-08
+
++16 catalogue entries (catalogue only — no installs):
+
+| Skill | Tier |
+|---|---|
+| figma-code-workflows | Trusted |
+| figma-spec | Trusted |
+| video-interaction-mapper | Trusted |
+| generate-project-plan | Trusted |
+| shadcn | Screen first |
+| code-review | Screen first |
+| triage | Screen first |
+| implement | Screen first |
+| to-spec | Screen first |
+| to-tickets | Screen first |
+| pr | Screen first |
+| diagnosing-bugs | Screen first |
+| git-guardrails-claude-code | Screen first |
+| setup-pre-commit | Screen first |
+| claude-handoff | Screen first |
+| software-factory | Screen first |
