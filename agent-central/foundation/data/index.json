@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-11-08T10:00:00.000Z",
+  "classification": "public-internal-summary",
+  "central": {
+    "title": "Agent Central — Linux StudEx OS",
+    "workSubmissionCount": 3,
+    "notionCanons": {
+      "projectsOwner": "Sentinel",
+      "workSubmissionsOwner": "Sentinel",
+      "fleetWikiOwner": "Sentinel",
+      "syncStatus": "unverified",
+      "links": {
+        "projects": "https://app.notion.com/p/e9a5ca9fbd6041c9920f4982bb64864d",
+        "workSubmissions": "https://app.notion.com/p/1e6946f49232443f83819e66031089d3",
+        "fleetWiki": "https://app.notion.com/p/3a03ef07399281a5b7e3f8cd77ba4d47"
+      }
+    },
+    "businessLanes": [
+      {
+        "id": "meat",
+        "displayName": "Meat sales",
+        "status": "unverified",
+        "priorityNote": "Business priority per executive briefing; no accepted launch from current repo evidence.",
+        "linkedAgents": ["robusca-chief-of-staff", "cashclaw"]
+      },
+      {
+        "id": "coffee",
+        "displayName": "Coffee sales",
+        "status": "unverified",
+        "priorityNote": "Business priority per executive briefing; revenue telemetry not in repo.",
+        "linkedAgents": ["robusca-chief-of-staff", "cashclaw"]
+      },
+      {
+        "id": "stud-bot-vm-workplace",
+        "displayName": "Stud-Bot VM / workplace",
+        "status": "tested",
+        "priorityNote": "RVS fleet and Express agent OS in this repo are the tested platform slice.",
+        "linkedAgents": ["hermes", "cursor", "openhuman", "farm", "stud-bot"]
+      },
+      {
+        "id": "gaming",
+        "displayName": "Gaming",
+        "status": "unverified",
+        "priorityNote": "Lane reserved; no scoped deliverables in this foundation PR.",
+        "linkedAgents": ["farm"]
+      },
+      {
+        "id": "platform-engineering",
+        "displayName": "Platform engineering",
+        "status": "tested",
+        "priorityNote": "Sentinel engineering ownership; Agent Central foundation in repo.",
+        "linkedAgents": ["sentinel", "cursor", "hermes"]
+      }
+    ],
+    "agents": [
+      {
+        "id": "sentinel",
+        "displayName": "Sentinel",
+        "roleSummary": "Engineering owner for Notion canons and platform delivery.",
+        "status": "unverified",
+        "vmAgent": false,
+        "dataRoomPath": "agent-central/foundation/data/agents/sentinel.json",
+        "apiDetailPath": "/api/agent-central/agents/sentinel",
+        "businessLanes": ["platform-engineering"],
+        "kpiReview": {
+          "humanReviewRequired": true,
+          "agentMetricsVerified": false,
+          "fields": ["submissions_passing_acceptance", "evidence_items_tested"],
+          "notes": "Human owner; KPIs require Notion/workflow evidence outside this slice."
+        }
+      },
+      {
+        "id": "robusca-chief-of-staff",
+        "displayName": "Robusca (Chief of Staff)",
+        "roleSummary": "Coordination and business organisation overview.",
+        "status": "unverified",
+        "vmAgent": false,
+        "dataRoomPath": "agent-central/foundation/data/agents/robusca-chief-of-staff.json",
+        "apiDetailPath": "/api/agent-central/agents/robusca-chief-of-staff",
+        "businessLanes": ["meat", "coffee"],
+        "kpiReview": {
+          "humanReviewRequired": true,
+          "agentMetricsVerified": false,
+          "fields": ["lane.priorityNote"],
+          "notes": "Overview sanitized; see /api/agent-central/overview/robusca-chief-of-staff"
+        }
+      },
+      {
+        "id": "stud-bot",
+        "displayName": "Stud-Bot",
+        "roleSummary": "Workplace / VM assistant persona for Studex fleet.",
+        "status": "unverified",
+        "vmAgent": false,
+        "dataRoomPath": "agent-central/foundation/data/agents/stud-bot.json",
+        "apiDetailPath": "/api/agent-central/agents/stud-bot",
+        "businessLanes": ["stud-bot-vm-workplace"],
+        "kpiReview": {
+          "humanReviewRequired": true,
+          "agentMetricsVerified": false,
+          "fields": ["tasks_completed_count"],
+          "notes": "Not a live runtime agent in server/agents; index entry only."
+        }
+      },
+      {
+        "id": "cashclaw",
+        "displayName": "Cashclaw",
+        "roleSummary": "Financial agent / trading (RVS1).",
+        "status": "historical",
+        "vmAgent": true,
+        "rvs": "RVS1",
+        "dataRoomPath": "agent-central/foundation/data/agents/cashclaw.json",
+        "apiDetailPath": "/api/agent-central/agents/cashclaw",
+        "businessLanes": ["meat", "coffee"],
+        "kpiReview": {
+          "humanReviewRequired": true,
+          "agentMetricsVerified": false,
+          "fields": ["tasks_completed_count"],
+          "notes": "Demo logs only; no live trading telemetry in repo."
+        }
+      },
+      {
+        "id": "hermes",
+        "displayName": "Hermes",
+        "roleSummary": "Gateway / orchestrator (RVS2).",
+        "status": "tested",
+        "vmAgent": true,
+        "rvs": "RVS2",
+        "dataRoomPath": "agent-central/foundation/data/agents/hermes.json",
+        "apiDetailPath": "/api/agent-central/agents/hermes",
+        "businessLanes": ["stud-bot-vm-workplace", "platform-engineering"],
+        "kpiReview": {
+          "humanReviewRequired": true,
+          "agentMetricsVerified": false,
+          "fields": ["repo_test_pass_rate"],
+          "notes": "Runtime tested via existing server; mesh KPIs need CI wiring."
+        }
+      },
+      {
+        "id": "openhuman",
+        "displayName": "OpenHuman",
+        "roleSummary": "Platform / deployment (RVS3).",
+        "status": "historical",
+        "vmAgent": true,
+        "rvs": "RVS3",
+        "dataRoomPath": "agent-central/foundation/data/agents/openhuman.json",
+        "apiDetailPath": "/api/agent-central/agents/openhuman",
+        "businessLanes": ["stud-bot-vm-workplace"],
+        "kpiReview": {
+          "humanReviewRequired": true,
+          "agentMetricsVerified": false,
+          "fields": ["tasks_completed_count"],
+          "notes": "Deploy paths unverified against production."
+        }
+      },
+      {
+        "id": "cursor",
+        "displayName": "Cursor",
+        "roleSummary": "IDE / development agent (RVS4).",
+        "status": "tested",
+        "vmAgent": true,
+        "rvs": "RVS4",
+        "dataRoomPath": "agent-central/foundation/data/agents/cursor.json",
+        "apiDetailPath": "/api/agent-central/agents/cursor",
+        "businessLanes": ["stud-bot-vm-workplace", "platform-engineering"],
+        "kpiReview": {
+          "humanReviewRequired": true,
+          "agentMetricsVerified": false,
+          "fields": ["submissions_passing_acceptance"],
+          "notes": "Maps to development lane; evidence via PR/work submissions."
+        }
+      },
+      {
+        "id": "farm",
+        "displayName": "Agent Farm",
+        "roleSummary": "Worker nodes / Ollama batch (RVS5+).",
+        "status": "historical",
+        "vmAgent": true,
+        "rvs": "RVS5-14",
+        "dataRoomPath": "agent-central/foundation/data/agents/farm.json",
+        "apiDetailPath": "/api/agent-central/agents/farm",
+        "businessLanes": ["stud-bot-vm-workplace", "gaming"],
+        "kpiReview": {
+          "humanReviewRequired": true,
+          "agentMetricsVerified": false,
+          "fields": ["tasks_completed_count"],
+          "notes": "Simulated farm logs; live worker count not verified."
+        }
+      }
+    ]
+  }
+}

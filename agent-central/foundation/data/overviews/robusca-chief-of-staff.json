@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0.0",
+  "classification": "public-internal-summary",
+  "overview": {
+    "id": "robusca-chief-of-staff",
+    "role": "Chief of Staff — coordination and business organisation",
+    "status": "unverified",
+    "sections": [
+      {
+        "heading": "Role",
+        "body": "Coordinates business organisation and cross-lane priorities. Does not operate live VMs in this repo."
+      },
+      {
+        "heading": "Engineering ownership",
+        "body": "Sentinel owns engineering delivery and canonical Notion Projects / Work Submissions / Fleet Wiki pointers."
+      },
+      {
+        "heading": "Commercial priorities",
+        "body": "Meat and coffee sales are stated business priorities. There is no accepted product launch evidenced in this repository slice."
+      },
+      {
+        "heading": "Paths & telemetry",
+        "body": "Linear and Obsidian workflow paths are documented as conventions only — unverified in CI. No fabricated agents, revenue figures, or live telemetry are stored in Agent Central data."
+      },
+      {
+        "heading": "Acceptance",
+        "body": "Human review required before treating any lane as production-ready. Finished cloud-agent runs do not imply production acceptance."
+      }
+    ]
+  }
+}

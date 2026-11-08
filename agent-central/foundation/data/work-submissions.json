@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "1.0.0",
+  "classification": "public-internal-summary",
+  "submissions": [
+    {
+      "id": "ws-agent-central-foundation",
+      "title": "Agent Central foundation index + independent PR #5 security review",
+      "source": "cursor-cloud-agent",
+      "project": "Linux StudEx OS",
+      "owner": "Sentinel",
+      "businessLane": "platform-engineering",
+      "status": "tested",
+      "acceptanceEvidence": [
+        {
+          "id": "ev-schema",
+          "kind": "schema",
+          "status": "tested",
+          "summary": "agent-central-v1.schema.json defines index, agents, submissions, lanes.",
+          "path": "agent-central/foundation/schema/agent-central-v1.schema.json"
+        },
+        {
+          "id": "ev-foundation-validate",
+          "kind": "test-run",
+          "status": "tested",
+          "summary": "validate-foundation.mjs checks dedupe and Notion canon URLs.",
+          "path": "agent-central/foundation/scripts/validate-foundation.mjs"
+        },
+        {
+          "id": "ev-pr5-review",
+          "kind": "manual-review",
+          "status": "tested",
+          "summary": "Independent PR #5 security review with reproducible curl/npm test commands.",
+          "path": "agent-central/review/PR5-INDEPENDENT-SECURITY-REVIEW.md"
+        },
+        {
+          "id": "ev-sync-contract",
+          "kind": "doc",
+          "status": "tested",
+          "summary": "Permissions, sync contract, daily filing, KPI field stubs documented.",
+          "path": "agent-central/foundation/docs/sync-contract.md"
+        }
+      ],
+      "approvalGate": {
+        "required": true,
+        "state": "pending",
+        "reviewerRole": "Sentinel",
+        "approvedAt": null,
+        "notes": "Provider run complete ≠ production acceptance."
+      },
+      "submittedAt": "2026-11-08T10:00:00.000Z",
+      "updatedAt": "2026-11-08T10:00:00.000Z"
+    },
+    {
+      "id": "ws-meat-coffee-lane-index",
+      "title": "Meat & coffee business lane index (no revenue claims)",
+      "source": "executive-briefing-sanitized",
+      "project": "Studex commercial lanes",
+      "owner": "Robusca (Chief of Staff)",
+      "businessLane": "meat",
+      "status": "unverified",
+      "acceptanceEvidence": [
+        {
+          "id": "ev-lane-index",
+          "kind": "doc",
+          "status": "unverified",
+          "summary": "Lanes listed in agent-central/foundation/data/index.json with unverified status.",
+          "path": "agent-central/foundation/data/index.json"
+        }
+      ],
+      "approvalGate": {
+        "required": true,
+        "state": "pending",
+        "reviewerRole": "founder",
+        "approvedAt": null,
+        "notes": "No accepted product launch from current evidence."
+      },
+      "submittedAt": "2026-11-08T10:00:00.000Z",
+      "updatedAt": "2026-11-08T10:00:00.000Z"
+    },
+    {
+      "id": "ws-notion-canon-pointers",
+      "title": "Notion canon pointers (Sentinel-owned)",
+      "source": "fleet-wiki-reference",
+      "project": "Agent Central",
+      "owner": "Sentinel",
+      "businessLane": "platform-engineering",
+      "status": "unverified",
+      "acceptanceEvidence": [
+        {
+          "id": "ev-notion-links",
+          "kind": "notion-canon",
+          "status": "unverified",
+          "summary": "URLs recorded; no API sync or bulk import performed.",
+          "href": "https://app.notion.com/p/1e6946f49232443f83819e66031089d3"
+        }
+      ],
+      "approvalGate": {
+        "required": true,
+        "state": "pending",
+        "reviewerRole": "Sentinel",
+        "approvedAt": null,
+        "notes": "Manual alignment only per sync-contract.md."
+      },
+      "submittedAt": "2026-11-08T10:00:00.000Z",
+      "updatedAt": "2026-11-08T10:00:00.000Z"
+    }
+  ]
+}
