@@ -71,14 +71,13 @@ deploy_vm() {
   #   - qemu-system-x86_64 -m 4G -hda ./images/${vm}.qcow2 ...
   #   - UTM CLI: utmctl create --name ${vm} --arch arm64 --memory 4096 ...
   #   - OrbStack: orb create --name ${vm} --cpus 2 --memory 4GB
-  echo -e "${GREEN}  ✓${NC} VM image created (stub)"
-  echo -e "${GREEN}  ✓${NC} QEMU instance started on port ${port} (stub)"
-  echo -e "${GREEN}  ✓${NC} OpenClaw gateway configured (stub)"
-  echo -e "${GREEN}  ✓${NC} Ollama model loaded (stub)"
-  echo -e "${GREEN}  ✓${NC} n8n workflows synced (stub)"
-  echo -e "${GREEN}  ✓${NC} Obsidian logging enabled (stub)"
+  echo -e "${RED}  ○${NC} No disk image created"
+  echo -e "${RED}  ○${NC} QEMU was not started on port ${port}"
+  echo -e "${RED}  ○${NC} OpenClaw was not configured"
+  echo -e "${RED}  ○${NC} No model was loaded"
   echo ""
-  echo -e "${GOLD}RVS_${vm^^} is online! (stub)${NC}"
+  echo -e "${GOLD}Deploy is still a stub. Nothing was started.${NC}"
+  return 2
 }
 
 ssh_vm() {
@@ -100,11 +99,12 @@ case "${1:-}" in
     fi
     if [ "$2" = "all" ]; then
       for vm in cashclaw hermes openhuman cursor; do
-        deploy_vm "$vm"
+        deploy_vm "$vm" || true
       done
     else
-      deploy_vm "$2"
+      deploy_vm "$2" || true
     fi
+    exit 2
     ;;
   --ssh)
     ssh_vm "${2:-}"
@@ -122,7 +122,7 @@ case "${1:-}" in
     bash "$SCRIPT_DIR/setup-naledi.sh" "$@"
     ;;
   --logs|-l)
-    local vm="${2:-}"
+    vm="${2:-}"
     if [ -n "$vm" ]; then
       tail -f "/var/log/studex/$vm.log" 2>/dev/null || echo "No logs for $vm yet"
     else
