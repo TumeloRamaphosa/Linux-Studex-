@@ -2,6 +2,8 @@
 
 A multi-VM agent platform running on QEMU/UTM with pixel-agent dashboard, tmux command center, and Obsidian memory logging.
 
+**Agent Central** is the shared data room: [`agent-central/README.md`](agent-central/README.md). Every agent files work there. The command plane serves it at `http://localhost:4000/agent-central.html`. VM deploy is still a stub; the dashboard says so.
+
 ## Architecture
 
 ```

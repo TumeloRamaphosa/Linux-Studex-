@@ -996,11 +996,12 @@ p { margin-bottom: 16px; text-wrap: pretty; }
       </div>
     </div>
     <div class="header-status" id="header-status">
-      <span id="vm-count"><span class="status-dot online"></span>14 VMs Online</span>
+      <span id="vm-count"><span class="status-dot offline"></span>VM deploy: stub</span>
       <span id="agent-count"><span class="status-dot online"></span>5 Agents Active</span>
       <span id="msg-count" style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)">0 msgs</span>
       <span id="total-cost" style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gold)">$0.000</span>
       <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)" id="clock">00:00 SAST</span>
+      <a href="agent-central.html" style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gold);text-decoration:none;letter-spacing:0.08em">AGENT CENTRAL</a>
       <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙 Dark</button>
     </div>
   </div>
@@ -2134,7 +2135,7 @@ function updateHeaderStatus(agentList) {
   const online = agentList.filter(a => a.status === 'online').length;
   const totalMsgs = agentList.reduce((s, a) => s + (a.messages || 0), 0);
 
-  vmEl.innerHTML = `<span class="status-dot ${online > 0 ? 'online' : 'offline'}"></span>14 VMs Online`;
+  vmEl.innerHTML = `<span class="status-dot offline"></span>VM deploy: stub`;
   agentEl.innerHTML = `<span class="status-dot ${online > 0 ? 'online' : 'offline'}"></span>${online} Agents Active`;
   msgEl.textContent = `${totalMsgs} msgs`;
 }

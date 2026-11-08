@@ -22,6 +22,9 @@ import sandboxRoutes from './routes/sandbox.js';
 import mcpRoutes from './routes/mcp.js';
 import llmMeshRoutes from './routes/llm-mesh.js';
 import networkRoutes from './routes/network.js';
+import centralRoutes from './routes/central.js';
+import { resolveMarkdown } from './lib/central-store.js';
+import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.env.PORT) || 4000;
@@ -65,8 +68,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve the dashboard HTML statically
-app.use(express.static(path.resolve(__dirname, '..')));
+// Public pages only. The repo root used to be served whole, which exposed .git.
+const PUBLIC_FILES = new Set(['dashboard.html', 'agent-central.html', 'hero-bg.png']);
+app.get('/', (req, res) => res.redirect('/dashboard.html'));
+app.get('/agent-central/*', (req, res) => {
+  try {
+    const rel = decodeURIComponent(req.path.replace(/^\/agent-central\//, ''));
+    const { abs } = resolveMarkdown(rel);
+    if (!fs.existsSync(abs)) return res.status(404).type('text/plain').send('Not found');
+    res.type('text/markdown').sendFile(abs);
+  } catch (err) {
+    res.status(err.status || 400).json({ error: err.message });
+  }
+});
 
 // API routes
 app.use('/api/agents', agentRoutes(agents));
@@ -76,6 +90,14 @@ app.use('/api/sandbox', sandboxRoutes(sandboxManager));
 app.use('/api/mcp', mcpRoutes(mcpServer));
 app.use('/api/llm-mesh', llmMeshRoutes(llmMesh));
 app.use('/api/network', networkRoutes());
+app.use('/api/central', centralRoutes());
+
+app.use((req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+  const name = req.path.replace(/^\/+/, '');
+  if (!name || name.includes('/') || name.includes('..') || !PUBLIC_FILES.has(name)) return next();
+  res.sendFile(path.resolve(__dirname, '..', name));
+});
 
 // POST /api/tmux — execute a tmux command
 app.post('/api/tmux', async (req, res) => {

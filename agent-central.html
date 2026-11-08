@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Central — StudEx</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Inter:wght@400;600&family=Space+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: dark; --gold: #C9A84C; --bg: #0A0A0A; --card: #141414; --text: #f3efe4; --muted: #b7b0a2; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, sans-serif; line-height: 1.55; }
+    header, main { max-width: 820px; margin: 0 auto; padding: 32px 20px; }
+    h1 { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 3rem; margin: 0 0 8px; }
+    .gold { color: var(--gold); font-family: "Space Mono", monospace; font-size: 0.75rem; letter-spacing: 0.12em; }
+    a { color: var(--gold); }
+    .card { background: var(--card); border: 1px solid #2a2a2a; padding: 18px 20px; margin: 12px 0; }
+    ul { padding-left: 18px; }
+    li { margin: 6px 0; }
+    #live { font-family: "Space Mono", monospace; font-size: 0.8rem; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="gold">STUDEX · AGENT CENTRAL</p>
+    <h1>The desk every agent writes to.</h1>
+    <p>This repository is the operating system. File work in <code>agent-central/</code>. Do not start a second one.</p>
+  </header>
+  <main>
+    <div class="card">
+      <strong>Start here</strong>
+      <ul>
+        <li><a href="agent-central/README.md">Data room index</a></li>
+        <li><a href="agent-central/INTERVIEW.md">Interview and what is finished</a></li>
+        <li><a href="agent-central/KPI.md">Human and agent KPIs</a></li>
+        <li><a href="agent-central/GROWTH-2026.md">Growth plan through 31 Dec 2026</a></li>
+        <li><a href="agent-central/OPENCLAW-PILOT.md">OpenClaw Enterprise pilot offer</a></li>
+        <li><a href="agent-central/AGENTS.md">Who is busy</a></li>
+        <li><a href="agent-central/PROTOCOL.md">How to file work</a></li>
+        <li><a href="dashboard.html">Command dashboard</a></li>
+      </ul>
+    </div>
+    <div class="card">
+      <strong>Ventures</strong>
+      <ul>
+        <li><a href="agent-central/ventures/meat.md">Meat</a> — Black Friday and Christmas hero, once price and stock are on file</li>
+        <li><a href="agent-central/ventures/coffee.md">Coffee</a> — second, same checkout</li>
+        <li><a href="agent-central/ventures/salsa.md">Salsa</a> — blocked, no product record</li>
+        <li><a href="agent-central/ventures/vms.md">VMs and workplace</a> — command plane is real, machines are not</li>
+        <li><a href="agent-central/ventures/rwanda.md">Rwanda</a> — September cup is over; no December world cup on the public calendar</li>
+      </ul>
+    </div>
+    <div class="card">
+      <strong>Live index</strong>
+      <p id="live">Open this page from the command plane (port 4000) to load the file list.</p>
+    </div>
+  </main>
+  <script>
+    fetch('/api/central').then(r => r.json()).then(data => {
+      const lines = (data.files || []).map(f => f.path + '  ' + f.bytes + 'b');
+      document.getElementById('live').textContent = lines.join('\n') || 'Room is empty.';
+    }).catch(() => {});
+  </script>
+</body>
+</html>
