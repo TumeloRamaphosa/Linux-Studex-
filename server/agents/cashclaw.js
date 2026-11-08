@@ -63,15 +63,24 @@ export default class CashclawAgent extends BaseAgent {
 
     // ── FeedHive Content Commands ──────────────────────────────────────────
 
-    if (lower.includes('content') || lower.includes('post') || lower.includes('schedule') || lower.includes('feedhive') || lower.includes('publish')) {
+    if (lower.includes('content') || lower.includes('post') || lower.includes('schedule') || lower.includes('feedhive') || lower.includes('publish') || lower.includes('queue') || lower.includes('draft')) {
       return this._handleContentCommand(msg);
     }
 
-    if (lower.includes('positions') || lower.includes('status') && !lower.includes('content') || lower.includes('portfolio')) {
+    if (lower.includes('close') || lower.includes('exit') || lower.includes('sell')) {
+      const asset = lower.includes('btc') ? 'BTC/USD' : lower.includes('eth') ? 'ETH/USD' : lower.includes('sol') ? 'SOL/USD' : null;
+      if (asset) {
+        this.logger.decision('Close Position', `Refused close for ${asset}. Demo book only.`);
+        return `No order sent. ${asset} is on the demo book only. Nothing was submitted to a broker.`;
+      }
+      return 'No order sent. Name BTC, ETH, or SOL. This book is a demo and does not trade.';
+    }
+
+    if ((lower.includes('positions') || lower.includes('portfolio') || lower.includes('status')) && !lower.includes('content')) {
       const lines = this.positions.map(p =>
         `${p.asset}: ${p.size} @ ${p.entry} → ${p.current} (${((p.current - p.entry) / p.entry * 100).toFixed(1)}%)`
       );
-      return `3 open positions.\n${lines.join('\n')}\nP&L today: +${this.pnl}% | Total trades: ${this.tradeCount}`;
+      return `Demo book only. Sample numbers, not a live brokerage.\n${lines.join('\n')}\nSample P&L today: +${this.pnl}% | Sample trades: ${this.tradeCount}`;
     }
 
     if (lower.includes('btc') || lower.includes('bitcoin')) {
@@ -90,15 +99,6 @@ export default class CashclawAgent extends BaseAgent {
       const sol = this.positions[2];
       const pct = ((sol.current - sol.entry) / sol.entry * 100).toFixed(1);
       return `SOL/USD @ ${sol.current} (${pct > 0 ? '+' : ''}${pct}%). Momentum bullish. Next target 160.`;
-    }
-
-    if (lower.includes('close') || lower.includes('exit') || lower.includes('sell')) {
-      const asset = lower.includes('btc') ? 'BTC/USD' : lower.includes('eth') ? 'ETH/USD' : lower.includes('sol') ? 'SOL/USD' : null;
-      if (asset) {
-        this.logger.decision('Close Position', `Closed ${asset} at market. Profit locked.`);
-        return `Closing ${asset} position at ${this.positions.find(p => p.asset === asset).current}. Order submitted.`;
-      }
-      return 'Which asset? Specify BTC, ETH, or SOL.';
     }
 
     if (lower.includes('check') || lower.includes('alert') || lower.includes('monitor')) {
@@ -167,12 +167,7 @@ export default class CashclawAgent extends BaseAgent {
       if (!this.feedhiveConfig.connected) return 'FeedHive not connected. Use "connect feedhive" first.';
       if (this.postedToday >= this.dailyLimit) return `Daily limit reached (${this.dailyLimit}). Upgrade plan or wait for reset.`;
 
-      const toPublish = this.contentQueue.shift();
-      toPublish.status = 'published';
-      toPublish.publishedAt = Date.now();
-      this.postedToday++;
-      this.logger.decision('Content Published', `${toPublish.template} → ${toPublish.platform}`);
-      return `📤 Published "${toPublish.template}" to ${toPublish.platform} via FeedHive. ${this.postedToday}/${this.dailyLimit} today. Queue: ${this.contentQueue.length} remaining.`;
+      return `Not sent. "${this.contentQueue[0].template}" is still a draft. This build does not call FeedHive.`;
     }
 
     // List platforms

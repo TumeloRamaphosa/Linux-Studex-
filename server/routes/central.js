@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import {
   assertDropAuthorized,
+  assertProvenanceMatchesBinding,
   centralDropPolicy,
-  dropReport,
-  listMarkdown,
-  readMarkdown,
-} from '../lib/central-store.js';
+} from '../lib/central-drop-auth.js';
+import { dropReport, listMarkdown, readMarkdown } from '../lib/central-store.js';
 
 export default function centralRoutes() {
   const router = Router();
@@ -18,8 +17,11 @@ export default function centralRoutes() {
       files: listMarkdown(),
       drop: {
         enabled: policy.enabled,
-        auth: policy.tokenRequired ? 'token' : policy.enabled ? 'open-when-enabled' : 'disabled',
+        configured: policy.configured,
+        auth: policy.auth,
         failClosed: policy.failClosed,
+        misconfigured: policy.misconfigured,
+        reason: policy.reason,
       },
     });
   });
@@ -34,11 +36,10 @@ export default function centralRoutes() {
 
   router.post('/drop', (req, res) => {
     try {
-      assertDropAuthorized(req);
+      const binding = assertDropAuthorized(req);
+      assertProvenanceMatchesBinding(req.body, binding);
       const saved = dropReport({
-        agent: req.body?.agent,
-        owner: req.body?.owner,
-        source: req.body?.source,
+        binding,
         date: req.body?.date,
         title: req.body?.title,
         body: req.body?.body,

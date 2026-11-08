@@ -23,6 +23,7 @@ import mcpRoutes from './routes/mcp.js';
 import llmMeshRoutes from './routes/llm-mesh.js';
 import networkRoutes from './routes/network.js';
 import centralRoutes from './routes/central.js';
+import agentCentralFoundationRoutes from './routes/agent-central-foundation.js';
 import { resolveMarkdown } from './lib/central-store.js';
 import {
   isPublicStaticRequest,
@@ -106,6 +107,7 @@ app.use('/api/mcp', mcpRoutes(mcpServer));
 app.use('/api/llm-mesh', llmMeshRoutes(llmMesh));
 app.use('/api/network', networkRoutes());
 app.use('/api/central', centralRoutes());
+app.use('/api/agent-central/foundation', agentCentralFoundationRoutes());
 
 // POST /api/tmux — execute a tmux command
 app.post('/api/tmux', async (req, res) => {

@@ -1,0 +1,23 @@
+name: agent-central-ci
+
+on:
+  push:
+    branches: [main, 'cursor/**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Server unit + smoke tests
+        working-directory: server
+        run: npm install && npm test
+      - name: Foundation validate
+        run: node agent-central/foundation/scripts/validate-foundation.mjs
+      - name: Local secret pattern scan
+        run: node agent-central/foundation/scripts/secret-scan-local.mjs

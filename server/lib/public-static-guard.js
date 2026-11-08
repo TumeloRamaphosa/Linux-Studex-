@@ -2,7 +2,11 @@
  * Allowlisted root static files only (no repo-wide static hosting).
  * Complementary security patch — provenance: cursor/agent-central-foundation-7328
  */
-export const PUBLIC_FILES = new Set(['dashboard.html', 'agent-central.html', 'hero-bg.png']);
+export const PUBLIC_FILES = new Set([
+  'dashboard.html',
+  'agent-central.html',
+  'hero-bg.png',
+]);
 
 export function isPublicStaticRequest(method, urlPath) {
   if (method !== 'GET' && method !== 'HEAD') return false;

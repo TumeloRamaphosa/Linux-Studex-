@@ -12,6 +12,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 
 test('PUBLIC_FILES allowlist blocks .git and nested paths', () => {
   assert.ok(PUBLIC_FILES.has('dashboard.html'));
+  assert.ok(PUBLIC_FILES.has('agent-central.html'));
   assert.ok(!PUBLIC_FILES.has('.git'));
   assert.equal(isPublicStaticRequest('GET', '/.git/HEAD'), false);
   assert.equal(isPublicStaticRequest('GET', '/dashboard.html'), true);

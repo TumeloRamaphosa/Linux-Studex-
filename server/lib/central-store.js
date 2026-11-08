@@ -46,6 +46,7 @@ export function resolveMarkdown(rel) {
     err.status = 400;
     throw err;
   }
+  assertMarkdownPathAllowed(cleaned);
   if (!cleaned.endsWith('.md')) {
     const err = new Error('Only markdown files are stored here');
     err.status = 400;
@@ -74,6 +75,7 @@ export function listMarkdown(dir = CENTRAL_ROOT, prefix = '') {
   const out = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name.startsWith('.')) continue;
+    if (entry.name === 'memory' || entry.name === 'foundation') continue;
     const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
     const abs = path.join(dir, entry.name);
     if (entry.isSymbolicLink()) continue;
@@ -131,34 +133,28 @@ export function validateProvenance({ agent, owner, source, date }) {
   return day;
 }
 
-export function centralDropPolicy() {
-  const enabled = process.env.CENTRAL_DROP_ENABLED === 'true';
-  const token = process.env.CENTRAL_DROP_TOKEN || '';
-  return {
-    enabled,
-    tokenRequired: Boolean(token),
-    failClosed: !enabled,
-  };
+const BLOCKED_MARKDOWN_PREFIXES = ['memory/', 'foundation/'];
+
+export { centralDropPolicy, assertDropAuthorized } from './central-drop-auth.js';
+
+function assertMarkdownPathAllowed(rel) {
+  const norm = String(rel || '').replace(/\\/g, '/');
+  if (BLOCKED_MARKDOWN_PREFIXES.some((p) => norm === p.slice(0, -1) || norm.startsWith(p))) {
+    const err = new Error('Path is not allowed');
+    err.status = 403;
+    throw err;
+  }
 }
 
-export function assertDropAuthorized(req) {
-  const policy = centralDropPolicy();
-  if (!policy.enabled) {
-    const err = new Error('Drop endpoint disabled until CENTRAL_DROP_ENABLED=true');
+export function dropReport({ binding, agent, owner, source, date, title, body }) {
+  if (!binding?.agent || !binding?.owner || !binding?.source) {
+    const err = new Error('Token-bound identity required');
     err.status = 503;
     throw err;
   }
-  if (policy.tokenRequired) {
-    const header = req.headers['x-central-token'];
-    if (header !== process.env.CENTRAL_DROP_TOKEN) {
-      const err = new Error('Unauthorized');
-      err.status = 401;
-      throw err;
-    }
-  }
-}
-
-export function dropReport({ agent, owner, source, date, title, body }) {
+  agent = binding.agent;
+  owner = binding.owner;
+  source = binding.source;
   const text = String(body || '');
   if (!text.trim()) {
     const err = new Error('Body is required');

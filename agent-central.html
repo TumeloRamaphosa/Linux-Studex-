@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Central — StudEx</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Inter:wght@400;600&family=Space+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root { --gold: #C9A84C; --bg: #FAF7F2; --card: #fff; --text: #1a1a1a; --muted: #666; --warn: #a65; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, sans-serif; line-height: 1.55; }
+    header, main { max-width: 960px; margin: 0 auto; padding: 28px 20px; }
+    h1 { font-family: "Cormorant Garamond", serif; font-size: 2.6rem; margin: 0 0 8px; }
+    .mono { font-family: "Space Mono", monospace; font-size: 0.72rem; letter-spacing: 0.08em; color: var(--gold); }
+    a { color: #5a3d8f; }
+    .card { background: var(--card); border: 1px solid #e8e2d8; border-radius: 8px; padding: 16px 18px; margin: 12px 0; }
+    .badge { display: inline-block; font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; background: #f0ebe3; margin-left: 6px; }
+    .badge-warn { background: #fde8e4; color: var(--warn); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+    .muted { color: var(--muted); font-size: 0.85rem; }
+    #disclaimer { border-left: 3px solid var(--gold); padding-left: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="mono">STUDEX · AGENT CENTRAL</p>
+    <h1>Command index &amp; data-room links</h1>
+    <p class="muted">One desk. JSON index is canonical for links/KPI field names; markdown room for human protocols. Runtime health: <strong>unverified</strong> unless stated with external evidence.</p>
+  </header>
+  <main>
+    <div class="card" id="disclaimer">
+      <strong>Examples vs accepted work</strong>
+      <p class="muted" id="index-disclaimer">Loading…</p>
+    </div>
+    <div class="card">
+      <strong>Agents</strong> <span class="badge badge-warn">runtime unverified</span>
+      <table id="agents"><thead><tr><th>Agent</th><th>Binding</th><th>Data room</th><th>Status</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="card">
+      <strong>Notion canons</strong> <span class="badge">pointers only</span>
+      <ul id="notion-links" class="muted"></ul>
+    </div>
+    <div class="card">
+      <strong>Markdown room</strong>
+      <ul>
+        <li><a href="agent-central/README.md">README</a></li>
+        <li><a href="agent-central/PROTOCOL.md">PROTOCOL</a> (drop requires token + bound identity)</li>
+        <li><a href="agent-central/KPI.md">KPI</a></li>
+        <li><a href="agent-central/AGENTS.md">AGENTS snapshot</a></li>
+        <li><a href="agent-central/ventures/meat.md">Venture: meat</a></li>
+        <li><a href="agent-central/ventures/coffee.md">Venture: coffee</a></li>
+        <li><a href="agent-central/ventures/vms.md">Venture: VMs</a></li>
+        <li><a href="dashboard.html">Command dashboard</a></li>
+      </ul>
+      <p class="muted">Sensitive <code>memory/</code> paths are not exposed via HTTP.</p>
+    </div>
+    <div class="card">
+      <strong>Live markdown index</strong>
+      <pre id="live" class="muted" style="white-space:pre-wrap;font-size:0.8rem;">Loading…</pre>
+    </div>
+  </main>
+  <script>
+    const fmt = (s) => s ?? '—';
+    Promise.all([
+      fetch('/api/agent-central/foundation/index').then((r) => r.json()),
+      fetch('/api/central').then((r) => r.json()).catch(() => ({})),
+    ]).then(([index, central]) => {
+      const c = index.central || index;
+      document.getElementById('index-disclaimer').textContent = c.disclaimer || index.disclaimer || 'See work-submissions recordKind.';
+      const tbody = document.querySelector('#agents tbody');
+      (c.agents || []).forEach((a) => {
+        const tr = document.createElement('tr');
+        const room = a.dataRoomPath
+          ? `<a href="/api/agent-central/foundation/agent-robusca-chief-of-staff">${a.id === 'robusca-chief-of-staff' ? 'JSON index' : 'example stub'}</a>`
+          : '—';
+        tr.innerHTML = `<td><strong>${fmt(a.displayName)}</strong><br><span class="muted">${fmt(a.id)}</span></td>
+          <td>${fmt(a.runtimeBinding)}<br><span class="muted">provisionedVm: ${fmt(a.provisionedVm)}</span></td>
+          <td class="muted">${fmt(a.dataRoomPath)}</td>
+          <td>${fmt(a.runtimeHealth || a.status)}</td>`;
+        tbody.appendChild(tr);
+      });
+      const ul = document.getElementById('notion-links');
+      const links = c.notionCanons?.links || {};
+      Object.entries(links).forEach(([k, href]) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${k}: <a href="${href}" rel="noopener noreferrer">${href}</a> <span class="badge">${c.notionCanons?.syncStatus || 'unverified'}</span>`;
+        ul.appendChild(li);
+      });
+      const lines = (central.files || []).map((f) => `${f.path}  ${f.bytes}b  updated ${f.updated}`);
+      document.getElementById('live').textContent = lines.join('\n') || 'No markdown files listed.';
+    }).catch((e) => {
+      document.getElementById('live').textContent = 'Start the command plane (port 4000) to load live data.';
+    });
+  </script>
+</body>
+</html>

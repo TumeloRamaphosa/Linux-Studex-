@@ -15,6 +15,10 @@ import {
   validateProvenance,
 } from '../lib/central-store.js';
 
+test('resolveMarkdown blocks sensitive memory paths', () => {
+  assert.throws(() => resolveMarkdown('memory/secret-session.md'), /not allowed/);
+});
+
 test('resolveMarkdown stays inside the data room', () => {
   const readme = resolveMarkdown('README.md');
   assert.equal(path.basename(readme.abs), 'README.md');
@@ -67,7 +71,7 @@ test('centralDropPolicy is fail-closed by default', () => {
   const prev = process.env.CENTRAL_DROP_ENABLED;
   delete process.env.CENTRAL_DROP_ENABLED;
   const policy = centralDropPolicy();
-  assert.equal(policy.enabled, false);
+  assert.equal(policy.configured, false);
   assert.equal(policy.failClosed, true);
   if (prev !== undefined) process.env.CENTRAL_DROP_ENABLED = prev;
 });
@@ -84,9 +88,7 @@ test('dropReport writes inbox file with provenance header', () => {
   process.env.CENTRAL_DROP_ENABLED = 'true';
   const title = `prov-${process.pid}-${Date.now()}`;
   const saved = dropReport({
-    agent: 'test',
-    owner: 'Sentinel',
-    source: 'node-test',
+    binding: { agent: 'test', owner: 'Sentinel', source: 'node-test' },
     date: '2026-11-08',
     title,
     body: '# Test drop\n\nProvenance required.\n',
@@ -104,9 +106,7 @@ test('dropReport refuses secret body in testcase', () => {
   assert.throws(
     () =>
       dropReport({
-        agent: 'test',
-        owner: 'Sentinel',
-        source: 'node-test',
+        binding: { agent: 'test', owner: 'Sentinel', source: 'node-test' },
         date: '2026-11-08',
         title: 'nope',
         body: 'token sk-abcdefghijklmnopqrstuvwxyz',
