@@ -1,0 +1,119 @@
+version: "0.2"
+name: studex7
+culture_file: CULTURE.md
+summary: >
+  StudEx-7 — the owned-business content pod of the Dark Factory. Daily
+  last30days competitor research -> brief -> brand copy -> Higgsfield
+  visuals/video -> approvals queue -> publish -> learnings to memory. Director
+  runs the loop; all other seats report to it.
+
+pods:
+  - id: studex7
+    label: StudEx-7 Content Pod
+    members:
+      - id: director
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/orchestration/orchestr\
+          ator"
+        runtime: claude-code
+        profile: default
+        cwd: "/Users/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/director.md
+              delivery_hint: send_text
+              required: true
+      - id: scout
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/research/analyst"
+        runtime: claude-code
+        profile: default
+        cwd: "/Users/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/scout.md
+              delivery_hint: send_text
+              required: true
+      - id: analyst
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/research/synthesizer"
+        runtime: claude-code
+        profile: default
+        cwd: "/Users/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/analyst.md
+              delivery_hint: send_text
+              required: true
+      - id: writer
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/development/implementer"
+        runtime: claude-code
+        profile: default
+        cwd: "/Users/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/writer.md
+              delivery_hint: send_text
+              required: true
+      - id: visual
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/design/product-designer"
+        runtime: claude-code
+        profile: default
+        cwd: "/Users/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/visual.md
+              delivery_hint: send_text
+              required: true
+      - id: video
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/development/implementer"
+        runtime: claude-code
+        profile: default
+        cwd: "/Users/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/video.md
+              delivery_hint: send_text
+              required: true
+      - id: publisher
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/development/implementer"
+        runtime: claude-code
+        profile: default
+        cwd: "/Users/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/publisher.md
+              delivery_hint: send_text
+              required: true
+      - id: memory
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/development/implementer"
+        runtime: claude-code
+        profile: default
+        cwd: "/Users/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/memory.md
+              delivery_hint: send_text
+              required: true
+    edges:
+      - kind: delegates_to
+        from: director
+        to: scout
+      - kind: delegates_to
+        from: director
+        to: analyst
+      - kind: delegates_to
+        from: director
+        to: writer
+      - kind: delegates_to
+        from: director
+        to: visual
+      - kind: delegates_to
+        from: director
+        to: video
+      - kind: delegates_to
+        from: director
+        to: publisher
+      - kind: delegates_to
+        from: director
+        to: memory
+
+edges: []
+permission_policy: builtin:yolo

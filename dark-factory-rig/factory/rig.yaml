@@ -1,0 +1,107 @@
+version: "0.2"
+name: factory
+culture_file: CULTURE.md
+summary: >
+  Factory — the revenue and voice pod of the Dark Factory, running on the GCP
+  herd VM. Gigs research, website/store builds, Google microservice deploys, QA,
+  approval-gated client comms, and the store voice agent that transcribes
+  conversations into Obsidian.
+
+pods:
+  - id: revenue
+    label: Revenue Builder Pod
+    members:
+      - id: gigs
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/research/analyst"
+        runtime: claude-code
+        profile: default
+        cwd: "/home/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/gigs.md
+              delivery_hint: send_text
+              required: true
+      - id: builder
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/development/implementer"
+        runtime: claude-code
+        profile: default
+        cwd: "/home/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/builder.md
+              delivery_hint: send_text
+              required: true
+      - id: deployer
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/development/implementer"
+        runtime: claude-code
+        profile: default
+        cwd: "/home/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/deployer.md
+              delivery_hint: send_text
+              required: true
+      - id: qa
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/development/qa"
+        runtime: claude-code
+        profile: default
+        cwd: "/home/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/qa.md
+              delivery_hint: send_text
+              required: true
+      - id: seller
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/development/implementer"
+        runtime: claude-code
+        profile: default
+        cwd: "/home/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/seller.md
+              delivery_hint: send_text
+              required: true
+    edges:
+      - kind: delegates_to
+        from: gigs
+        to: builder
+      - kind: delegates_to
+        from: builder
+        to: deployer
+      - kind: delegates_to
+        from: builder
+        to: qa
+      - kind: delegates_to
+        from: qa
+        to: seller
+
+  - id: voice
+    label: Voice & Obsidian
+    members:
+      - id: voice-agent
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/development/implementer"
+        runtime: claude-code
+        profile: default
+        cwd: "/home/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/voice-agent.md
+              delivery_hint: send_text
+              required: true
+      - id: obsidian-sync
+        agent_ref: "local:./OpenRig/packages/daemon/specs/agents/development/implementer"
+        runtime: claude-code
+        profile: default
+        cwd: "/home/tumeloramaphosa/dark-factory-rig"
+        startup:
+          files:
+            - path: guidance/obsidian-sync.md
+              delivery_hint: send_text
+              required: true
+    edges:
+      - kind: delegates_to
+        from: voice-agent
+        to: obsidian-sync
+
+edges: []
+permission_policy: builtin:yolo

@@ -1,0 +1,19 @@
+{
+  "sandbox": {
+    "enabled": false
+  },
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Read(/Users/tumeloramaphosa/.agents/**)",
+      "Read(/Users/tumeloramaphosa/.config/last30days/**)",
+      "Read(/Users/tumeloramaphosa/.cashclaw/**)",
+      "Read(/Users/tumeloramaphosa/second-brain/**)",
+      "Read(/Users/tumeloramaphosa/dark-factory-rig/**)",
+      "Write(/Users/tumeloramaphosa/dark-factory-rig/**)",
+      "Bash(rig:*)",
+      "Bash(~/.local/bin/rig:*)",
+      "Bash(~/.local/bin/higgsfield:*)"
+    ]
+  }
+}

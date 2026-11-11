@@ -1,0 +1,468 @@
+{
+  "schema": "openrig.skill-loadout/v1",
+  "runtime": "claude-code",
+  "targetRoot": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills",
+  "updatedAt": "2026-11-01T06:55:30.527Z",
+  "topologySelections": {
+    "studex7-analyst@studex7": [
+      "agent-operated-software",
+      "agent-operated-workflows",
+      "applying-a-permission-policy",
+      "claude-compaction-restore",
+      "delegating-work",
+      "forming-an-openrig-mental-model",
+      "loading-addressable-markdown",
+      "messaging-the-human",
+      "mission-slice-sop",
+      "openrig-operating-model",
+      "openrig-skills",
+      "openrig-user",
+      "orienting-to-an-inherited-seat",
+      "queue-handoff",
+      "refocusing",
+      "retiring-and-inheriting-a-seat",
+      "seat-continuity-and-handover",
+      "session-compaction-and-restore",
+      "software-for-agents"
+    ],
+    "studex7-director@studex7": [
+      "agent-operated-software",
+      "agent-operated-workflows",
+      "applying-a-permission-policy",
+      "claude-compaction-restore",
+      "delegating-work",
+      "forming-an-openrig-mental-model",
+      "loading-addressable-markdown",
+      "messaging-the-human",
+      "mission-slice-sop",
+      "openrig-operating-model",
+      "openrig-skills",
+      "openrig-user",
+      "orienting-to-an-inherited-seat",
+      "queue-handoff",
+      "refocusing",
+      "retiring-and-inheriting-a-seat",
+      "seat-continuity-and-handover",
+      "session-compaction-and-restore",
+      "software-for-agents"
+    ],
+    "studex7-memory@studex7": [
+      "agent-operated-software",
+      "agent-operated-workflows",
+      "applying-a-permission-policy",
+      "claude-compaction-restore",
+      "delegating-work",
+      "forming-an-openrig-mental-model",
+      "loading-addressable-markdown",
+      "messaging-the-human",
+      "mission-slice-sop",
+      "openrig-operating-model",
+      "openrig-skills",
+      "openrig-user",
+      "orienting-to-an-inherited-seat",
+      "queue-handoff",
+      "refocusing",
+      "retiring-and-inheriting-a-seat",
+      "seat-continuity-and-handover",
+      "session-compaction-and-restore",
+      "software-for-agents"
+    ],
+    "studex7-publisher@studex7": [
+      "agent-operated-software",
+      "agent-operated-workflows",
+      "applying-a-permission-policy",
+      "claude-compaction-restore",
+      "delegating-work",
+      "forming-an-openrig-mental-model",
+      "loading-addressable-markdown",
+      "messaging-the-human",
+      "mission-slice-sop",
+      "openrig-operating-model",
+      "openrig-skills",
+      "openrig-user",
+      "orienting-to-an-inherited-seat",
+      "queue-handoff",
+      "refocusing",
+      "retiring-and-inheriting-a-seat",
+      "seat-continuity-and-handover",
+      "session-compaction-and-restore",
+      "software-for-agents"
+    ],
+    "studex7-scout@studex7": [
+      "agent-operated-software",
+      "agent-operated-workflows",
+      "applying-a-permission-policy",
+      "claude-compaction-restore",
+      "delegating-work",
+      "forming-an-openrig-mental-model",
+      "loading-addressable-markdown",
+      "messaging-the-human",
+      "mission-slice-sop",
+      "openrig-operating-model",
+      "openrig-skills",
+      "openrig-user",
+      "orienting-to-an-inherited-seat",
+      "queue-handoff",
+      "refocusing",
+      "retiring-and-inheriting-a-seat",
+      "seat-continuity-and-handover",
+      "session-compaction-and-restore",
+      "software-for-agents"
+    ],
+    "studex7-video@studex7": [
+      "agent-operated-software",
+      "agent-operated-workflows",
+      "applying-a-permission-policy",
+      "claude-compaction-restore",
+      "delegating-work",
+      "forming-an-openrig-mental-model",
+      "loading-addressable-markdown",
+      "messaging-the-human",
+      "mission-slice-sop",
+      "openrig-operating-model",
+      "openrig-skills",
+      "openrig-user",
+      "orienting-to-an-inherited-seat",
+      "queue-handoff",
+      "refocusing",
+      "retiring-and-inheriting-a-seat",
+      "seat-continuity-and-handover",
+      "session-compaction-and-restore",
+      "software-for-agents"
+    ],
+    "studex7-visual@studex7": [
+      "agent-operated-software",
+      "agent-operated-workflows",
+      "applying-a-permission-policy",
+      "claude-compaction-restore",
+      "delegating-work",
+      "forming-an-openrig-mental-model",
+      "loading-addressable-markdown",
+      "messaging-the-human",
+      "mission-slice-sop",
+      "openrig-operating-model",
+      "openrig-skills",
+      "openrig-user",
+      "orienting-to-an-inherited-seat",
+      "queue-handoff",
+      "refocusing",
+      "retiring-and-inheriting-a-seat",
+      "seat-continuity-and-handover",
+      "session-compaction-and-restore",
+      "software-for-agents"
+    ],
+    "studex7-writer@studex7": [
+      "agent-operated-software",
+      "agent-operated-workflows",
+      "applying-a-permission-policy",
+      "claude-compaction-restore",
+      "delegating-work",
+      "forming-an-openrig-mental-model",
+      "loading-addressable-markdown",
+      "messaging-the-human",
+      "mission-slice-sop",
+      "openrig-operating-model",
+      "openrig-skills",
+      "openrig-user",
+      "orienting-to-an-inherited-seat",
+      "queue-handoff",
+      "refocusing",
+      "retiring-and-inheriting-a-seat",
+      "seat-continuity-and-handover",
+      "session-compaction-and-restore",
+      "software-for-agents"
+    ]
+  },
+  "projectSelection": [],
+  "skills": [
+    {
+      "id": "agent-operated-software",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/agent-operated-software",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/agent-operated-software",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "7b9cf0e1f7356098856f35e0281d3122a62a6be88ccdb5e796cee267fc21016a",
+      "files": {
+        "SKILL.md": "9159d26e7884bc5205f8b06adaa65625c7d9c6bef41dc2f307d91da4cc1b424b"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "agent-operated-workflows",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/agent-operated-workflows",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/agent-operated-workflows",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "6636b40e1e9db421e603696517ef8186a064ad654e9f3612f3758b114c41fc37",
+      "files": {
+        "SKILL.md": "24e54cbfa979999f523516112670618b2926ae5d42c7aa0846c94db214857ea5"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "applying-a-permission-policy",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/applying-a-permission-policy",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/applying-a-permission-policy",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "cd6b8d59269d08e821ba44d93e1d6eaf51bb7d73603d6e3c2e100e6883637ca0",
+      "files": {
+        "SKILL.md": "e8dbd8eec75847bfd382fb06de408c63807171d584237d1b1d7e1104c7ed4acc"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "claude-compaction-restore",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/claude-compaction-restore",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/claude-compaction-restore",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "c1473eb067ed4776ca2fc9e78e14d42d129a5b7d86b95d7e0d2db527ea9356c8",
+      "files": {
+        "SKILL.md": "e86560d6ce8fa5678ed569abfe9bfd2d2a2251eaf5ae453b8e13c5bc4a0da1e1",
+        "reference/SKILL-v1.md": "6af2a889c9c38227fb186897c6e29185f81b215822070b469a6ceeb47734e133",
+        "scripts/precompact-hook.mjs": "8eb4cccdaec654fca9eacba3676b0418d2bac383649ce31544434c73af8b8772",
+        "scripts/restore-from-jsonl.mjs": "5584cff4ab36cd843e14c81bd201e4a2f8e498e995abacc4f81ec6c1fc556b10",
+        "templates/compact-instruction.md": "682c778464517b831902ddc2678c055545899b4751a1d32391ce965d5eb7061d",
+        "templates/post-compact-restore-instruction.md": "10a5a7e5e052f3aa000a4209f386dc4eb90a3c2bba449ca685f124714f59e47a"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "delegating-work",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/delegating-work",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/delegating-work",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "44d5b791b755a1af9211eb56e892029e819998f25719ba5703f2855de7f200a2",
+      "files": {
+        "SKILL.md": "54c061d1b28435266952d431765b40f4170581279decfffd3b10839848cd65e4"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "forming-an-openrig-mental-model",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/forming-an-openrig-mental-model",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/forming-an-openrig-mental-model",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "61a545bbde5267144400cae77dad8d2ad84a5b4d514da6cf0a41b85bc9b4e2f7",
+      "files": {
+        "SKILL.md": "3765c0c918988cc13d90e8a6bc91c7f5019fb5532f8c7030bd6d56172f5853ff"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "loading-addressable-markdown",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/loading-addressable-markdown",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/loading-addressable-markdown",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "d969f9303671ac330920236523ef9e213adb917e7b8952ef4914ef114a6afe4c",
+      "files": {
+        "SKILL.md": "104dc6a02ae6e2d0eff519387c6839cb09803945b9ee35ec3498af8feaaa8d1e",
+        "scripts/resolve-markdown.mjs": "61a6d52c6c94fb1878361d19bdfaeb4524062fc4c483f557ab2f140e516d15f9"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "messaging-the-human",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/messaging-the-human",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/messaging-the-human",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "a885e617bf0bd713077035d118bea76984d0c5b236833504086e645f5af15d9c",
+      "files": {
+        "SKILL.md": "581372434f27b1994d516e144be1324c7c5981cacf64fef6f09d1a57017faa08"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "mission-slice-sop",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/mission-slice-sop",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/mission-slice-sop",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "174ac848cdd109ed59fc3dbff9e17be9bc7ebcfedde062ea5e879de6c20b7043",
+      "files": {
+        "SKILL.md": "2cdc12b398f6d0fc05361791ec36066c44f1abd0137afd1f4f11a88b37bcc767"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "openrig-operating-model",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/openrig-operating-model",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/openrig-operating-model",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "bb344d90ec9b6c5c5d90274f6324b7bfc2facfdce9b9e2b7d89943ac651cadeb",
+      "files": {
+        "SKILL.md": "8364530a6199f6e2df42b773c35434cb4ecade0ede48e439cd9fc03df4469896",
+        "scripts/compose.py": "f71065de92b1ef4ce3ca78a8bc0cfe07bcf54ed84bb8ec5359d3889674fe385d",
+        "scripts/scaffold.sh": "873fc78d8581e463079db24cfbdef3228b845c1a4c32e0d631234eacb3094be7",
+        "scripts/trace-due.sh": "c56a8b044e624f40972654bc810df623e70303cc5daa4aa06e3ee86b262b7792",
+        "scripts/trace-stamp.sh": "6fd3a0999dd36ea58252181f5129489a460a60631291f0ff84c4f374b65113c7",
+        "scripts/trunk-diff.sh": "c0362a5a02aed2caf28b7c026989c88a6fef0bc35fa2e6ae8ba9dba2c2f9cc64",
+        "templates/LEARNED.md": "37d67f788ffe6c4bd282e5ed0859e07e613b8940e8fa84726c84fbaef8f87fd6",
+        "templates/NOTES.md": "ca73848520871474428f87d28bb2346feeb3bd59763b299399d9dacf4d64bcf5",
+        "templates/PLAYBOOK.md": "ff6f9dc8caab06dc7b9ae21977310ddefa23e925453bd54629ce0a669403bfb0",
+        "templates/SOP.md": "1eaf0daf4f9bbf0715e6a5aaf0f29f030af5fe8b8a10232488ee97c507afa6dc",
+        "templates/SPEC.md": "f126536daa59cea3f1cfb0898d83c7cdf99f6392f6f155ea64fe55187dd0f5f1"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "openrig-skills",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/openrig-skills",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/openrig-skills",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "9b2174c8308fade4eb3ed8213496c58e317a3b28e5fad7b82fb8e3ac51cf15ae",
+      "files": {
+        "SKILL.md": "3a55d25cacaef4700f8cd8bbc62f96aadba591057c065b3b453972727e9ef823"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "openrig-user",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/openrig-user",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/openrig-user",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "196aca1799ee96273b2ae627a357c7f8ad625698cf5c416e1415be5c450cdd42",
+      "files": {
+        "SKILL.md": "f7b91d3c45f3a18bc58f50f5ccbf63615d4f8db30bc95e208c787326a02ba7b0"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "orienting-to-an-inherited-seat",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/orienting-to-an-inherited-seat",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/orienting-to-an-inherited-seat",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "c6c3c8ee836b040328dbfd439a27470c9674993f34e8b292cb55e1b2e9978978",
+      "files": {
+        "CHANGELOG.md": "4d0970e75e5c15b00a48d6a7150376d646257777264fd1b9a191165a8d5a6e84",
+        "SKILL.md": "65300ce0e299cce0148a8bacd51b0475ac1b59cd77a51a9bb2db9d43bda6e208"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "queue-handoff",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/queue-handoff",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/queue-handoff",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "897ef08a5c37a788948331686a6e1b29a010869bd67453406628c4581d66a6c6",
+      "files": {
+        "SKILL.md": "d4d7e3e8772886b3771daffd60523b5f79040309b892c8be1afd47d1f7287f7b"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "refocusing",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/refocusing",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/refocusing",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "473c16a920518cb24def6bba2b006fae0b953f22280f6563554bbba7f5bbc6db",
+      "files": {
+        "SKILL.md": "9f5b903b26430f60334b6dcaf66009df195c67ecf825437d1883d2a06a90d790",
+        "references/refocus.md": "6e71513e82bd815e1506b0be4f9a972eecd3053a8deb06340c10b1d1792489bc",
+        "scripts/trace-to-root.py": "c07f70c58e95cdcf3e80f64ee692174303256b1911fdb60cafa2eed67c3599e6"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "retiring-and-inheriting-a-seat",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/retiring-and-inheriting-a-seat",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/retiring-and-inheriting-a-seat",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "2fc31880353c4d91602c91cc75eadfc9fba3ba914b3c1741fdf39d83976e641c",
+      "files": {
+        "CHANGELOG.md": "1756a0a6dadc015e2744b4c39a3e7cd08813d9d421e788e953ac5ad75b064197",
+        "SKILL.md": "ebe58e4db60ed963fd721a1685c4c2afe1e45d93beddd211518dfb5f0b48bdcc"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "seat-continuity-and-handover",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/seat-continuity-and-handover",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/seat-continuity-and-handover",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "cac191c6053bd551bca8fdd152313cd8c9782696ce8e7bf20d6393d266cead54",
+      "files": {
+        "SKILL.md": "c08aa84aa1888b8a5d63d5e3a6d2ec8b700b8b13177fba48661ba7c7508f44ff",
+        "references/apprentice-evidence-toolkit.md": "a50bd7a3107762dbb6accd5d2fb7e058b408b85b09067ac79a7a8af6212234fd",
+        "references/apprentice-successor-seat-cutover.md": "0c865b76c9b0908373d3cf17439ef31b08e20a769c1cef1bea2403d963887840",
+        "references/orchestrator-role.md": "2ddf05125e0bf22e2dc64cb328fcc4bd94fa62eb2fcfd21d75f21c488c72ecaa"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "session-compaction-and-restore",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/session-compaction-and-restore",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/session-compaction-and-restore",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "94c8cda69411e65029358b237643c50be208f1954dcf022175a300af13dd69fd",
+      "files": {
+        "SKILL.md": "6218ebe601901fc19c3b40a6c29d57c304c82984825595f74b19120754839b63"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    },
+    {
+      "id": "software-for-agents",
+      "target": "/Users/tumeloramaphosa/dark-factory-rig/.claude/skills/software-for-agents",
+      "sourceDir": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core/skills/software-for-agents",
+      "sourceRoot": "/Users/tumeloramaphosa/.openrig/plugins/openrig-core",
+      "revision": "plugin:openrig-core@0.1.4",
+      "digest": "c9ac0e640bd437eacc4f8deccd996a269c62d4ca6759b532f1d27629b9955dc0",
+      "files": {
+        "SKILL.md": "c36c6d3ae7484f477f1bd24e8ff72846f6dfbff685aef1e780f6011072a51ac7"
+      },
+      "selectedBy": [
+        "topology"
+      ]
+    }
+  ]
+}
