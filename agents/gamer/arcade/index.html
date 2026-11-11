@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Studex Arcade — powered by Stud-Bot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Metal+Mania&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="logo-block" href="#top">
+      <span class="wordmark"><span class="splatter" aria-hidden="true"></span>STUDEX ARCADE</span>
+      <span class="tagline">Agent OS · Gamer division</span>
+    </a>
+    <button id="menu" type="button" aria-label="Menu">☰</button>
+    <nav id="links">
+      <a href="#play">Play</a>
+      <a href="#credits">Credits</a>
+      <a href="#owner">Owner</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="hero-prompt">&gt; Initialize arcade hub · Stud-Bot online</p>
+      <h1 class="title">STUDEX ARCADE</h1>
+      <p class="powered">Studex Arcade — powered by Stud-Bot</p>
+      <p class="lede">Browser-native open-source games vendored for the Linux StudEx agent operating system. No accounts, no downloads — pick a title and play locally.</p>
+      <a class="btn" href="#play">Enter the grid</a>
+    </section>
+
+    <section id="play">
+      <h2>Play</h2>
+      <p class="muted">Each game ships with its upstream license in <code>games/&lt;title&gt;/</code>. Links open in-place under this hub.</p>
+      <div class="grid play-grid">
+        <div class="card">
+          <h3>2048</h3>
+          <p>Slide tiles and combine matching numbers until you reach 2048.</p>
+          <p class="credit">MIT License · Gabriele Cirulli</p>
+          <p class="license"><a href="games/2048/LICENSE.txt">License</a></p>
+          <a class="btn" href="games/2048/index.html">Play 2048</a>
+        </div>
+        <div class="card">
+          <h3>Hextris</h3>
+          <p>Rotate the hexagon and clear lines in a falling-block puzzle.</p>
+          <p class="credit">GNU GPL v3 · Hextris authors</p>
+          <p class="license"><a href="games/hextris/LICENSE.md">License</a></p>
+          <a class="btn" href="games/hextris/index.html">Play Hextris</a>
+        </div>
+        <div class="card">
+          <h3>Clumsy Bird</h3>
+          <p>Tap or click to fly between pipes. Built with melonJS.</p>
+          <p class="credit">GNU GPL v3 · Ellison Leão</p>
+          <p class="license"><a href="games/clumsy-bird/LICENSE.md">License</a></p>
+          <a class="btn" href="games/clumsy-bird/index.html">Play Clumsy Bird</a>
+        </div>
+        <div class="card">
+          <h3>Canvas Tetris</h3>
+          <p>HTML5 canvas falling-block puzzle. Arrow keys to play.</p>
+          <p class="credit">MIT License · Dionysis Zindros</p>
+          <p class="license"><a href="games/tetris/LICENSE.md">License</a></p>
+          <a class="btn" href="games/tetris/index.html">Play Tetris</a>
+        </div>
+        <div class="card">
+          <h3>JavaScript Snake</h3>
+          <p>Classic snake — eat, grow, avoid the walls.</p>
+          <p class="credit">MIT License · Patrick Gillespie</p>
+          <p class="license"><a href="games/snake/LICENSE">License</a></p>
+          <a class="btn" href="games/snake/index.html">Play Snake</a>
+        </div>
+        <div class="card">
+          <h3>Javascript Racer</h3>
+          <p>Pseudo-3D racer. From the menu, open Version 4 — Final for the full course.</p>
+          <p class="credit">MIT License · Jake Gordon and contributors</p>
+          <p class="license"><a href="games/racer/LICENSE">License</a></p>
+          <a class="btn" href="games/racer/index.html">Play Racer</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="credits">
+      <h2>Open-source credits</h2>
+      <p class="muted">Upstream projects and licenses bundled under <code>games/</code>. License files are preserved verbatim.</p>
+      <table class="credits-table">
+        <thead>
+          <tr>
+            <th>Game</th>
+            <th>Upstream</th>
+            <th>License file</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2048</td>
+            <td>gabrielecirulli/2048</td>
+            <td><a href="games/2048/LICENSE.txt">games/2048/LICENSE.txt</a></td>
+          </tr>
+          <tr>
+            <td>Hextris</td>
+            <td>Hextris/hextris</td>
+            <td><a href="games/hextris/LICENSE.md">games/hextris/LICENSE.md</a></td>
+          </tr>
+          <tr>
+            <td>Clumsy Bird</td>
+            <td>ellisonleao/clumsy-bird</td>
+            <td><a href="games/clumsy-bird/LICENSE.md">games/clumsy-bird/LICENSE.md</a></td>
+          </tr>
+          <tr>
+            <td>Canvas Tetris</td>
+            <td>dionyziz/canvas-tetris</td>
+            <td><a href="games/tetris/LICENSE.md">games/tetris/LICENSE.md</a></td>
+          </tr>
+          <tr>
+            <td>JavaScript Snake</td>
+            <td>patorjk/JavaScript-Snake</td>
+            <td><a href="games/snake/LICENSE">games/snake/LICENSE</a> (TuiCss: <a href="games/snake/css/tuicss/LICENSE.md">css/tuicss/LICENSE.md</a>)</td>
+          </tr>
+          <tr>
+            <td>Javascript Racer</td>
+            <td>jakesgordon/javascript-racer</td>
+            <td><a href="games/racer/LICENSE">games/racer/LICENSE</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="owner">
+      <h2>Agent owner</h2>
+      <p class="owner-line"><strong>Gamer</strong> — Head of Studex Arcade on the Linux StudEx Agent OS. This hub lives at <code>agents/gamer/arcade/</code> and is served as static assets alongside <code>dashboard.html</code>.</p>
+    </section>
+  </main>
+
+  <footer>Studex Arcade · Berzerker skin · Stud-Bot</footer>
+  <script src="main.js"></script>
+</body>
+</html>

@@ -54,6 +54,10 @@ tmux new-session -s linux-studex -n main \; \
 ./scripts/orbit.sh --status
 ```
 
+## Studex Arcade
+
+**Gamer** (Head of Studex Arcade) owns the static game hub at [`agents/gamer/arcade/`](agents/gamer/arcade/). Open it from the dashboard Integrations grid or run `python3 -m http.server` at the repo root and visit `/agents/gamer/arcade/`.
+
 ## Dashboard
 
 Open `dashboard.html` for the full Agent OS interface:
