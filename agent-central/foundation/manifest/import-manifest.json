@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "1.0.0",
+  "classification": "reference-only",
+  "description": "Future reviewed imports only. Entries are evaluation references — not installed or licensed in this repo.",
+  "imports": [
+    {
+      "id": "ref-openclaw-enterprise",
+      "vendor": "openclaw.ai",
+      "href": "https://openclaw.ai/enterprise",
+      "purpose": "Enterprise gateway patterns",
+      "reviewState": "not-started",
+      "licenseEvidenceRequired": true
+    },
+    {
+      "id": "ref-awesome-claude-corporate-skills",
+      "vendor": "w95",
+      "href": "https://github.com/w95/awesome-claude-corporate-skills",
+      "purpose": "Corporate skills catalogue",
+      "reviewState": "not-started",
+      "licenseEvidenceRequired": true
+    },
+    {
+      "id": "ref-eswatini",
+      "vendor": "TumeloRamaphosa",
+      "href": "https://github.com/TumeloRamaphosa/Eswatini",
+      "purpose": "Regional fit evaluation",
+      "reviewState": "not-started",
+      "licenseEvidenceRequired": true
+    },
+    {
+      "id": "ref-humanizer",
+      "vendor": "blader",
+      "href": "https://github.com/blader/humanizer",
+      "purpose": "Copy humanization tooling",
+      "reviewState": "not-started",
+      "licenseEvidenceRequired": true
+    },
+    {
+      "id": "ref-headroom",
+      "vendor": "headroomlabs-ai",
+      "href": "https://github.com/headroomlabs-ai/headroom",
+      "purpose": "Context compression",
+      "reviewState": "not-started",
+      "licenseEvidenceRequired": true
+    },
+    {
+      "id": "ref-claude-goal-docs",
+      "vendor": "Anthropic",
+      "href": "https://code.claude.com/docs/en/goal",
+      "purpose": "Goal-directed agent patterns",
+      "reviewState": "not-started",
+      "licenseEvidenceRequired": false
+    },
+    {
+      "id": "ref-graphify",
+      "vendor": "Graphify-Labs",
+      "href": "https://github.com/Graphify-Labs/graphify",
+      "purpose": "Graph visualisation",
+      "reviewState": "not-started",
+      "licenseEvidenceRequired": true
+    },
+    {
+      "id": "ref-deepseek-harness",
+      "vendor": "deepseek-ai",
+      "href": "https://github.com/deepseek-ai/deepseek-harness",
+      "purpose": "Harness patterns",
+      "reviewState": "not-started",
+      "licenseEvidenceRequired": true
+    },
+    {
+      "id": "ref-durable-pi",
+      "vendor": "disler",
+      "href": "https://github.com/disler/durable-pi",
+      "purpose": "Durable workflows",
+      "reviewState": "not-started",
+      "licenseEvidenceRequired": true
+    },
+    {
+      "id": "ref-gbrain",
+      "vendor": "garrytan",
+      "href": "https://github.com/garrytan/gbrain",
+      "purpose": "Knowledge graph experiments",
+      "reviewState": "not-started",
+      "licenseEvidenceRequired": true
+    }
+  ],
+  "blockedActions": [
+    "bulk-import",
+    "auto-sync-notion",
+    "merge-skills-update-2026-11-07-without-review"
+  ]
+}

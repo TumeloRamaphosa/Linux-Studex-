@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0.0",
+  "classification": "public-internal-summary",
+  "overview": {
+    "id": "robusca-chief-of-staff",
+    "role": "Chief of Staff — coordination and business organisation",
+    "status": "unverified",
+    "sections": [
+      {
+        "heading": "Role",
+        "body": "Coordinates business planning and evidence. Agent Central in this repo is a linked command home, not a duplicate of Sentinel's canonical project queue."
+      },
+      {
+        "heading": "Business plan data room",
+        "body": "Notion business plan evidence index (pointer only, unverified sync): https://app.notion.com/p/4123ef073992811a9c3dc01e9222ca71"
+      },
+      {
+        "heading": "Engineering ownership",
+        "body": "Sentinel owns engineering delivery and canonical Notion Projects / Work Submissions / Fleet Wiki pointers."
+      },
+      {
+        "heading": "Commercial priorities",
+        "body": "Founder-proposed priorities include meat and coffee online sales (seasonal campaigns), Stud-Bot and VM/workplace offers. No accepted launch or sales baselines in this repository."
+      },
+      {
+        "heading": "Routines vs implementation",
+        "body": "Parent weekday hourly review instructions and daily filing guidance exist outside this repo. They do not imply implemented in-app sync, live fleet telemetry, or proof of completed product."
+      },
+      {
+        "heading": "Paths & telemetry",
+        "body": "Linear and Obsidian workflow paths are documented as conventions only — unverified in CI. No fabricated agents, revenue figures, or live telemetry are stored in Agent Central data."
+      },
+      {
+        "heading": "Acceptance",
+        "body": "Human review required before treating any lane as production-ready. Finished cloud-agent runs do not imply production acceptance."
+      }
+    ]
+  }
+}

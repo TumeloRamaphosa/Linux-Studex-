@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0.0",
+  "recordKind": "example",
+  "classification": "public-internal-summary",
+  "agent": {
+    "id": "robusca-chief-of-staff",
+    "displayName": "Robusca (Chief of Staff)",
+    "roleSummary": "Coordinates business planning and evidence. Agent Central is a linked command home, not a duplicate of Sentinel's project queue.",
+    "status": "unverified",
+    "owner": "Robusca",
+    "dataRoomLinks": [
+      {
+        "id": "robusca-business-plan-evidence-index",
+        "label": "Business plan evidence index (Notion)",
+        "kind": "notion-canon",
+        "href": "https://app.notion.com/p/4123ef073992811a9c3dc01e9222ca71",
+        "status": "unverified",
+        "notes": "Pointer only. No bulk import. Curated context reviewed 2026-11-08; not a copy of the plan."
+      },
+      {
+        "id": "robusca-repo-overview",
+        "label": "Sanitized repo overview",
+        "kind": "repo-path",
+        "path": "agent-central/foundation/data/overviews/robusca-chief-of-staff.json",
+        "status": "unverified",
+        "notes": "Summary text only; no raw memory."
+      }
+    ],
+    "kpiReview": {
+      "humanReviewRequired": true,
+      "agentMetricsVerified": false,
+      "fields": [
+        "orders",
+        "contribution_margin",
+        "fulfilment_reliability",
+        "accepted_work_with_evidence",
+        "test_results",
+        "decision_turnaround",
+        "founder_time"
+      ],
+      "notes": "Field names proposed only. Sales/order/conversion baselines unknown — never treat targets as results."
+    }
+  }
+}

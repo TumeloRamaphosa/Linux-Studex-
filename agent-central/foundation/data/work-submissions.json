@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "1.0.0",
+  "classification": "public-internal-summary",
+  "disclaimer": "All submissions below are example/proposed unless recordKind is accepted and approvalGate.state is approved with dated evidence.",
+  "submissions": [
+    {
+      "id": "ws-agent-central-foundation",
+      "recordKind": "proposed",
+      "title": "Agent Central foundation index + security-hardening patch (complementary)",
+      "source": "cursor-cloud-agent",
+      "project": "Linux StudEx OS",
+      "owner": "Sentinel",
+      "businessLane": "platform-engineering",
+      "status": "unverified",
+      "acceptanceEvidence": [
+        {
+          "id": "ev-schema",
+          "kind": "schema",
+          "status": "tested",
+          "scope": "software",
+          "summary": "JSON schema defines index, agents, submissions, lanes.",
+          "path": "agent-central/foundation/schema/agent-central-v1.schema.json"
+        },
+        {
+          "id": "ev-foundation-validate",
+          "kind": "test-run",
+          "status": "tested",
+          "scope": "software",
+          "summary": "validate-foundation.mjs schema + dedupe checks.",
+          "path": "agent-central/foundation/scripts/validate-foundation.mjs"
+        },
+        {
+          "id": "ev-server-unit-tests",
+          "kind": "test-run",
+          "status": "tested",
+          "scope": "software",
+          "summary": "central-store, static guard, drop auth fail-closed tests.",
+          "path": "server/test/"
+        },
+        {
+          "id": "ev-pr5-review",
+          "kind": "manual-review",
+          "status": "tested",
+          "scope": "software",
+          "summary": "Independent PR #5 review document (does not approve PR #5 merge).",
+          "path": "agent-central/review/PR5-INDEPENDENT-SECURITY-REVIEW.md"
+        }
+      ],
+      "approvalGate": {
+        "required": true,
+        "state": "pending",
+        "reviewerRole": "Sentinel",
+        "approvedAt": null,
+        "notes": "Proposed work only. Provider run ≠ production acceptance."
+      },
+      "submittedAt": "2026-11-08T11:00:00.000Z",
+      "updatedAt": "2026-11-08T11:00:00.000Z"
+    },
+    {
+      "id": "ws-meat-coffee-lane-index",
+      "recordKind": "example",
+      "title": "Meat & coffee business lane index (no revenue claims)",
+      "source": "executive-briefing-sanitized",
+      "project": "Studex commercial lanes",
+      "owner": "Robusca (Chief of Staff)",
+      "businessLane": "meat",
+      "status": "unverified",
+      "acceptanceEvidence": [
+        {
+          "id": "ev-lane-index",
+          "kind": "doc",
+          "status": "unverified",
+          "scope": "software",
+          "summary": "Example lane rows in index.json — not commercial acceptance.",
+          "path": "agent-central/foundation/data/index.json"
+        }
+      ],
+      "approvalGate": {
+        "required": true,
+        "state": "pending",
+        "reviewerRole": "founder",
+        "approvedAt": null,
+        "notes": "Example record only."
+      },
+      "submittedAt": "2026-11-08T11:00:00.000Z",
+      "updatedAt": "2026-11-08T11:00:00.000Z"
+    },
+    {
+      "id": "ws-notion-canon-pointers",
+      "recordKind": "proposed",
+      "title": "Notion canon pointers (Sentinel + Robusca business plan index)",
+      "source": "curated-context-review-2026-11-08",
+      "project": "Agent Central",
+      "owner": "Sentinel",
+      "businessLane": "platform-engineering",
+      "status": "unverified",
+      "acceptanceEvidence": [
+        {
+          "id": "ev-notion-links",
+          "kind": "notion-canon",
+          "status": "unverified",
+          "scope": "external-pointer",
+          "summary": "Sentinel work submissions URL — link only, no API sync.",
+          "href": "https://app.notion.com/p/1e6946f49232443f83819e66031089d3"
+        },
+        {
+          "id": "ev-robusca-business-plan-index",
+          "kind": "notion-canon",
+          "status": "unverified",
+          "scope": "external-pointer",
+          "summary": "Robusca business plan evidence index — reviewed curated context; no plan body copied.",
+          "href": "https://app.notion.com/p/4123ef073992811a9c3dc01e9222ca71"
+        }
+      ],
+      "approvalGate": {
+        "required": true,
+        "state": "pending",
+        "reviewerRole": "Sentinel",
+        "approvedAt": null,
+        "notes": "Pointers only; manual alignment per sync-contract.md."
+      },
+      "submittedAt": "2026-11-08T11:00:00.000Z",
+      "updatedAt": "2026-11-08T11:00:00.000Z"
+    }
+  ]
+}
