@@ -1,0 +1,40 @@
+/* Studex Arcade — in-game top bar (Berzerker chrome) */
+.arcade-top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 34px;
+  z-index: 2147483646;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  background: linear-gradient(180deg, #141414 0%, #0a0a0a 100%);
+  border-bottom: 1px solid #8b0000;
+  box-shadow: 0 2px 12px rgba(139, 0, 0, 0.35);
+  font-family: "IBM Plex Mono", "Space Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.arcade-top-bar a.arcade-back {
+  color: #d4cfc8;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.arcade-top-bar a.arcade-back:hover {
+  color: #cc4400;
+}
+.arcade-top-bar .arcade-brand {
+  color: #6e1515;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+body.arcade-framed {
+  padding-top: 34px !important;
+  box-sizing: border-box;
+}
+html.arcade-framed-root {
+  box-shadow: inset 0 0 0 1px #6b1010, inset 0 0 0 4px #0a0a0a;
+  min-height: 100%;
+}
