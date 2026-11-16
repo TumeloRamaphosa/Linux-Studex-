@@ -1,0 +1,15 @@
+{
+  "name": "linux-studex-register",
+  "version": "1.0.0",
+  "private": true,
+  "description": "StudEx Group asset register. The Obsidian vault at register/vault/ is the source of truth; WORKSPACE-INDEX.md and index.html are generated.",
+  "type": "module",
+  "scripts": {
+    "sync": "node scripts/vault-to-manifest.mjs && node scripts/build-vault.mjs && node scripts/build-index.mjs",
+    "vault:scaffold": "node scripts/scaffold-vault.mjs",
+    "check:sync": "npm run sync && git diff --exit-code --stat -- assets.json WORKSPACE-INDEX.md index.html vault"
+  },
+  "dependencies": {
+    "yaml": "^2.9.1"
+  }
+}

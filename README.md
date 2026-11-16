@@ -101,6 +101,12 @@ Log: `auto-push.log`
 - **Fonts:** Cormorant Garamond (headings) · Bebas Neue (display) · Inter (body) · Space Mono (code)
 - **Colors:** #C9A84C (gold) · #0A0A0A (obsidian black)
 
+## Asset Register
+
+The group's canonical asset index lives in [`register/`](register/) as an Obsidian
+vault. Edit the notes, run `npm run sync`, and `WORKSPACE-INDEX.md` + `index.html`
+regenerate. See [`register/README.md`](register/README.md).
+
 ---
 
 *Studex Group, Johannesburg SA · Built on QEMU/UTM · Powered by Ollama + n8n + OpenClaw*

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<!-- DO NOT EDIT BY HAND — generated from assets.json by scripts/build-index.mjs -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudEx Group — Workspace Index</title>
+<meta name="description" content="Canonical register of StudEx Group operating assets, organised by business line.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a; --dark: #111; --line: #222;
+    --cyan: #00f0ff; --dim: #8a8a8a; --text: #f2f2f2;
+    --live: #00ff88; --ready: #00f0ff; --draft: #ffd700; --research: #8b5cf6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--black); color: var(--text);
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 15px; line-height: 1.6;
+    background-image:
+      linear-gradient(rgba(0,240,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,.025) 1px, transparent 1px);
+    background-size: 50px 50px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px 96px; }
+  header.top { padding: 64px 0 32px; border-bottom: 1px solid var(--line); }
+  h1 { font-family: Orbitron, sans-serif; font-weight: 800; font-size: clamp(28px, 5vw, 46px);
+       letter-spacing: -.02em; text-shadow: 0 0 28px rgba(0,240,255,.35); }
+  .sub { color: var(--dim); margin-top: 10px; max-width: 62ch; }
+  .stats { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 22px;
+           font-size: 13px; color: var(--dim); }
+  .stats b { color: var(--cyan); font-weight: 500; }
+  .controls { position: sticky; top: 0; z-index: 10; padding: 16px 0;
+              background: rgba(10,10,10,.93); backdrop-filter: blur(8px);
+              border-bottom: 1px solid var(--line); }
+  #search { width: 100%; padding: 11px 14px; background: var(--dark); color: var(--text);
+            border: 1px solid var(--line); border-radius: 6px; font: inherit; font-size: 14px; }
+  #search:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,240,255,.12); }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .chip { --accent: var(--cyan); cursor: pointer; font: inherit; font-size: 12px;
+          padding: 5px 11px; border-radius: 999px; color: var(--dim);
+          background: transparent; border: 1px solid var(--line); transition: .15s; }
+  .chip:hover { color: var(--text); border-color: var(--accent); }
+  .chip[aria-pressed="true"] { color: var(--black); background: var(--accent);
+                               border-color: var(--accent); font-weight: 500; }
+  .chip-count { opacity: .55; margin-left: 3px; }
+  .line { padding-top: 52px; scroll-margin-top: 130px; }
+  .line-head { border-left: 3px solid var(--accent); padding-left: 14px; margin-bottom: 20px; }
+  .line-head h2 { font-family: Orbitron, sans-serif; font-size: 20px; font-weight: 600;
+                  color: var(--accent); letter-spacing: .01em; }
+  .line-head p { color: var(--dim); font-size: 13px; margin-top: 4px; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .card { background: var(--dark); border: 1px solid var(--line); border-radius: 8px;
+          padding: 16px; display: flex; flex-direction: column; gap: 10px; transition: .15s; }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card-head { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+  .card-head h3 { font-size: 14px; font-weight: 500; line-height: 1.4; }
+  .star { color: #ffd700; }
+  .stage { font-size: 10px; text-transform: uppercase; letter-spacing: .09em;
+           padding: 2px 8px; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+           border: 1px solid currentColor; }
+  .stage-live { color: var(--live); } .stage-ready { color: var(--ready); }
+  .stage-draft { color: var(--draft); } .stage-research { color: var(--research); }
+  .note { font-size: 13px; color: var(--dim); flex: 1; }
+  .card-foot { display: flex; flex-direction: column; gap: 5px;
+               border-top: 1px solid var(--line); padding-top: 10px; }
+  .card-foot code { font-size: 11px; color: #6f6f6f; word-break: break-all; }
+  .meta { font-size: 11px; color: #5a5a5a; text-transform: uppercase; letter-spacing: .06em; }
+  .empty { display: none; padding: 60px 0; text-align: center; color: var(--dim); }
+  body.is-empty .empty { display: block; }
+  footer.foot { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--line);
+                color: #5a5a5a; font-size: 12px; }
+  .hidden { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .card:hover { transform: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>StudEx Group — Workspace Index</h1>
+    <p class="sub">Canonical register of StudEx Group operating assets, organised by business line.</p>
+    <div class="stats">
+      <span><b>40</b> assets</span>
+      <span><b>7</b> business lines</span>
+      <span><b>11</b> live</span>
+      <span><b>22</b> ready to fire</span>
+      <span>updated <b>2026-09-25</b></span>
+    </div>
+  </header>
+
+  <div class="controls">
+    <input id="search" type="search" placeholder="Search assets, paths, notes…" aria-label="Search assets">
+    <div class="chips" id="chips">
+        <button class="chip" data-filter="line" data-value="coffee" style="--accent:#ff6b00">Coffee <span class="chip-count">10</span></button>
+        <button class="chip" data-filter="line" data-value="meat" style="--accent:#ff2d78">Meat — Wagyu Biltong <span class="chip-count">6</span></button>
+        <button class="chip" data-filter="line" data-value="agents" style="--accent:#00f0ff">StudBot Super Agents <span class="chip-count">6</span></button>
+        <button class="chip" data-filter="line" data-value="ops" style="--accent:#00ff88">Operations <span class="chip-count">4</span></button>
+        <button class="chip" data-filter="line" data-value="agent-os" style="--accent:#8b5cf6">Agent OS <span class="chip-count">6</span></button>
+        <button class="chip" data-filter="line" data-value="capital" style="--accent:#ffd700">Capital &amp; Pitch <span class="chip-count">3</span></button>
+        <button class="chip" data-filter="line" data-value="content" style="--accent:#ff00ff">Content &amp; Brand <span class="chip-count">5</span></button>
+        <button class="chip chip-stage" data-filter="stage" data-value="live">live <span class="chip-count">11</span></button>
+        <button class="chip chip-stage" data-filter="stage" data-value="ready">ready <span class="chip-count">22</span></button>
+        <button class="chip chip-stage" data-filter="stage" data-value="draft">draft <span class="chip-count">5</span></button>
+        <button class="chip chip-stage" data-filter="stage" data-value="research">research <span class="chip-count">2</span></button>
+    </div>
+  </div>
+
+      <section class="line" data-line="coffee" style="--accent:#ff6b00">
+        <div class="line-head">
+          <h2>Coffee</h2>
+          <p>Rwanda origin into China and South African enterprise.</p>
+        </div>
+        <div class="grid">
+          <article class="card" data-line="coffee" data-stage="ready" data-search="ciie coffee landing /workspace/ciie-coffee-landing/ china-facing export page built for the ciie window. landing">
+            <header class="card-head">
+              <h3>CIIE Coffee Landing</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">China-facing export page built for the CIIE window.</p>
+            <footer class="card-foot">
+              <code>/workspace/ciie-coffee-landing/</code>
+              <span class="meta">landing · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="coffee" data-stage="ready" data-search="coffee noir landing /workspace/coffee-noir-landing/ premium and luxury positioning of the same origin supply. landing">
+            <header class="card-head">
+              <h3>Coffee Noir Landing</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Premium and luxury positioning of the same origin supply.</p>
+            <footer class="card-foot">
+              <code>/workspace/coffee-noir-landing/</code>
+              <span class="meta">landing · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="coffee" data-stage="ready" data-search="sa b2b coffee landing /workspace/sa-b2b-coffee-landing/ south african enterprise outreach page. landing">
+            <header class="card-head">
+              <h3>SA B2B Coffee Landing</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">South African enterprise outreach page.</p>
+            <footer class="card-foot">
+              <code>/workspace/sa-b2b-coffee-landing/</code>
+              <span class="meta">landing · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="coffee" data-stage="ready" data-search="studex coffee — pipeline landing /workspace/studex-coffee/ full pipeline page covering origin through delivery. landing">
+            <header class="card-head">
+              <h3>StudEx Coffee — Pipeline Landing</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Full pipeline page covering origin through delivery.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-coffee/</code>
+              <span class="meta">landing · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="coffee" data-stage="ready" data-search="china coffee lead capture /workspace/china-coffee-lead-capture/ market-entry capture funnel for the china push. landing">
+            <header class="card-head">
+              <h3>China Coffee Lead Capture</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Market-entry capture funnel for the China push.</p>
+            <footer class="card-foot">
+              <code>/workspace/china-coffee-lead-capture/</code>
+              <span class="meta">landing · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="coffee" data-stage="research" data-search="rwanda coffee research database /workspace/rwanda-coffee/research-database.md origin, grade and logistics research underpinning every coffee page. research">
+            <header class="card-head">
+              <h3>Rwanda Coffee Research Database</h3>
+              <span class="stage stage-research">research</span>
+            </header>
+            <p class="note">Origin, grade and logistics research underpinning every coffee page.</p>
+            <footer class="card-foot">
+              <code>/workspace/rwanda-coffee/research-database.md</code>
+              <span class="meta">research · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="coffee" data-stage="draft" data-search="mission master plan /workspace/rwanda-coffee/mission-master-plan-2026-08-18.md operating plan for the rwanda origin mission. doc">
+            <header class="card-head">
+              <h3>Mission Master Plan</h3>
+              <span class="stage stage-draft">draft</span>
+            </header>
+            <p class="note">Operating plan for the Rwanda origin mission.</p>
+            <footer class="card-foot">
+              <code>/workspace/rwanda-coffee/MISSION-MASTER-PLAN-2026-08-18.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="coffee" data-stage="draft" data-search="september coffee strategy /workspace/rwanda-coffee/september-coffee-strategy-2026-08-18.md quarter-facing strategy note. review against actuals before reuse. doc">
+            <header class="card-head">
+              <h3>September Coffee Strategy</h3>
+              <span class="stage stage-draft">draft</span>
+            </header>
+            <p class="note">Quarter-facing strategy note. Review against actuals before reuse.</p>
+            <footer class="card-foot">
+              <code>/workspace/rwanda-coffee/SEPTEMBER-COFFEE-STRATEGY-2026-08-18.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="coffee" data-stage="ready" data-search="china outreach script /workspace/china-coffee-outreach.md outbound script for the china channel. doc">
+            <header class="card-head">
+              <h3>China Outreach Script</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Outbound script for the China channel.</p>
+            <footer class="card-foot">
+              <code>/workspace/china-coffee-outreach.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="coffee" data-stage="ready" data-search="sa b2b prospect list /workspace/sa-b2b-coffee-prospects.md named commercial prospects. contents not indexed. doc">
+            <header class="card-head">
+              <h3><span class="lock" aria-label="restricted">🔒</span> SA B2B Prospect List</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Named commercial prospects. Contents not indexed.</p>
+            <footer class="card-foot">
+              <code>/workspace/sa-b2b-coffee-prospects.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+        </div>
+      </section>
+      <section class="line" data-line="meat" style="--accent:#ff2d78">
+        <div class="line-head">
+          <h2>Meat — Wagyu Biltong</h2>
+          <p>Wagyu biltong and the subscription box around it.</p>
+        </div>
+        <div class="grid">
+          <article class="card" data-line="meat" data-stage="ready" data-search="studex biltong product page /workspace/studex-biltong/dist/index.html full product page, built and ready to deploy. landing">
+            <header class="card-head">
+              <h3>StudEx Biltong Product Page</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Full product page, built and ready to deploy.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-biltong/dist/index.html</code>
+              <span class="meta">landing · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="meat" data-stage="ready" data-search="biltong email sequence /workspace/biltong-email-sequence.md five-email campaign, written and cleared to send. doc">
+            <header class="card-head">
+              <h3>Biltong Email Sequence</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Five-email campaign, written and cleared to send.</p>
+            <footer class="card-foot">
+              <code>/workspace/biltong-email-sequence.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="meat" data-stage="research" data-search="wagyu biltong competitive research /workspace/wagyu-biltong-research.md competitor landscape and positioning for the premium biltong category. research">
+            <header class="card-head">
+              <h3>Wagyu Biltong Competitive Research</h3>
+              <span class="stage stage-research">research</span>
+            </header>
+            <p class="note">Competitor landscape and positioning for the premium biltong category.</p>
+            <footer class="card-foot">
+              <code>/workspace/wagyu-biltong-research.md</code>
+              <span class="meta">research · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="meat" data-stage="draft" data-search="biltong / caviar / coffee stack /workspace/projects-biltong-caviar-coffee.md cross-line product stack strategy. touches all three consumer lines. doc">
+            <header class="card-head">
+              <h3>Biltong / Caviar / Coffee Stack</h3>
+              <span class="stage stage-draft">draft</span>
+            </header>
+            <p class="note">Cross-line product stack strategy. Touches all three consumer lines.</p>
+            <footer class="card-foot">
+              <code>/workspace/projects-biltong-caviar-coffee.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="meat" data-stage="draft" data-search="bite subscription /workspace/bite-subscription/ whatsapp ordering agent plus the unboxing mobile app. app">
+            <header class="card-head">
+              <h3>Bite Subscription</h3>
+              <span class="stage stage-draft">draft</span>
+            </header>
+            <p class="note">WhatsApp ordering agent plus the unboxing mobile app.</p>
+            <footer class="card-foot">
+              <code>/workspace/bite-subscription/</code>
+              <span class="meta">app · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="meat" data-stage="ready" data-search="studex meat pitch deck /workspace/studex-pitch/studex-meat-pitch-deck.pdf pdf deck for the meat line. deck">
+            <header class="card-head">
+              <h3>StudEx Meat Pitch Deck</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">PDF deck for the meat line.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-pitch/Studex-Meat-Pitch-Deck.pdf</code>
+              <span class="meta">deck · workspace</span>
+            </footer>
+          </article>
+        </div>
+      </section>
+      <section class="line" data-line="agents" style="--accent:#00f0ff">
+        <div class="line-head">
+          <h2>StudBot Super Agents</h2>
+          <p>The agentic operating system. This is the product the rest of the group runs on.</p>
+        </div>
+        <div class="grid">
+          <article class="card" data-line="agents" data-stage="ready" data-search="studbot super agents — product spec /workspace/skills/studbot-super-agents/skill.md primary selling document. product spec, tiers and differentiators. skill">
+            <header class="card-head">
+              <h3><span class="star" aria-label="flagship">★</span> StudBot Super Agents — Product Spec</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Primary selling document. Product spec, tiers and differentiators.</p>
+            <footer class="card-foot">
+              <code>/workspace/skills/studbot-super-agents/SKILL.md</code>
+              <span class="meta">skill · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="agents" data-stage="live" data-search="studex platform studex-platform/ next.js application: cognitive brain, agent apis, supabase and vertex integration. code">
+            <header class="card-head">
+              <h3>StudEx Platform</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">Next.js application: cognitive brain, agent APIs, Supabase and Vertex integration.</p>
+            <footer class="card-foot">
+              <code>studex-platform/</code>
+              <span class="meta">code · repo</span>
+            </footer>
+          </article>
+          <article class="card" data-line="agents" data-stage="live" data-search="cognitive brain route studex-platform/src/app/brain/page.tsx brain interface inside the platform app. code">
+            <header class="card-head">
+              <h3>Cognitive Brain Route</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">Brain interface inside the platform app.</p>
+            <footer class="card-foot">
+              <code>studex-platform/src/app/brain/page.tsx</code>
+              <span class="meta">code · repo</span>
+            </footer>
+          </article>
+          <article class="card" data-line="agents" data-stage="ready" data-search="platform explainer suite /workspace/studex-platform-explainer/ ten podcast episodes, four videos and the architecture infographic. media">
+            <header class="card-head">
+              <h3>Platform Explainer Suite</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Ten podcast episodes, four videos and the architecture infographic.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-platform-explainer/</code>
+              <span class="meta">media · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="agents" data-stage="ready" data-search="ghost brain explorer /workspace/studex-ghost-brain-explorer.html interactive visualisation of agent memory. landing">
+            <header class="card-head">
+              <h3>Ghost Brain Explorer</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Interactive visualisation of agent memory.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-ghost-brain-explorer.html</code>
+              <span class="meta">landing · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="agents" data-stage="ready" data-search="client proposal landing /workspace/studex-client-proposal/ proposal page used to close platform clients. landing">
+            <header class="card-head">
+              <h3>Client Proposal Landing</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Proposal page used to close platform clients.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-client-proposal/</code>
+              <span class="meta">landing · workspace</span>
+            </footer>
+          </article>
+        </div>
+      </section>
+      <section class="line" data-line="ops" style="--accent:#00ff88">
+        <div class="line-head">
+          <h2>Operations</h2>
+          <p>War rooms and dashboards. Where the machine is watched.</p>
+        </div>
+        <div class="grid">
+          <article class="card" data-line="ops" data-stage="live" data-search="ops war room /workspace/studex-war-room/dist/index.html primary operations view. dashboard">
+            <header class="card-head">
+              <h3>Ops War Room</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">Primary operations view.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-war-room/dist/index.html</code>
+              <span class="meta">dashboard · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="ops" data-stage="live" data-search="mission control /workspace/studex-mission-control/index.html cross-mission status board. dashboard">
+            <header class="card-head">
+              <h3>Mission Control</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">Cross-mission status board.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-mission-control/index.html</code>
+              <span class="meta">dashboard · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="ops" data-stage="live" data-search="n8n deploy dashboard /workspace/n8n-deploy-dashboard/dist/index.html workflow deployment and run status. dashboard">
+            <header class="card-head">
+              <h3>n8n Deploy Dashboard</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">Workflow deployment and run status.</p>
+            <footer class="card-foot">
+              <code>/workspace/n8n-deploy-dashboard/dist/index.html</code>
+              <span class="meta">dashboard · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="ops" data-stage="live" data-search="etb cashclaw revenue dashboard /workspace/etb-cashclaw/src/dashboard/public/index.html revenue reporting surface. dashboard">
+            <header class="card-head">
+              <h3>ETB CashClaw Revenue Dashboard</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">Revenue reporting surface.</p>
+            <footer class="card-foot">
+              <code>/workspace/etb-cashclaw/src/dashboard/public/index.html</code>
+              <span class="meta">dashboard · workspace</span>
+            </footer>
+          </article>
+        </div>
+      </section>
+      <section class="line" data-line="agent-os" style="--accent:#8b5cf6">
+        <div class="line-head">
+          <h2>Agent OS</h2>
+          <p>What any agent reads on the way in. Treat as the constitution.</p>
+        </div>
+        <div class="grid">
+          <article class="card" data-line="agent-os" data-stage="ready" data-search="studex onboarding pack /workspace/studex-onboarding-pack.md full briefing pack. first read for any agent joining the fleet. doc">
+            <header class="card-head">
+              <h3><span class="star" aria-label="flagship">★</span> StudEx Onboarding Pack</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Full briefing pack. First read for any agent joining the fleet.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-onboarding-pack.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="agent-os" data-stage="live" data-search="agents.md /workspace/agents.md operating instructions for the agent fleet. doc">
+            <header class="card-head">
+              <h3>AGENTS.md</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">Operating instructions for the agent fleet.</p>
+            <footer class="card-foot">
+              <code>/workspace/AGENTS.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="agent-os" data-stage="live" data-search="soul.md /workspace/soul.md katia persona definition. doc">
+            <header class="card-head">
+              <h3>SOUL.md</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">Katia persona definition.</p>
+            <footer class="card-foot">
+              <code>/workspace/SOUL.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="agent-os" data-stage="live" data-search="memory.md /workspace/memory.md long-term memory store. doc">
+            <header class="card-head">
+              <h3>MEMORY.md</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">Long-term memory store.</p>
+            <footer class="card-foot">
+              <code>/workspace/MEMORY.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="agent-os" data-stage="live" data-search="tools.md — credential vault /workspace/tools.md api keys and credentials. never commit, never index, never paste into a session transcript. doc">
+            <header class="card-head">
+              <h3><span class="lock" aria-label="restricted">🔒</span> TOOLS.md — Credential Vault</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">API keys and credentials. Never commit, never index, never paste into a session transcript.</p>
+            <footer class="card-foot">
+              <code>/workspace/TOOLS.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="agent-os" data-stage="live" data-search="mcp server config .mcp.json model context protocol servers wired into this repository. code">
+            <header class="card-head">
+              <h3>MCP Server Config</h3>
+              <span class="stage stage-live">live</span>
+            </header>
+            <p class="note">Model Context Protocol servers wired into this repository.</p>
+            <footer class="card-foot">
+              <code>.mcp.json</code>
+              <span class="meta">code · repo</span>
+            </footer>
+          </article>
+        </div>
+      </section>
+      <section class="line" data-line="capital" style="--accent:#ffd700">
+        <div class="line-head">
+          <h2>Capital &amp; Pitch</h2>
+          <p>What goes in front of investors and partners.</p>
+        </div>
+        <div class="grid">
+          <article class="card" data-line="capital" data-stage="ready" data-search="rwanda coffee investor brief /workspace/rwanda-coffee/investor-brief-2026-08-17.md investor-facing financials. contents not indexed. doc">
+            <header class="card-head">
+              <h3><span class="lock" aria-label="restricted">🔒</span> Rwanda Coffee Investor Brief</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Investor-facing financials. Contents not indexed.</p>
+            <footer class="card-foot">
+              <code>/workspace/rwanda-coffee/INVESTOR-BRIEF-2026-08-17.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="capital" data-stage="ready" data-search="ciie export bundle pitch /workspace/ciie-bundle-pitch.md bundled export offer for the ciie channel. doc">
+            <header class="card-head">
+              <h3>CIIE Export Bundle Pitch</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Bundled export offer for the CIIE channel.</p>
+            <footer class="card-foot">
+              <code>/workspace/ciie-bundle-pitch.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="capital" data-stage="draft" data-search="wolf pack pitch /workspace/wolf-pack-pitch.md competitive positioning narrative. doc">
+            <header class="card-head">
+              <h3>Wolf Pack Pitch</h3>
+              <span class="stage stage-draft">draft</span>
+            </header>
+            <p class="note">Competitive positioning narrative.</p>
+            <footer class="card-foot">
+              <code>/workspace/wolf-pack-pitch.md</code>
+              <span class="meta">doc · workspace</span>
+            </footer>
+          </article>
+        </div>
+      </section>
+      <section class="line" data-line="content" style="--accent:#ff00ff">
+        <div class="line-head">
+          <h2>Content &amp; Brand</h2>
+          <p>The media library behind every campaign.</p>
+        </div>
+        <div class="grid">
+          <article class="card" data-line="content" data-stage="ready" data-search="platform podcast — 10 episodes /workspace/studex-platform-explainer/podcast_s01e01_seg01-10.mp3 season one, ten segments explaining the platform. media">
+            <header class="card-head">
+              <h3>Platform Podcast — 10 Episodes</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Season one, ten segments explaining the platform.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-platform-explainer/podcast_s01e01_seg01-10.mp3</code>
+              <span class="meta">media · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="content" data-stage="ready" data-search="platform videos — 4 cuts /workspace/studex-platform-explainer/vid1-4.mp4 four platform explainer videos. media">
+            <header class="card-head">
+              <h3>Platform Videos — 4 Cuts</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Four platform explainer videos.</p>
+            <footer class="card-foot">
+              <code>/workspace/studex-platform-explainer/vid1-4.mp4</code>
+              <span class="meta">media · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="content" data-stage="ready" data-search="study videos &amp; slideshows /workspace/content/ notebooklm-derived study videos and slideshows. media">
+            <header class="card-head">
+              <h3>Study Videos &amp; Slideshows</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">NotebookLM-derived study videos and slideshows.</p>
+            <footer class="card-foot">
+              <code>/workspace/content/</code>
+              <span class="meta">media · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="content" data-stage="ready" data-search="women's month campaign /workspace/womens-month/ rwanda farmer portraits, co-founder portrait and heritage campaign assets. media">
+            <header class="card-head">
+              <h3>Women's Month Campaign</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Rwanda farmer portraits, co-founder portrait and heritage campaign assets.</p>
+            <footer class="card-foot">
+              <code>/workspace/womens-month/</code>
+              <span class="meta">media · workspace</span>
+            </footer>
+          </article>
+          <article class="card" data-line="content" data-stage="ready" data-search="product image library /workspace/imgs/ product shots, heritage day, ankole bull and wagyu imagery. media">
+            <header class="card-head">
+              <h3>Product Image Library</h3>
+              <span class="stage stage-ready">ready</span>
+            </header>
+            <p class="note">Product shots, Heritage Day, Ankole bull and wagyu imagery.</p>
+            <footer class="card-foot">
+              <code>/workspace/imgs/</code>
+              <span class="meta">media · workspace</span>
+            </footer>
+          </article>
+        </div>
+      </section>
+
+  <p class="empty">Nothing matches that filter.</p>
+
+  <footer class="foot">
+    Generated from <code>assets.json</code> · public-sanitised ·
+    restricted entries are listed for accounting only, contents are never indexed here.
+  </footer>
+</div>
+<script>
+  const cards = [...document.querySelectorAll(".card")];
+  const sections = [...document.querySelectorAll(".line")];
+  const search = document.getElementById("search");
+  const active = { line: null, stage: null };
+
+  function apply() {
+    const q = search.value.trim().toLowerCase();
+    let shown = 0;
+    for (const card of cards) {
+      const ok =
+        (!active.line || card.dataset.line === active.line) &&
+        (!active.stage || card.dataset.stage === active.stage) &&
+        (!q || card.dataset.search.includes(q));
+      card.classList.toggle("hidden", !ok);
+      if (ok) shown++;
+    }
+    for (const section of sections) {
+      const any = [...section.querySelectorAll(".card")].some((c) => !c.classList.contains("hidden"));
+      section.classList.toggle("hidden", !any);
+    }
+    document.body.classList.toggle("is-empty", shown === 0);
+  }
+
+  document.getElementById("chips").addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    const { filter, value } = chip.dataset;
+    const next = active[filter] === value ? null : value;
+    active[filter] = next;
+    for (const c of document.querySelectorAll('.chip[data-filter="' + filter + '"]')) {
+      c.setAttribute("aria-pressed", String(c.dataset.value === next));
+    }
+    apply();
+  });
+
+  search.addEventListener("input", apply);
+  for (const c of document.querySelectorAll(".chip")) c.setAttribute("aria-pressed", "false");
+</script>
+</body>
+</html>
