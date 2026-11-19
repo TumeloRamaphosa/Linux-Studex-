@@ -2,7 +2,9 @@
 
 **Owner:** Gamer agent (Head of Studex Arcade)  
 **Branding:** Studex Arcade — powered by Stud-Bot  
-**Theme:** Berzerker (CSS + SVG backdrop; original art, not third-party UI clones)
+**Theme:** Stud-Bot retro gaming hub (pixel UI, gold/purple StudEx palette, CRT scanlines; `assets/stud-bot-mark.svg`)
+
+**Library:** `games-catalog.js` drives the hub grid and **All / Retro / New** filters.
 
 ## Layout
 

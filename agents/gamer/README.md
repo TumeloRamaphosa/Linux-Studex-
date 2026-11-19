@@ -24,7 +24,7 @@ When the Node backend is running (`server/`), static files from the repo root ar
 
 ## Branding
 
-Hub copy uses **Studex Arcade — powered by Stud-Bot**. Visual theme: **Berzerker** (near-black, blood-red frames, grim backdrop).
+Hub copy uses **Studex Arcade — powered by Stud-Bot**. Visual theme: **Stud-Bot gaming hub** (retro cabinet, CRT scanlines, StudEx gold + neon purple, pixel type). Library filters: **All games**, **Retro**, **New** (`games-catalog.js`).
 
 ## Games
 

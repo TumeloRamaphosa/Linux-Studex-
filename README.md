@@ -56,7 +56,7 @@ tmux new-session -s linux-studex -n main \; \
 
 ## Studex Arcade
 
-**Gamer** (Head of Studex Arcade) owns the static game hub at [`agents/gamer/arcade/`](agents/gamer/arcade/). Open it from the dashboard Integrations grid or run `python3 -m http.server` at the repo root and visit `/agents/gamer/arcade/`.
+**Gamer** (Head of Studex Arcade) owns the **Stud-Bot gaming hub** at [`agents/gamer/arcade/`](agents/gamer/arcade/) — retro and new browser games with an **All / Retro / New** library. Open from the dashboard Integrations grid or `python3 -m http.server` → `/agents/gamer/arcade/`.
 
 ## Dashboard
 

@@ -9,7 +9,7 @@
     '<a class="arcade-back" href="' +
     home +
     '">← Studex Arcade</a>' +
-    '<span class="arcade-brand">Stud-Bot</span>';
+    '<span class="arcade-brand">STUD-BOT</span>';
   document.body.insertBefore(barEl, document.body.firstChild);
   document.body.classList.add("arcade-framed");
 })();
