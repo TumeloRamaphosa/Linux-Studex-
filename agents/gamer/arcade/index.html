@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stud-Bot Gaming Hub — Studex Arcade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="logo-block" href="#top">
+      <img class="stud-bot-icon" src="assets/stud-bot-mark.svg" alt="" width="40" height="40">
+      <span class="wordmark-wrap">
+        <span class="wordmark">STUD-BOT ARCADE</span>
+        <span class="wordmark-sub">Gaming hub · retro &amp; new</span>
+      </span>
+    </a>
+    <button id="menu" type="button" aria-label="Menu">MENU</button>
+    <nav id="links">
+      <a href="#library">Library</a>
+      <a href="#credits">Credits</a>
+      <a href="#owner">Gamer agent</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="hero-marquee">★ INSERT COIN — PRESS START ★</p>
+      <h1 class="title">STUD-BOT GAMING HUB</h1>
+      <p class="powered">Studex Arcade — powered by Stud-Bot</p>
+      <p class="lede">Your agent OS game floor: vintage cabinet classics and modern browser titles in one place. Filter retro or new, or browse everything — all runnable locally with zero installs.</p>
+      <a class="btn" href="#library">Browse all games</a>
+    </section>
+
+    <section id="library">
+      <h2>Game library</h2>
+      <p class="muted">Six titles today — four <strong>retro</strong> (arcade-era feel) and two <strong>new</strong> (modern HTML5). More slots ready as Gamer adds games.</p>
+      <div class="filter-bar" role="tablist" aria-label="Filter games">
+        <button type="button" class="filter-btn is-active" data-filter="all" role="tab">All games</button>
+        <button type="button" class="filter-btn" data-filter="retro" role="tab">Retro</button>
+        <button type="button" class="filter-btn" data-filter="new" role="tab">New</button>
+      </div>
+      <p class="filter-count" id="game-count" aria-live="polite"></p>
+      <div class="grid play-grid" id="play-grid"></div>
+    </section>
+
+    <section id="credits">
+      <h2>Open-source credits</h2>
+      <p class="muted">Upstream projects and licenses under <code>games/</code>. License files are preserved verbatim.</p>
+      <table class="credits-table">
+        <thead>
+          <tr>
+            <th>Game</th>
+            <th>Era</th>
+            <th>Upstream</th>
+            <th>License file</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>JavaScript Snake</td><td>Retro</td><td>patorjk/JavaScript-Snake</td><td><a href="games/snake/LICENSE">games/snake/LICENSE</a></td></tr>
+          <tr><td>Canvas Tetris</td><td>Retro</td><td>dionyziz/canvas-tetris</td><td><a href="games/tetris/LICENSE.md">games/tetris/LICENSE.md</a></td></tr>
+          <tr><td>Javascript Racer</td><td>Retro</td><td>jakesgordon/javascript-racer</td><td><a href="games/racer/LICENSE">games/racer/LICENSE</a></td></tr>
+          <tr><td>Clumsy Bird</td><td>Retro</td><td>ellisonleao/clumsy-bird</td><td><a href="games/clumsy-bird/LICENSE.md">games/clumsy-bird/LICENSE.md</a></td></tr>
+          <tr><td>2048</td><td>New</td><td>gabrielecirulli/2048</td><td><a href="games/2048/LICENSE.txt">games/2048/LICENSE.txt</a></td></tr>
+          <tr><td>Hextris</td><td>New</td><td>Hextris/hextris</td><td><a href="games/hextris/LICENSE.md">games/hextris/LICENSE.md</a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="owner">
+      <h2>Gamer agent</h2>
+      <p class="owner-line"><strong>Gamer</strong> — Head of Studex Arcade on the Linux StudEx Agent OS. Hub path: <code>agents/gamer/arcade/</code>. Catalog: <code>games-catalog.js</code> for filters and future titles.</p>
+    </section>
+  </main>
+
+  <footer>Stud-Bot Gaming Hub · retro cabinet × StudEx gold · local play only</footer>
+  <script src="games-catalog.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
