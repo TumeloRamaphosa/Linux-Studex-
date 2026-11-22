@@ -7,12 +7,12 @@ tags: [index, studex]
 
 Studex Skills Library catalogue. **Catalogue only — no auto-install.** See [[README - How to add a skill]].
 
-_Last library update: 2026-11-08_
+_Last library update: 2026-11-22_
 
 ## Counts by tier
 
-- **Trusted:** 149
-- **Screen first:** 38
+- **Trusted:** 150
+- **Screen first:** 42
 - **Missing:** 2
 
 ## By category
@@ -70,6 +70,7 @@ _Last library update: 2026-11-08_
 - [[env-vars|env-vars]] — Trusted — Vercel environment variables
 - [[eve|eve]] — Trusted — eve framework for durable AI agents
 - [[flags-sdk|flags-sdk]] — Trusted — Feature flags and A/B tests
+- [[gsap-core|gsap-core]] — not yet screened — GSAP animation core API guidance for web animation and video-style motion - exact scope not verified
 - [[is-agentic|is-agentic]] — Trusted — Score agentic readiness of a site
 - [[k2|k2]] — Trusted — Cloudflare K2
 - [[knowledge-update|knowledge-update]] — Trusted — Correct outdated LLM knowledge
@@ -105,6 +106,15 @@ _Last library update: 2026-11-08_
 - [[workers-profiling|workers-profiling]] — Trusted — Profile CPU/memory on deployed Cloudflare Workers and Durable Objects
 - [[workflow|workflow]] — Trusted — Vercel Workflow SDK
 - [[wrangler|wrangler]] — Trusted — Wrangler CLI
+
+### Backend
+
+- [[neon-postgres|neon-postgres]] — not yet screened — Neon serverless Postgres guidance for agents - exact scope not verified
+- [[supabase|supabase]] — not yet screened — Supabase product guidance for agents (database, auth, storage, edge functions) - exact scope not verified
+
+### Testing
+
+- [[playwright-cli|playwright-cli]] — not yet screened — Browser automation and testing via the Playwright CLI for coding agents - exact scope not verified
 
 ### MCP
 
@@ -150,6 +160,7 @@ _Last library update: 2026-11-08_
 - [[cloudflare-one-migrations|cloudflare-one-migrations]] — Trusted — Migrate to Cloudflare One
 - [[gateway-workers|gateway-workers]] — Trusted — Build/debug Workers invoked by Cloudflare Gateway HTTP Forward policies
 - [[n8n-security-testing|n8n-security-testing]] — Screen first — Security testing patterns for n8n workflows
+- [[security-and-hardening|security-and-hardening]] — not yet screened — Secure-coding and hardening workflow for agent-written code - exact scope not verified
 - [[shannon|shannon]] — Screen first — AI pentester for web apps/APIs (source analysis)
 - [[turnstile-spin|turnstile-spin]] — Trusted — Cloudflare Turnstile
 
@@ -266,3 +277,15 @@ _Last library update: 2026-11-08_
 | setup-pre-commit | Screen first |
 | claude-handoff | Screen first |
 | software-factory | Screen first |
+
+## Changelog 2026-11-22
+
++5 catalogue entries (catalogue only — no installs; **not yet screened**):
+
+| Skill | Tier (catalogue) | Screen status |
+|---|---|---|
+| supabase | Screen first | not yet screened |
+| playwright-cli | Trusted | not yet screened — confirm no browser/binary download on install |
+| neon-postgres | Screen first | not yet screened |
+| security-and-hardening | Screen first | not yet screened |
+| gsap-core | Screen first | not yet screened |
