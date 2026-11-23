@@ -54,6 +54,10 @@ tmux new-session -s linux-studex -n main \; \
 ./scripts/orbit.sh --status
 ```
 
+## Studex Arcade
+
+**Gamer** (Head of Studex Arcade) owns the **Stud-Bot gaming hub** at [`agents/gamer/arcade/`](agents/gamer/arcade/) — retro and new browser games with an **All / Retro / New** library. Open from the dashboard Integrations grid or `python3 -m http.server` → `/agents/gamer/arcade/`.
+
 ## Dashboard
 
 Open `dashboard.html` for the full Agent OS interface:

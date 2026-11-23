@@ -1,0 +1,38 @@
+/* Stud-Bot in-game top bar — retro cabinet chrome */
+.arcade-top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  z-index: 2147483646;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  background: linear-gradient(180deg, #1a1520 0%, #0c0a10 100%);
+  border-bottom: 2px solid #c9a84c;
+  box-shadow: 0 2px 16px rgba(176, 38, 255, 0.2);
+  font-family: "Press Start 2P", "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 8px;
+  line-height: 1.5;
+}
+.arcade-top-bar a.arcade-back {
+  color: #5ef0ff;
+  text-decoration: none;
+}
+.arcade-top-bar a.arcade-back:hover {
+  color: #c9a84c;
+}
+.arcade-top-bar .arcade-brand {
+  color: #c9a84c;
+  letter-spacing: 0.06em;
+}
+body.arcade-framed {
+  padding-top: 36px !important;
+  box-sizing: border-box;
+}
+html.arcade-framed-root {
+  box-shadow: inset 0 0 0 2px #8a7340, inset 0 0 0 5px #08080c;
+  min-height: 100%;
+}
