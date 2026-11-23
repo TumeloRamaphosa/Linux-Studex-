@@ -23,6 +23,7 @@ import tempfile
 import threading
 import time
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from starlette.requests import Request
 from starlette.responses import FileResponse, JSONResponse
@@ -132,7 +133,10 @@ def _transport_ok(request: Request) -> bool:
 
 
 def _local_host(request: Request) -> bool:
-    host = (request.headers.get("host") or "").rsplit(":", 1)[0].strip("[]").lower()
+    try:  # bracket-aware: handles "localhost:8787", "[::1]", "[::1]:8787"
+        host = (urlsplit("//" + (request.headers.get("host") or "")).hostname or "").lower()
+    except ValueError:
+        return False
     return host in ("localhost", "127.0.0.1", "::1")
 
 
