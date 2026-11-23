@@ -18,11 +18,14 @@ PUBLISH=(
   os scripts sdk server dark-factory-rig
 )
 
-# Anything staged by hand outside the list is unstaged first, so only PUBLISH paths can ever go out.
-allowed() { local f="$1" p; for p in "${PUBLISH[@]}"; do [[ "$f" == "$p" || "$f" == "$p"/* ]] && return 0; done; return 1; }
-git diff --cached --name-only | while read -r f; do allowed "$f" || git reset -q -- "$f"; done
+# Build the commit in a scratch index started from HEAD, so your own staged work is never touched
+# and nothing outside PUBLISH can be included, however it was staged.
+TMPIDX=$(mktemp "${TMPDIR:-/tmp}/studex-index.XXXXXX") || exit 1
+trap 'rm -f "$TMPIDX"' EXIT
+export GIT_INDEX_FILE="$TMPIDX"
+git read-tree HEAD || exit 1
 
-# Stage the listed paths, deletions included.
+# Stage the listed paths from the working tree, deletions included.
 for p in "${PUBLISH[@]}"; do
   if [ -e "$p" ] || [ -L "$p" ] || git ls-files --error-unmatch -- "$p" >/dev/null 2>&1; then
     git add -A -- "$p" || exit 1
@@ -41,7 +44,6 @@ big=$(git diff --cached --name-only --diff-filter=AM | while read -r f; do
         [ -f "$f" ] && [ "$(wc -c < "$f")" -gt 20971520 ] && echo "$f"; done)
 
 if [ -n "$hits$big" ]; then
-  git reset -q
   {
     echo "[$(stamp)] BLOCKED — nothing pushed. Remove these, then it will push next run:"
     [ -n "$hits" ] && echo "$hits" | sed 's/^/    possible key or personal email: /'
@@ -50,7 +52,13 @@ if [ -n "$hits$big" ]; then
   exit 1
 fi
 
-git commit -q -m "auto: checkpoint $(date '+%Y-%m-%d %H:%M')" -m "Auto-commit from dev machine"
+tree=$(git write-tree) || exit 1
+commit=$(git commit-tree "$tree" -p HEAD -m "auto: checkpoint $(date '+%Y-%m-%d %H:%M')" -m "Auto-commit from dev machine") || exit 1
+git update-ref -m "auto-push" HEAD "$commit" || exit 1
+unset GIT_INDEX_FILE
+# Your real index: only the published paths are brought up to the new commit; anything else you staged stays staged.
+for p in "${PUBLISH[@]}"; do git reset -q -- "$p" 2>/dev/null || true; done
+
 if git push -q origin HEAD 2>>"$LOG"; then
   echo "[$(stamp)] Auto-committed and pushed" >> "$LOG"
 else

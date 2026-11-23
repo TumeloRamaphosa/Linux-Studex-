@@ -215,16 +215,20 @@ def _bearer(request):
 VIEW_COOKIE = "studex_view"
 
 
+def _key_ok(given):
+    return bool(given) and hmac.compare_digest(given, VIEW_TOKEN)
+
+
 def _viewer_ok(request):
+    """Any one valid credential is enough, so a stale ?key= saved in a browser can't shadow a valid session cookie."""
     if not VIEW_TOKEN:
         return True
-    given = _bearer(request) or request.query_params.get("key", "") or request.cookies.get(VIEW_COOKIE, "")
-    return hmac.compare_digest(given, VIEW_TOKEN)
+    return any(_key_ok(g) for g in (_bearer(request), request.query_params.get("key", ""), request.cookies.get(VIEW_COOKIE, "")))
 
 
 def _remember(request, response):
     """A valid ?key= becomes an HttpOnly cookie, so an app's scripts, images and media load without the key in every URL."""
-    if VIEW_TOKEN and request.query_params.get("key") and _viewer_ok(request):
+    if VIEW_TOKEN and _key_ok(request.query_params.get("key", "")):
         response.set_cookie(VIEW_COOKIE, VIEW_TOKEN, max_age=30 * 86400, httponly=True, samesite="lax",
                             secure=request.url.scheme == "https", path="/")
     return response
@@ -297,7 +301,9 @@ async def apps(request: Request):
     kind = APP_TYPES.get(target.suffix.lower()) or ("text/html" if target.name.endswith(".dc.html") else None)
     if not kind:
         return PlainTextResponse("not found", status_code=404)
-    return _remember(request, FileResponse(target, media_type=kind))
+    # Behind a view key these are private: no shared cache may keep them and hand them to someone without the key.
+    headers = {"Cache-Control": "private, no-cache", "Vary": "Cookie, Authorization"} if VIEW_TOKEN else None
+    return _remember(request, FileResponse(target, media_type=kind, headers=headers))
 
 
 @mcp.custom_route("/join.sh", methods=["GET"])
