@@ -167,6 +167,8 @@ def snapshot():
                           "advertise": rep.get("advertise"), "models": rep.get("models") or []}
         for sess in sessions:
             for a in sess.get("agents") or []:
+                if a.get("status") not in STATUSES:
+                    a = {**a, "status": "unknown"}
                 rid = place(a, cid, rooms_cfg)
                 buckets.setdefault(rid, []).append({
                     "name": a.get("name"), "tool": a.get("tool"),
@@ -210,11 +212,22 @@ def _bearer(request):
     return h[7:].strip() if h.lower().startswith("bearer ") else ""
 
 
+VIEW_COOKIE = "studex_view"
+
+
 def _viewer_ok(request):
     if not VIEW_TOKEN:
         return True
-    given = _bearer(request) or request.query_params.get("key", "")
+    given = _bearer(request) or request.query_params.get("key", "") or request.cookies.get(VIEW_COOKIE, "")
     return hmac.compare_digest(given, VIEW_TOKEN)
+
+
+def _remember(request, response):
+    """A valid ?key= becomes an HttpOnly cookie, so an app's scripts, images and media load without the key in every URL."""
+    if VIEW_TOKEN and request.query_params.get("key") and _viewer_ok(request):
+        response.set_cookie(VIEW_COOKIE, VIEW_TOKEN, max_age=30 * 86400, httponly=True, samesite="lax",
+                            secure=request.url.scheme == "https", path="/")
+    return response
 
 
 @mcp.custom_route("/relay/report", methods=["POST"])
@@ -241,7 +254,7 @@ async def relay_report(request: Request):
 async def rooms_json(request: Request):
     if not _viewer_ok(request):
         return JSONResponse({"error": "view token required"}, status_code=401)
-    return JSONResponse(snapshot(), headers={"Access-Control-Allow-Origin": "*", "Cache-Control": "no-store"})
+    return _remember(request, JSONResponse(snapshot(), headers={"Access-Control-Allow-Origin": "*", "Cache-Control": "no-store"}))
 
 
 @mcp.custom_route("/", methods=["GET"])
@@ -284,7 +297,7 @@ async def apps(request: Request):
     kind = APP_TYPES.get(target.suffix.lower()) or ("text/html" if target.name.endswith(".dc.html") else None)
     if not kind:
         return PlainTextResponse("not found", status_code=404)
-    return FileResponse(target, media_type=kind)
+    return _remember(request, FileResponse(target, media_type=kind))
 
 
 @mcp.custom_route("/join.sh", methods=["GET"])
@@ -335,6 +348,22 @@ def agent_find(name: str) -> list[dict]:
     return hits
 
 
+LOOPBACK = {"localhost", "127.0.0.1", "::1", "0.0.0.0", "ip6-localhost"}
+
+
+def public_endpoint(url, host):
+    """Swap a loopback host for the machine's advertised one, keeping scheme, port and path."""
+    from urllib.parse import urlsplit, urlunsplit
+    try:
+        u = urlsplit(url)
+    except ValueError:
+        return url
+    if not host or (u.hostname or "").lower() not in LOOPBACK and not (u.hostname or "").startswith("127."):
+        return url
+    h = f"[{host}]" if ":" in host and not host.startswith("[") else host
+    return urlunsplit((u.scheme, f"{h}:{u.port}" if u.port else h, u.path, u.query, u.fragment))
+
+
 @mcp.tool
 def models_list(online_only: bool = True) -> list[dict]:
     """Every AI model served by a computer in the OS (Ollama, LM Studio or other OpenAI-compatible servers),
@@ -346,9 +375,24 @@ def models_list(online_only: bool = True) -> list[dict]:
         for srv in c.get("models") or []:
             for m in srv.get("models") or []:
                 out.append({"computer": c["id"], "online": c["online"], "server": srv.get("server"),
-                            "endpoint": (srv.get("endpoint") or "").replace("127.0.0.1", c.get("advertise") or c.get("hostname") or "127.0.0.1"),
+                            "endpoint": public_endpoint(srv.get("endpoint") or "", c.get("advertise") or c.get("hostname")),
                             "model": m.get("name"), "size_gb": m.get("size_gb")})
     return out
+
+
+class McpKey:
+    """When STUDEX_VIEW_TOKEN is set, MCP clients must send it as a Bearer token, same as /rooms."""
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if VIEW_TOKEN and scope["type"] == "http" and scope["path"].startswith("/mcp"):
+            auth = dict(scope.get("headers") or []).get(b"authorization", b"").decode()
+            given = auth[7:].strip() if auth.lower().startswith("bearer ") else ""
+            if not hmac.compare_digest(given, VIEW_TOKEN):
+                await JSONResponse({"error": "Bearer view token required"}, status_code=401)(scope, receive, send)
+                return
+        await self.app(scope, receive, send)
 
 
 if __name__ == "__main__":
@@ -358,4 +402,5 @@ if __name__ == "__main__":
         raise SystemExit(0)
     if not relay_tokens():
         raise SystemExit("No computers yet. Add one: python3 rooms_gateway.py mint meat-desk")
-    mcp.run(transport="http", host=os.environ.get("HOST", "0.0.0.0"), port=int(os.environ.get("PORT", "8787")))
+    import uvicorn
+    uvicorn.run(McpKey(mcp.http_app(path="/mcp")), host=os.environ.get("HOST", "0.0.0.0"), port=int(os.environ.get("PORT", "8787")))

@@ -50,11 +50,13 @@ RestartSec=10
 WantedBy=default.target
 EOF
     systemctl --user daemon-reload
-    systemctl --user enable --now studex-relay
+    systemctl --user enable studex-relay
+    systemctl --user restart studex-relay   # picks up new settings on a rejoin
     loginctl enable-linger "$USER" 2>/dev/null || true
     echo "✓ joined as $STUDEX_COMPUTER · service: systemctl --user status studex-relay" ;;
   Darwin)
     PL="$HOME/Library/LaunchAgents/com.studex.relay.plist"
+    mkdir -p "$(dirname "$PL")"
     cat > "$PL" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

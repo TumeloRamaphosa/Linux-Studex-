@@ -385,7 +385,7 @@ footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--line);
   t(); setInterval(t,1000);
 
   var btns=document.querySelectorAll('.roles button');
-  var nodes=document.querySelectorAll('[data-role]');
+  var nodes=document.querySelectorAll('[data-role]:not(.roles button)');
   function apply(role){
     nodes.forEach(function(n){
       if(role==='all'){ n.removeAttribute('data-role-hide'); return; }

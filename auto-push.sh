@@ -18,7 +18,16 @@ PUBLISH=(
   os scripts sdk server dark-factory-rig
 )
 
-for p in "${PUBLISH[@]}"; do [ -e "$p" ] && git add -- "$p"; done
+# Anything staged by hand outside the list is unstaged first, so only PUBLISH paths can ever go out.
+allowed() { local f="$1" p; for p in "${PUBLISH[@]}"; do [[ "$f" == "$p" || "$f" == "$p"/* ]] && return 0; done; return 1; }
+git diff --cached --name-only | while read -r f; do allowed "$f" || git reset -q -- "$f"; done
+
+# Stage the listed paths, deletions included.
+for p in "${PUBLISH[@]}"; do
+  if [ -e "$p" ] || [ -L "$p" ] || git ls-files --error-unmatch -- "$p" >/dev/null 2>&1; then
+    git add -A -- "$p" || exit 1
+  fi
+done
 
 if git diff --cached --quiet; then
   echo "[$(stamp)] No changes to commit" >> "$LOG"; exit 0
