@@ -9,7 +9,8 @@ Security:
     Only its SHA-256 is stored (admin.key.sha256, chmod 600). Without it, /secrets is switched off.
   * Changes are accepted only over HTTPS, from this machine, or from the Tailscale network
     (100.64.0.0/10), unless STUDEX_SECRETS_ALLOW_HTTP=1.
-  * Five wrong admin keys from one address in 10 minutes locks that address out for 10 minutes.
+  * Five wrong admin keys from one address in 10 minutes locks out further wrong guesses from it for
+    10 minutes; the correct key is always accepted, so nobody can lock the owner out.
 """
 import hashlib
 import hmac
@@ -142,15 +143,16 @@ def _admin_ok(request: Request) -> tuple[bool, JSONResponse | None]:
     if not _transport_ok(request):
         return False, JSONResponse({"error": "Use HTTPS or the Tailscale address to manage secrets."}, status_code=403)
     ip = _client(request)
-    if _locked(ip):
-        return False, JSONResponse({"error": "Too many wrong admin keys. Try again in 10 minutes."}, status_code=429)
     auth = request.headers.get("authorization", "")
     given = auth[7:].strip() if auth.lower().startswith("bearer ") else ""
-    if not given or not hmac.compare_digest(hashlib.sha256(given.encode()).hexdigest(), expected):
-        _fails.setdefault(ip, []).append(time.time())
-        return False, JSONResponse({"error": "Admin key not valid."}, status_code=401)
-    _fails.pop(ip, None)
-    return True, None
+    if given and hmac.compare_digest(hashlib.sha256(given.encode()).hexdigest(), expected):
+        # The right key always works: wrong guesses from a shared address (a proxy) can't lock the owner out.
+        _fails.pop(ip, None)
+        return True, None
+    if _locked(ip):
+        return False, JSONResponse({"error": "Too many wrong admin keys. Try again in 10 minutes."}, status_code=429)
+    _fails.setdefault(ip, []).append(time.time())
+    return False, JSONResponse({"error": "Admin key not valid."}, status_code=401)
 
 
 NO_STORE = {"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"}
@@ -190,6 +192,8 @@ def register(mcp):
                 action = "removed"
             else:
                 value = str(value).strip()
+                if not value:
+                    return JSONResponse({"error": "Enter a value (only spaces were sent). To delete a key, use Remove."}, status_code=400)
                 if len(value) > MAX_VALUE or "\n" in value:
                     return JSONResponse({"error": "Value too long or has line breaks."}, status_code=400)
                 data[name] = {"value": value, "updated": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime())}
