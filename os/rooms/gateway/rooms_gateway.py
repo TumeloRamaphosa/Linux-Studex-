@@ -263,8 +263,9 @@ def _viewer_ok(request):
 
 
 def _remember(request, response):
-    """A valid ?key= becomes an HttpOnly cookie, so an app's scripts, images and media load without the key in every URL."""
-    if VIEW_TOKEN and _key_ok(request.query_params.get("key", "")):
+    """A valid ?key= or Bearer key becomes an HttpOnly cookie, so apps, scripts, images and media
+    load without the key in any URL."""
+    if VIEW_TOKEN and (_key_ok(request.query_params.get("key", "")) or _key_ok(_bearer(request))):
         response.set_cookie(VIEW_COOKIE, VIEW_TOKEN, max_age=30 * 86400, httponly=True, samesite="lax",
                             secure=request.url.scheme == "https", path="/")
     return response
@@ -288,6 +289,13 @@ async def relay_report(request: Request):
     for rep in sorted(reports, key=lambda r: r.get("ts") or 0):
         store_report(rep)
     return JSONResponse({"ok": True, "stored": len(reports)})
+
+
+@mcp.custom_route("/rooms", methods=["OPTIONS"])
+async def rooms_preflight(request: Request):
+    """Lets a rooms page served from elsewhere send the view key as an Authorization header."""
+    return PlainTextResponse("", headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET",
+                                          "Access-Control-Allow-Headers": "Authorization", "Access-Control-Max-Age": "600"})
 
 
 @mcp.custom_route("/rooms", methods=["GET"])

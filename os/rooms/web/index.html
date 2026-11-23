@@ -120,6 +120,7 @@ dialog input{background:#0B0A07;border:1px solid var(--line);color:var(--cream);
   const params = new URLSearchParams(location.search);
   let gw = params.get('gateway') || store.get('rooms.gw') || (location.protocol.startsWith('http') ? location.origin : '');
   let key = params.get('key') || store.get('rooms.key');
+  if (params.has('key')) { store.set('rooms.key', key); params.delete('key'); history.replaceState(null, '', location.pathname + (params.toString() ? '?' + params : '')); }  // keep the key out of the address bar and history
 
   const ago = ts => { if (!ts) return 'never'; const s = Math.max(0, Date.now()/1000 - ts);
     return s < 60 ? `${Math.round(s)}s ago` : s < 3600 ? `${Math.round(s/60)}m ago` : s < 86400 ? `${Math.round(s/3600)}h ago` : `${Math.round(s/86400)}d ago`; };
@@ -202,8 +203,8 @@ dialog input{background:#0B0A07;border:1px solid var(--line);color:var(--cream);
   async function poll() {
     if (!gw) { render(demoData(), true); return; }
     try {
-      const u = new URL('/rooms', gw); if (key) u.searchParams.set('key', key);
-      const r = await fetch(u, { cache: 'no-store' });
+      // The key goes in a header, never in the address, so it doesn't land in server or proxy logs.
+      const r = await fetch(new URL('/rooms', gw), { cache: 'no-store', headers: key ? { 'Authorization': 'Bearer ' + key } : {} });
       if (r.status === 401) { setConn(['NEEDS VIEW KEY','var(--blocked)']); return; }
       if (!r.ok) throw new Error(r.status);
       render(await r.json(), false);

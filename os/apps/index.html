@@ -62,11 +62,11 @@ curl -fsSL <span class="gw"></span>/join.sh | STUDEX_COMPUTER=&lt;computer-id&gt
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const key = new URLSearchParams(location.search).get('key') || (() => { try { return localStorage.getItem('rooms.key') || ''; } catch { return ''; } })();
   document.querySelectorAll('.gw').forEach(e => e.textContent = location.origin);
-  if (key) document.querySelectorAll('a.app:not([data-nokey])').forEach(a => { const u = new URL(a.href); u.searchParams.set('key', key); a.href = u; });
+  // A ?key= in the address is read once, then removed; the gateway's session cookie opens the apps.
+  if (new URLSearchParams(location.search).has('key')) history.replaceState(null, '', location.pathname);
   async function load() {
     try {
-      const u = new URL('/rooms', location.origin); if (key) u.searchParams.set('key', key);
-      const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status);
+      const r = await fetch('/rooms', { cache: 'no-store', headers: key ? { 'Authorization': 'Bearer ' + key } : {} }); if (!r.ok) throw new Error(r.status);
       const d = await r.json(), cs = d.computers;
       const agents = d.rooms.reduce((n, r) => n + r.agents.length, 0) + d.unassigned.agents.length;
       const rows = cs.flatMap(c => (c.models || []).flatMap(s => (s.models || []).map(m => ({ c, s, m }))));
