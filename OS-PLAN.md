@@ -42,6 +42,7 @@ The repo is public and the Mac auto-pushes every 30 minutes. `auto-push.sh` now 
 
 ### 1 · Go live (needs Tumelo, about 30 minutes)
 1. On the GCP box: `pip install -r os/rooms/gateway/requirements.txt`, then `python3 os/rooms/gateway/rooms_gateway.py mint <id>` once per machine.
+   Then `python3 os/rooms/gateway/rooms_gateway.py admin` once, and paste API keys (OpenAI, Ollama, Freepik, Brevo…) on the gateway's `/secrets` page — never into a chat or this repo.
 2. Put the gateway behind HTTPS: a free Cloudflare Tunnel (already used for the control plane) or Caddy. Set `STUDEX_PUBLIC_URL` and a `STUDEX_VIEW_TOKEN`.
 3. On each VM and Mac: the one-line join from the launcher. Add `STUDEX_ADVERTISE_HOST` so other machines can reach its models.
 4. Open the gateway address on your phone and add it to the home screen.

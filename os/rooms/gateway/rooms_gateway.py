@@ -21,6 +21,7 @@ Environment:
   STUDEX_VIEW_TOKEN    optional; when set, /rooms and / need ?key=<token>
                        or "Authorization: Bearer <token>"
   STUDEX_ROOMS_FILE    default ../rooms.json
+  STUDEX_SECRETS_FILE  default ./secrets.json (API keys from /secrets; chmod 600, never committed)
   STUDEX_ROOMS_PRIVATE default ../rooms.private.json (repo, Drive and file links per room; never committed)
   STUDEX_DB            default ./rooms.sqlite3
   PORT                 default 8787
@@ -417,6 +418,10 @@ def models_list(online_only: bool = True) -> list[dict]:
     return out
 
 
+import secrets_vault  # noqa: E402  (write-only API key store at /secrets)
+secrets_vault.register(mcp)
+
+
 class McpKey:
     """When STUDEX_VIEW_TOKEN is set, MCP clients must send it as a Bearer token, same as /rooms."""
     def __init__(self, app):
@@ -434,6 +439,10 @@ class McpKey:
 
 if __name__ == "__main__":
     import sys
+    if len(sys.argv) == 2 and sys.argv[1] == "admin":
+        print(f"Admin key for /secrets: {secrets_vault.make_admin_key()}\n"
+              f"(shown once; only its hash is saved in {secrets_vault.ADMIN_HASH_FILE}. Run again to replace it.)")
+        raise SystemExit(0)
     if len(sys.argv) == 3 and sys.argv[1] == "mint":
         print(f"{sys.argv[2]}: {mint(sys.argv[2])}\n(shown once; it is saved in {TOKENS_FILE})")
         raise SystemExit(0)

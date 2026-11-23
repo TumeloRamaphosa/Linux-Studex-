@@ -43,6 +43,7 @@ th{color:var(--dim);font-weight:400;font-size:10.5px;letter-spacing:.1em}
     <a class="app" href="/apps/factory/"><span class="k">FACTORY</span><span class="n">Studex Factory</span><span class="d">The Factory floor, the opening call and the Dark Factory.</span></a>
     <a class="app" href="/apps/stud-bot/"><span class="k">APP</span><span class="n">Stud-Bot</span><span class="d">Mission control for agents: plan, run, approve. Phone and laptop.</span></a>
     <a class="app" href="/apps/mission-control/"><span class="k">TRACKER</span><span class="n">Mission Control</span><span class="d">Work tracking across the Studex companies.</span></a>
+    <a class="app" href="/secrets" data-nokey><span class="k">VAULT</span><span class="n">Secrets</span><span class="d">Load API keys (OpenAI, Ollama, Freepik, Brevo…) for the gateway. Write-only, admin key needed.</span></a>
   </div>
 
   <h2>JOIN A COMPUTER</h2>
@@ -61,7 +62,7 @@ curl -fsSL <span class="gw"></span>/join.sh | STUDEX_COMPUTER=&lt;computer-id&gt
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const key = new URLSearchParams(location.search).get('key') || (() => { try { return localStorage.getItem('rooms.key') || ''; } catch { return ''; } })();
   document.querySelectorAll('.gw').forEach(e => e.textContent = location.origin);
-  if (key) document.querySelectorAll('a.app').forEach(a => { const u = new URL(a.href); u.searchParams.set('key', key); a.href = u; });
+  if (key) document.querySelectorAll('a.app:not([data-nokey])').forEach(a => { const u = new URL(a.href); u.searchParams.set('key', key); a.href = u; });
   async function load() {
     try {
       const u = new URL('/rooms', location.origin); if (key) u.searchParams.set('key', key);
