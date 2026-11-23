@@ -1,0 +1,124 @@
+{
+  "_about": "Studex company rooms. Each room has its own computer. An agent lands in a room by (1) the computer it runs on, (2) its herdr workspace name, (3) its agent name. Edit this file to add rooms, computers or agents; the gateway reloads it on every request.",
+  "offline_after_seconds": 90,
+  "rooms": [
+    {
+      "id": "meat",
+      "name": "Studex Meat",
+      "lead": "Naledi",
+      "accent": "#C8553D",
+      "computer": {
+        "id": "meat-desk",
+        "label": "Orgo Auto-Meat",
+        "kind": "cloud",
+        "note": "Shopify, ads and content agents"
+      },
+      "workspaces": [
+        "meat",
+        "auto-meat",
+        "studexmeat",
+        "content"
+      ],
+      "agents": [
+        "naledi",
+        "eddie",
+        "ralf",
+        "content"
+      ]
+    },
+    {
+      "id": "global-markets",
+      "name": "Studex Global Markets",
+      "lead": "Katjana",
+      "accent": "#3D7DC8",
+      "computer": {
+        "id": "markets-desk",
+        "label": "Orgo Global Markets (2 CPU / 16 GB)",
+        "kind": "cloud",
+        "note": "RFQs, trading desk, Project Chronos"
+      },
+      "workspaces": [
+        "markets",
+        "global-markets",
+        "chronos",
+        "sgm"
+      ],
+      "agents": [
+        "katjana",
+        "cryptopia",
+        "orgo-gm",
+        "market-lead",
+        "ledger"
+      ],
+      "reel": {
+        "src": "media/ghost-hall.mp4",
+        "poster": "media/ghost-hall.jpg",
+        "title": "Business Ghosts · the hall",
+        "sound": false
+      }
+    },
+    {
+      "id": "dark-factory",
+      "name": "Super Agents / Dark Factory",
+      "lead": "Product",
+      "accent": "#8B5CF6",
+      "computer": {
+        "id": "factory-desk",
+        "label": "Orgo Super Agents Command",
+        "kind": "cloud",
+        "note": "SaaS build, software factory, Stud-Bot"
+      },
+      "workspaces": [
+        "dark-factory",
+        "factory",
+        "super-agents",
+        "studbot",
+        "orch",
+        "infra"
+      ],
+      "agents": [
+        "product",
+        "adam-smasher",
+        "claudio-cto",
+        "codex",
+        "openclaw",
+        "grok",
+        "hermes-core"
+      ],
+      "reel": {
+        "src": "media/studbot-presenter.mp4",
+        "poster": "media/studbot-presenter.jpg",
+        "title": "StudBot preview · WhatsApp AI assistant",
+        "sound": true,
+        "vertical": true
+      }
+    },
+    {
+      "id": "coffee",
+      "name": "Studex Coffee",
+      "lead": "CashClaw",
+      "accent": "#B8924E",
+      "computer": {
+        "id": "coffee-desk",
+        "label": "Coffee desk (to assign)",
+        "kind": "local",
+        "note": "Café Noir, Rwanda supply. No dedicated machine yet"
+      },
+      "workspaces": [
+        "coffee",
+        "cafe-noir",
+        "founders-den"
+      ],
+      "agents": [
+        "coffee",
+        "cashclaw"
+      ],
+      "reel": {
+        "src": "media/coffee-tiger.mp4",
+        "poster": "media/coffee-tiger.jpg",
+        "title": "Studex Coffee · the tiger pour",
+        "sound": true
+      }
+    }
+  ]
+}

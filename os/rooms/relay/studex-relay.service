@@ -1,0 +1,17 @@
+# Linux: copy to ~/.config/systemd/user/studex-relay.service, then
+#   systemctl --user daemon-reload && systemctl --user enable --now studex-relay
+#   loginctl enable-linger $USER     # keep it running after you log out
+# Put the three variables in ~/.config/studex-relay.env (chmod 600):
+#   STUDEX_GATEWAY=https://...   STUDEX_COMPUTER=meat-desk   STUDEX_RELAY_TOKEN=...
+[Unit]
+Description=Studex room relay (reports herdr agents to the gateway)
+After=network-online.target
+
+[Service]
+EnvironmentFile=%h/.config/studex-relay.env
+ExecStart=/usr/bin/env python3 %h/studex_relay.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
