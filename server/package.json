@@ -2,11 +2,13 @@
   "name": "linux-studex-server",
   "version": "1.0.0",
   "type": "module",
-  "description": "Linux StudEx Agent OS — Backend Server",
+  "description": "Linux StudEx Agent OS \u2014 Backend Server",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "node --watch index.js"
+    "dev": "node --watch index.js",
+    "preview:coms": "node preview-coms.mjs",
+    "test:coms": "node --test coms/*.test.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
