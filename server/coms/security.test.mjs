@@ -1,0 +1,7 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
+import SandboxManager from '../lib/sandbox.js';
+import {Gateway} from './gateway.mjs';import {HermesJarvisAdapters} from './providers.mjs';
+test('sandbox refuses host execution before Docker or shell work',()=>{const s=Object.create(SandboxManager.prototype);s.dockerAvailable=false;assert.throws(()=>s.spawn('python'),/isolation required/);assert.throws(()=>s.run('unknown','not executed'),/isolation required/);});
+test('legacy controls fail closed even for preview session',()=>{const g=new Gateway({origin:'http://127.0.0.1:1',demo:true});assert.throws(()=>g.legacyGuard({headers:{host:'127.0.0.1:1'},method:'POST'}),/disabled/);});
+test('provider cannot turn a live dial into a mock or select arbitrary URL',()=>{const p=new HermesJarvisAdapters();assert.throws(()=>p.submitMock({operation:'call.request'}));assert.throws(()=>p.endpoint('http://example.com/'));assert.throws(()=>p.endpoint('https://user:pass@example.com/'));assert.throws(()=>p.cancel());});
+test('entrypoint removes repository-root static and shell interpolation',()=>{const s=readFileSync(new URL('../index.js',import.meta.url),'utf8');assert.ok(!s.includes('express.static'));assert.ok(!s.includes('execSync'));assert.ok(!s.includes('app.use(cors'));assert.ok(s.includes('gateway.legacyGuard'));assert.ok(s.includes("HOST=process.env.HOST||'127.0.0.1'"));});
