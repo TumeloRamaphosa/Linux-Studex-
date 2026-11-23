@@ -34,3 +34,4 @@ spool.jsonl
 *.safetensors
 *.onnx
 .DS_Store
+os/rooms/rooms.private.json

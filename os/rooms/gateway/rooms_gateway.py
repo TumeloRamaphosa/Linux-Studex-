@@ -21,6 +21,7 @@ Environment:
   STUDEX_VIEW_TOKEN    optional; when set, /rooms and / need ?key=<token>
                        or "Authorization: Bearer <token>"
   STUDEX_ROOMS_FILE    default ../rooms.json
+  STUDEX_ROOMS_PRIVATE default ../rooms.private.json (repo, Drive and file links per room; never committed)
   STUDEX_DB            default ./rooms.sqlite3
   PORT                 default 8787
 """
@@ -38,6 +39,7 @@ from starlette.responses import FileResponse, JSONResponse, PlainTextResponse
 
 HERE = Path(__file__).resolve().parent
 ROOMS_FILE = Path(os.environ.get("STUDEX_ROOMS_FILE", HERE.parent / "rooms.json"))
+PRIVATE_ROOMS_FILE = Path(os.environ.get("STUDEX_ROOMS_PRIVATE", HERE.parent / "rooms.private.json"))
 WEB_PAGE = HERE.parent / "web" / "index.html"
 DB_PATH = os.environ.get("STUDEX_DB", str(HERE / "rooms.sqlite3"))
 STATUSES = ("working", "blocked", "idle", "done", "unknown")
@@ -97,8 +99,37 @@ CREATE INDEX IF NOT EXISTS events_ts ON events(ts);
 
 
 def load_rooms():
+    """rooms.json (public) merged with rooms.private.json (never published): per room, the
+    private file adds `links` (repos, agents repo, Drive folder, working files) and may add
+    whole rooms. Links only leave the gateway behind the view key."""
     with open(ROOMS_FILE) as f:
-        return json.load(f)
+        cfg = json.load(f)
+    if PRIVATE_ROOMS_FILE.is_file():
+        try:
+            extra = json.loads(PRIVATE_ROOMS_FILE.read_text())
+        except (OSError, ValueError):
+            extra = {}
+        by_id = {r["id"]: r for r in cfg.get("rooms", [])}
+        for pr in extra.get("rooms", []):
+            if pr.get("id") in by_id:
+                room = by_id[pr["id"]]
+                room["links"] = (room.get("links") or []) + (pr.get("links") or [])
+                for k, v in pr.items():
+                    if k not in ("id", "links"):
+                        room.setdefault(k, v)
+            elif pr.get("id") and pr.get("name"):
+                cfg.setdefault("rooms", []).append(pr)
+    return cfg
+
+
+def safe_links(links):
+    """Only http(s) links with a label make it out; anything else is dropped."""
+    out = []
+    for l in links or []:
+        url, label = str(l.get("url", "")), str(l.get("label", "")).strip()
+        if label and url.startswith(("https://", "http://")):
+            out.append({"kind": str(l.get("kind", "link"))[:16], "label": label[:60], "url": url})
+    return out
 
 
 def agent_key(computer, session, a):
@@ -192,7 +223,7 @@ def snapshot():
         agents = sorted(buckets[r["id"]], key=lambda a: (STATUSES + ("offline",)).index(a["status"]))
         rooms.append({
             "id": r["id"], "name": r["name"], "lead": r.get("lead"), "accent": r.get("accent"),
-            "reel": r.get("reel"),
+            "reel": r.get("reel"), "about": r.get("about"), "links": safe_links(r.get("links")),
             "computer": {**comp_cfg, "connected": bool(live), "online": bool(live and live["online"]),
                          "last_seen": live and live["last_seen"], "hostname": live and live["hostname"]},
             "agents": agents, "counts": counts(agents),
