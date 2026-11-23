@@ -996,8 +996,8 @@ p { margin-bottom: 16px; text-wrap: pretty; }
       </div>
     </div>
     <div class="header-status" id="header-status">
-      <span id="vm-count"><span class="status-dot online"></span>14 VMs Online</span>
-      <span id="agent-count"><span class="status-dot online"></span>5 Agents Active</span>
+      <span id="vm-count"><span class="status-dot online"></span>VM runtime unverified</span>
+      <span id="agent-count"><span class="status-dot online"></span>5 agent definitions</span>
       <span id="msg-count" style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)">0 msgs</span>
       <span id="total-cost" style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gold)">$0.000</span>
       <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted)" id="clock">00:00 SAST</span>
@@ -1007,6 +1007,12 @@ p { margin-bottom: 16px; text-wrap: pretty; }
 </header>
 
 <main class="container">
+  <section id="coms" style="padding-top:24px;">
+    <h2>CRM, onboarding &amp; calling</h2>
+    <p>Coms review integration. Legacy agent cards describe architecture, not verified VM or voice telemetry.</p>
+    <p><a href="/coms/" target="_blank" rel="noopener">Open CRM and calling workspace ↗</a> · <button onclick="connectLegacyUI()">Load operator telemetry</button></p>
+    <iframe title="Coms CRM and calling workspace" src="/coms/" style="width:100%;min-height:1050px;border:1px solid var(--border);border-radius:12px;" loading="eager"></iframe>
+  </section>
 
   <!-- LLM Mesh Status Bar -->
   <div class="llm-mesh-bar reveal-1" style="margin-top:24px;" id="llm-mesh-bar">
@@ -1858,7 +1864,7 @@ open dashboard.html</pre>
     <div style="font-family:var(--font-heading);font-size:1.4rem;color:var(--gold);letter-spacing:2px;margin-bottom:8px;">Linux StudEx</div>
     <p>Agent Operating System — Studex Group, Johannesburg SA</p>
     <p style="font-size:0.7rem;">14 VMs · QEMU/UTM · Ollama · n8n · OpenClaw · Obsidian</p>
-    <p style="font-size:0.65rem;margin-top:12px;">Auto-pushes every 30 min · <span class="gold">#goldandobsidian</span> · <span style="color:var(--neon-purple-light);">⬡ LLM Mesh ready</span></p>
+    <p style="font-size:0.65rem;margin-top:12px;">Auto-push script present; schedule unverified · <span class="gold">#goldandobsidian</span> · <span style="color:var(--neon-purple-light);">⬡ LLM Mesh status unverified</span></p>
   </div>
 </footer>
 
@@ -1985,9 +1991,14 @@ setInterval(updateClock, 10000);
 // ── API Helper ─────────────────────────────────────────────────────────────
 async function api(path, options = {}) {
   const url = API_BASE + '/api' + path;
+  let csrf = '';
+  if (options.method && options.method !== 'GET') {
+    const session = await fetch(API_BASE + '/api/coms/session', { credentials: 'same-origin' });
+    if (session.ok) csrf = (await session.json()).csrf || '';
+  }
   const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-    ...options,
+    ...options, credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json', ...(csrf ? { 'X-Coms-CSRF': csrf } : {}), ...options.headers },
   });
   if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
   return res.json();
@@ -2134,8 +2145,8 @@ function updateHeaderStatus(agentList) {
   const online = agentList.filter(a => a.status === 'online').length;
   const totalMsgs = agentList.reduce((s, a) => s + (a.messages || 0), 0);
 
-  vmEl.innerHTML = `<span class="status-dot ${online > 0 ? 'online' : 'offline'}"></span>14 VMs Online`;
-  agentEl.innerHTML = `<span class="status-dot ${online > 0 ? 'online' : 'offline'}"></span>${online} Agents Active`;
+  vmEl.innerHTML = `<span class="status-dot ${online > 0 ? 'online' : 'offline'}"></span>VM runtime unverified`;
+  agentEl.innerHTML = `<span class="status-dot ${online > 0 ? 'online' : 'offline'}"></span>${online} legacy definitions responding`;
   msgEl.textContent = `${totalMsgs} msgs`;
 }
 
@@ -2522,17 +2533,20 @@ async function callMcpTool() {
   }
 }
 
-// ── Initialise ─────────────────────────────────────────────────────────────
-setConn('connecting');
-subscribeStatus();
-refreshLlmMesh();
-setTimeout(refreshMesh, 1000);
-setTimeout(refreshSandboxes, 2000);
-setTimeout(refreshMcpTools, 3000);
-setInterval(refreshLlmMesh, 30000);
-setInterval(refreshMesh, 15000);
-setInterval(refreshSandboxes, 20000);
-setInterval(refreshMcpTools, 30000);
+// Legacy polling is explicit, authenticated and disabled by default.
+let legacyTelemetryStarted = false;
+async function connectLegacyUI() {
+  try {
+    const session = await api('/coms/session');
+    const health = await api('/health');
+    if (session.role !== 'operator' || !health.legacy_operator_enabled) throw new Error('Legacy operator controls are disabled');
+    if (legacyTelemetryStarted) return;
+    legacyTelemetryStarted = true;
+    setConn('connecting'); subscribeStatus(); refreshLlmMesh(); refreshMesh(); refreshSandboxes(); refreshMcpTools();
+    setInterval(refreshLlmMesh, 30000); setInterval(refreshMesh, 15000); setInterval(refreshSandboxes, 20000); setInterval(refreshMcpTools, 30000);
+  } catch (error) { setConn('disconnected'); alert(error.message); }
+}
+setConn('disconnected');
 </script>
 
 </body>
