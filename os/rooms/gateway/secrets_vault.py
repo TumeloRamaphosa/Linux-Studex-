@@ -166,6 +166,17 @@ def register(mcp):
         return FileResponse(PAGE, headers={**NO_STORE, "X-Frame-Options": "DENY",
                                            "Content-Security-Policy": "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; frame-ancestors 'none'"})
 
+    @mcp.custom_route("/secrets/transport", methods=["GET"])
+    async def secrets_transport(request: Request):
+        """No key needed: tells the page whether it may send the admin key over this connection."""
+        ok = _transport_ok(request)
+        try:
+            tailnet = ipaddress.ip_address(_client(request)) in _TAILNET
+        except ValueError:
+            tailnet = False
+        encrypted = request.url.scheme == "https" or tailnet or _client(request) in ("127.0.0.1", "::1")
+        return JSONResponse({"ok": ok, "encrypted": bool(ok and encrypted)}, headers=NO_STORE)
+
     @mcp.custom_route("/secrets/status", methods=["POST"])
     async def secrets_status(request: Request):
         ok, err = _admin_ok(request)
