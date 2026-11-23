@@ -28,7 +28,7 @@ export default class SandboxManager {
       this.dockerAvailable = true;
     } catch {
       this.dockerAvailable = false;
-      console.warn('⚠ Docker not available — sandboxes will use local execution (no isolation)');
+      console.warn('⚠ Docker not available — sandbox execution disabled (Docker isolation required)');
     }
   }
 
@@ -69,6 +69,7 @@ export default class SandboxManager {
 
   /** Spawn a new sandbox. Returns sandbox ID. */
   spawn(template = 'python', ttlMs = 120_000) {
+    if (!this.dockerAvailable) throw new Error('Docker isolation required; local fallback disabled');
     if (this.sandboxes.size >= MAX_SANDBOXES) {
       throw new Error(`Max sandboxes (${MAX_SANDBOXES}) reached`);
     }
@@ -140,6 +141,7 @@ export default class SandboxManager {
 
   /** Run code in a sandbox. Returns stdout, stderr, exitCode. */
   run(id, code, options = {}) {
+    if (!this.dockerAvailable) throw new Error('Docker isolation required; host execution denied');
     const sb = this.sandboxes.get(id);
     if (!sb) throw new Error(`Sandbox '${id}' not found`);
 
@@ -177,30 +179,7 @@ export default class SandboxManager {
         stderr = '';
         exitCode = 0;
       } else {
-        // Local execution fallback (no isolation)
-        // Write code to file first to avoid shell quoting issues
-        const ext = { python: 'py', node: 'js', shell: 'sh', go: 'go' }[lang] || 'sh';
-        const codeFile = `code_${Date.now()}.${ext}`;
-        const codePath = path.join(sb.workDir, codeFile);
-        fs.writeFileSync(codePath, code, 'utf-8');
-
-        const runner = {
-          python: `cd ${JSON.stringify(sb.workDir)} && python3 ${JSON.stringify(codePath)}`,
-          node: `cd ${JSON.stringify(sb.workDir)} && node ${JSON.stringify(codePath)}`,
-          shell: `cd ${JSON.stringify(sb.workDir)} && /bin/sh ${JSON.stringify(codePath)}`,
-          go: `cd ${JSON.stringify(sb.workDir)} && go run ${JSON.stringify(codePath)}`,
-        }[lang] || `cd ${JSON.stringify(sb.workDir)} && /bin/sh ${JSON.stringify(codePath)}`;
-
-        const result = execSync(runner, {
-          timeout,
-          stdio: 'pipe',
-          encoding: 'utf-8',
-          maxBuffer: 1024 * 1024,
-          shell: true,
-        });
-        stdout = result;
-        stderr = '';
-        exitCode = 0;
+        throw new Error('Docker isolation required; host execution denied');
       }
 
       // Find new files created
@@ -219,7 +198,7 @@ export default class SandboxManager {
     const sb = this.sandboxes.get(id);
     if (!sb) throw new Error(`Sandbox '${id}' not found`);
     const target = path.join(sb.workDir, dir);
-    if (!target.startsWith(sb.workDir)) throw new Error('Path traversal blocked');
+    if (!(target === path.resolve(sb.workDir) || target.startsWith(path.resolve(sb.workDir) + path.sep))) throw new Error('Path traversal blocked');
     if (!fs.existsSync(target)) return [];
     return fs.readdirSync(target).map(name => {
       const full = path.join(target, name);
@@ -238,7 +217,7 @@ export default class SandboxManager {
     const sb = this.sandboxes.get(id);
     if (!sb) throw new Error(`Sandbox '${id}' not found`);
     const full = path.join(sb.workDir, filePath);
-    if (!full.startsWith(sb.workDir)) throw new Error('Path traversal blocked');
+    if (!(full === path.resolve(sb.workDir) || full.startsWith(path.resolve(sb.workDir) + path.sep))) throw new Error('Path traversal blocked');
     if (!fs.existsSync(full)) return null;
     return fs.readFileSync(full, 'utf-8');
   }
@@ -248,7 +227,7 @@ export default class SandboxManager {
     const sb = this.sandboxes.get(id);
     if (!sb) throw new Error(`Sandbox '${id}' not found`);
     const full = path.join(sb.workDir, filePath);
-    if (!full.startsWith(sb.workDir)) throw new Error('Path traversal blocked');
+    if (!(full === path.resolve(sb.workDir) || full.startsWith(path.resolve(sb.workDir) + path.sep))) throw new Error('Path traversal blocked');
     fs.mkdirSync(path.dirname(full), { recursive: true });
     fs.writeFileSync(full, content, 'utf-8');
     return { path: filePath, size: content.length };
