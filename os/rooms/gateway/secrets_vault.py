@@ -122,11 +122,18 @@ def _transport_ok(request: Request) -> bool:
         ip = ipaddress.ip_address(host)
     except ValueError:
         return False
-    if request.url.scheme == "https":
+    if request.url.scheme == "https":   # includes a local proxy/tunnel that forwards X-Forwarded-Proto: https
         return True
-    if ip.is_loopback:  # direct, or via a tunnel/proxy on this machine (Cloudflare Tunnel, Caddy)
-        return True
+    if ip.is_loopback:
+        # Plain HTTP from this machine counts only when the browser itself is on this machine. A local
+        # proxy that serves the browser over plain HTTP must not make the key look safe.
+        return _local_host(request)
     return ip in _TAILNET
+
+
+def _local_host(request: Request) -> bool:
+    host = (request.headers.get("host") or "").rsplit(":", 1)[0].strip("[]").lower()
+    return host in ("localhost", "127.0.0.1", "::1")
 
 
 def _locked(ip: str) -> bool:
@@ -174,7 +181,7 @@ def register(mcp):
             tailnet = ipaddress.ip_address(_client(request)) in _TAILNET
         except ValueError:
             tailnet = False
-        encrypted = request.url.scheme == "https" or tailnet or _client(request) in ("127.0.0.1", "::1")
+        encrypted = request.url.scheme == "https" or tailnet or (_client(request) in ("127.0.0.1", "::1") and _local_host(request))
         return JSONResponse({"ok": ok, "encrypted": bool(ok and encrypted)}, headers=NO_STORE)
 
     @mcp.custom_route("/secrets/status", methods=["POST"])

@@ -116,14 +116,23 @@ dialog input{background:#0B0A07;border:1px solid var(--line);color:var(--cream);
   const COL = { working:'var(--working)', blocked:'var(--blocked)', idle:'var(--idle)', done:'var(--done)', offline:'var(--offline)', unknown:'var(--unknown)' };
   const ORDER = ['working','blocked','idle','done','offline','unknown'];
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const store = { get(k){ try { return localStorage.getItem(k) || ''; } catch { return ''; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
+  const store = { get(k){ try { return localStorage.getItem(k) || ''; } catch { return ''; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} },
+                  del(k){ try { localStorage.removeItem(k); } catch {} } };
   const params = new URLSearchParams(location.search);
   let gw = params.get('gateway') || store.get('rooms.gw') || (location.protocol.startsWith('http') ? location.origin : '');
-  // View keys are saved per gateway, so a link to one gateway never overwrites another's key.
+  // View keys are saved per gateway, one storage entry each ('rooms.key:<origin>'), so tabs and links
+  // never overwrite another gateway's key.
   const origin = u => { try { return new URL(u).origin; } catch { return ''; } };
-  const keys = (() => { try { return JSON.parse(store.get('rooms.keys') || '{}') || {}; } catch { return {}; } })();
-  const keyFor = g => keys[origin(g)] || (origin(g) === origin(store.get('rooms.gw') || location.origin) ? store.get('rooms.key') : '') || '';
-  const saveKey = (g, k) => { const o = origin(g); if (!o) return; if (k) keys[o] = k; else delete keys[o]; store.set('rooms.keys', JSON.stringify(keys)); };
+  const slot = g => 'rooms.key:' + origin(g);
+  const keyFor = g => origin(g) ? store.get(slot(g)) : '';
+  const saveKey = (g, k) => { if (!origin(g)) return; if (k) store.set(slot(g), k); else store.del(slot(g)); };
+  // One-time move of older formats, then they are gone (so a cleared key stays cleared).
+  (() => {
+    const legacy = store.get('rooms.key'), home = store.get('rooms.gw') || location.origin;
+    if (legacy && !keyFor(home)) saveKey(home, legacy);
+    try { const m = JSON.parse(store.get('rooms.keys') || '{}') || {}; Object.entries(m).forEach(([o, k]) => { if (!store.get('rooms.key:' + o)) store.set('rooms.key:' + o, k); }); } catch {}
+    store.del('rooms.key'); store.del('rooms.keys');
+  })();
   let key = params.get('key') || keyFor(gw);
   if (params.has('key')) { saveKey(gw, key); params.delete('key'); history.replaceState(null, '', location.pathname + (params.toString() ? '?' + params : '')); }  // keep the key out of the address bar and history
 
@@ -245,7 +254,12 @@ dialog input{background:#0B0A07;border:1px solid var(--line);color:var(--cream);
   }
 
   const dlg = document.getElementById('dlg');
-  document.getElementById('setBtn').onclick = () => { document.getElementById('gwIn').value = gw; document.getElementById('keyIn').value = key; dlg.showModal(); };
+  // In the Gateway dialog the key field follows the address: switching to another gateway shows that
+  // gateway's saved key (or blank), unless the key was typed by hand.
+  let keyTyped = false;
+  document.getElementById('keyIn').addEventListener('input', () => { keyTyped = true; });
+  document.getElementById('gwIn').addEventListener('input', () => { if (!keyTyped) document.getElementById('keyIn').value = keyFor(document.getElementById('gwIn').value.trim()); });
+  document.getElementById('setBtn').onclick = () => { keyTyped = false; document.getElementById('gwIn').value = gw; document.getElementById('keyIn').value = keyFor(gw) || key; dlg.showModal(); };
   dlg.addEventListener('close', () => { if (dlg.returnValue !== 'save') return;
     gw = document.getElementById('gwIn').value.trim(); key = document.getElementById('keyIn').value.trim();
     store.set('rooms.gw', gw); saveKey(gw, key); poll(); });
