@@ -166,10 +166,12 @@ def _match(value, words):
 
 
 def place(agent, computer_id, rooms):
-    """Workspace name wins, then the computer's own room, then the agent's name."""
-    for r in rooms:
-        if _match(agent.get("workspace"), r.get("workspaces", [])):
-            return r["id"]
+    """Workspace name wins (the computer's own room breaks a tie), then the computer's own room,
+    then the agent's name."""
+    by_ws = [r for r in rooms if _match(agent.get("workspace"), r.get("workspaces", []))]
+    if by_ws:
+        own = [r for r in by_ws if (r.get("computer") or {}).get("id") == computer_id]
+        return (own or by_ws)[0]["id"]
     for r in rooms:
         if (r.get("computer") or {}).get("id") == computer_id:
             return r["id"]
@@ -224,7 +226,9 @@ def snapshot():
         agents = sorted(buckets[r["id"]], key=lambda a: (STATUSES + ("offline",)).index(a["status"]))
         rooms.append({
             "id": r["id"], "name": r["name"], "lead": r.get("lead"), "accent": r.get("accent"),
-            "reel": r.get("reel"), "about": r.get("about"), "links": safe_links(r.get("links")),
+            "reel": r.get("reel"), "about": r.get("about"),
+            # Private links only leave the gateway when a view key protects it.
+            "links": safe_links(r.get("links")) if VIEW_TOKEN else [],
             "computer": {**comp_cfg, "connected": bool(live), "online": bool(live and live["online"]),
                          "last_seen": live and live["last_seen"], "hostname": live and live["hostname"]},
             "agents": agents, "counts": counts(agents),
@@ -359,7 +363,7 @@ async def healthz(request: Request):
 def rooms_list() -> list[dict]:
     """Every company room with its computer (online or offline) and how many agents are working, blocked, idle or done."""
     s = snapshot()
-    return [{"room": r["id"], "name": r["name"], "computer": r["computer"]["label"],
+    return [{"room": r["id"], "name": r["name"], "computer": r["computer"].get("label") or r["computer"].get("id") or "unassigned",
              "computer_online": r["computer"]["online"], "counts": r["counts"]} for r in s["rooms"]]
 
 

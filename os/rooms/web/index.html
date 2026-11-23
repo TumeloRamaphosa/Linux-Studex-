@@ -159,7 +159,7 @@ dialog input{background:#0B0A07;border:1px solid var(--line);color:var(--cream);
       if (!card) {
         card = document.createElement('article');
         card.className = 'room'; card.dataset.room = r.id; card.setAttribute('aria-label', `${r.name} room`);
-        card.innerHTML = `<div class="rh"></div>${r.reel ? reelHtml(r.reel, isDemo) : ''}<div class="dyn"></div>`;
+        card.innerHTML = `<div class="rh"><div class="rhd" style="display:contents"></div><div class="lk"></div></div>${r.reel ? reelHtml(r.reel, isDemo) : ''}<div class="dyn"></div>`;
         const btn = card.querySelector('.snd');
         if (btn) btn.onclick = () => { const v = card.querySelector('video'); v.muted = !v.muted; if (!v.muted) v.play().catch(() => {});
           btn.textContent = v.muted ? '♪ SOUND OFF' : '♪ SOUND ON'; btn.setAttribute('aria-pressed', String(!v.muted)); };
@@ -169,10 +169,15 @@ dialog input{background:#0B0A07;border:1px solid var(--line);color:var(--cream);
       const pcState = !c.connected ? ['NOT CONNECTED','var(--offline)'] : c.online ? ['ONLINE','var(--done)'] : [`OFFLINE · ${ago(c.last_seen)}`,'var(--blocked)'];
       const bar = ORDER.filter(s => r.counts[s]).map(s => `<span style="width:${100*r.counts[s]/total}%;background:${COL[s]}" title="${s} ${r.counts[s]}"></span>`).join('');
       const counts = ORDER.filter(s => r.counts[s]).map(s => `<span><span style="color:${COL[s]}">■</span> ${r.counts[s]} ${s}</span>`).join('');
-      card.querySelector('.rh').innerHTML = `<span class="rn">${esc(r.name)}</span><span class="lead">LEAD · ${esc(r.lead || '—')}</span>
+      const rhHtml = `<span class="rn">${esc(r.name)}</span><span class="lead">LEAD · ${esc(r.lead || '—')}</span>
           <div class="pc"><span class="dot" style="background:${pcState[1]}" aria-hidden="true"></span>
             <span class="lbl" title="${esc(c.note || '')}">${esc(c.label || c.id)}${c.hostname ? ' · ' + esc(c.hostname) : ''}</span>
-            <span class="st" style="color:${pcState[1]}">${pcState[0]}</span></div>${r.about ? `<span class="about">${esc(r.about)}</span>` : ''}${(r.links || []).length ? `<nav class="links" aria-label="${esc(r.name)} links">${r.links.filter(l => /^https?:\/\//.test(l.url)).map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer"><b>${esc((l.kind || 'link').toUpperCase())}</b>${esc(l.label)}</a>`).join('')}</nav>` : ''}`;
+            <span class="st" style="color:${pcState[1]}">${pcState[0]}</span></div>${r.about ? `<span class="about">${esc(r.about)}</span>` : ''}`;
+      const rhd = card.querySelector('.rhd');
+      if (rhd.dataset.html !== rhHtml) { rhd.innerHTML = rhHtml; rhd.dataset.html = rhHtml; }
+      // Links live in their own box and are only rewritten when they change, so keyboard focus on one survives the 10-second refresh.
+      const lkHtml = `${(r.links || []).length ? `<nav class="links" aria-label="${esc(r.name)} links">${r.links.filter(l => /^https?:\/\//.test(l.url)).map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer"><b>${esc((l.kind || 'link').toUpperCase())}</b>${esc(l.label)}</a>`).join('')}</nav>` : ''}`, lk = card.querySelector('.lk');
+      if (lk.dataset.html !== lkHtml) { lk.innerHTML = lkHtml; lk.dataset.html = lkHtml; }
       card.querySelector('.dyn').innerHTML = r.agents.length ? `<div class="bar" aria-hidden="true">${bar}</div><div class="counts">${counts}</div>
           <ul class="agents">${r.agents.map(agentRow).join('')}</ul>`
           : `<div class="empty">No agents reporting yet.<br>Run the relay on <b>${esc(c.id)}</b> to bring this room online.</div>`;
