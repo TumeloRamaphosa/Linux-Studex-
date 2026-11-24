@@ -881,7 +881,7 @@ textarea,input{caret-color:#FFB000;}
     <sc-if value="{{ pApps }}" hint-placeholder-val="{{ false }}">
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="display:flex;flex-wrap:wrap;gap:6px">
-          <sc-for list="{{ appTabs }}" as="a" hint-placeholder-count="4"><button onClick="{{ a.onClick }}" style="all:unset;cursor:pointer;padding:5px 12px;border:1px solid {{ a.border }};background:{{ a.bg }};color:{{ a.color }};font-size:12px;letter-spacing:.1em">{{ a.name }}</button></sc-for>
+          <sc-for list="{{ appTabs }}" as="a" hint-placeholder-count="3"><button onClick="{{ a.onClick }}" style="all:unset;cursor:pointer;padding:5px 12px;border:1px solid {{ a.border }};background:{{ a.bg }};color:{{ a.color }};font-size:12px;letter-spacing:.1em">{{ a.name }}</button></sc-for>
           <a href="{{ appUrl }}" target="_blank" style="margin-left:auto;padding:5px 12px;border:1px solid #3a2c10;color:#C98A1E;text-decoration:none;font-size:12px;letter-spacing:.1em">OPEN FULL ↗</a>
         </div>
         <iframe src="{{ appUrl }}" style="width:100%;height:calc(100vh - 210px);min-height:520px;border:1px solid #3a2c10;background:#0a0805"></iframe>
@@ -2259,7 +2259,7 @@ class Component extends DCLogic {
     const hit = this.sim.slice().reverse().find(c => lx >= c.x && lx <= c.x + 16 && ly >= c.y - 8 && ly <= c.y + 32);
     if (hit) { this.setState({ ch: hit.id }); this.go('comms'); }
   }
-  componentWillUnmount() { this.toolsUnmount(); this.stopAmb(); cancelAnimationFrame(this.fr); clearInterval(this.tk); clearInterval(this.rv); clearTimeout(this.sv); clearTimeout(this.tt); window.removeEventListener('keydown', this.onKey); try { this.rec && this.rec.stop(); } catch (e) {} }
+  componentWillUnmount() { this.toolsUnmount(); this.stopAmb(); cancelAnimationFrame(this.fr); clearInterval(this.tk); clearInterval(this.rv); clearTimeout(this.sv); clearTimeout(this.sv2); clearTimeout(this.tt); window.removeEventListener('keydown', this.onKey); try { this.rec && this.rec.stop(); } catch (e) {} }
   componentDidUpdate() { this.paint(); }
   paint() {
     const p = this.previewRef.current; if (p && p._h !== this._html) { p.innerHTML = this._html; p._h = this._html; }
@@ -2400,8 +2400,8 @@ class Component extends DCLogic {
   openNote(path) { this.setState({ open: path }); this.persist({ open: path }); this.sfx('tick'); }
   edit(v) {
     const notes = { ...this.state.notes, [this.state.open]: v };
-    this.setState({ notes, sync: 'UNSAVED' }); clearTimeout(this.sv);
-    this.sv = setTimeout(() => { this.setState({ sync: 'SYNCING…' }); setTimeout(() => { this.setState({ sync: 'SYNCED' }); this.persist({ notes }); }, 450); }, 700);
+    this.setState({ notes, sync: 'UNSAVED' }); this.persist({ notes }); clearTimeout(this.sv); clearTimeout(this.sv2);
+    this.sv = setTimeout(() => { this.setState({ sync: 'SYNCING…' }); this.sv2 = setTimeout(() => this.setState({ sync: 'SYNCED' }), 450); }, 700);
   }
 
   async robuscaAsk(text) {
@@ -2653,9 +2653,9 @@ class Component extends DCLogic {
     };
   }
   appsVals(s) {
-    const A = [['UNIFIED COMMAND', 'studex-unified-command-center.html'], ['NEXUS CHAT', 'nexus-command-deck-chat.html'], ['INVESTMENT', 'investment-company-dashboard.html'], ['BRIEFING DECK', 'Programme Briefing Deck.dc.html']];
-    const i = s.appI || 0;
-    return { pApps: s.tab === 'apps', appUrl: 'uploads/' + encodeURI(A[i][1]),
+    const A = [['STUD-BOT', '../stud-bot/index.html'], ['MISSION CONTROL', '../mission-control/index.html'], ['LAUNCHER', '../index.html']];
+    const i = Math.min(s.appI || 0, A.length - 1);
+    return { pApps: s.tab === 'apps', appUrl: A[i][1],
       appTabs: A.map(([name], j) => ({ name, border: j === i ? '#FFB000' : '#3a2c10', bg: j === i ? '#FFB000' : 'transparent', color: j === i ? '#0a0805' : '#FFB000', onClick: () => this.setState({ appI: j }) })) };
   }
   renderVals() {
