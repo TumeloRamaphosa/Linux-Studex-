@@ -6,3 +6,32 @@ sdk/python/**/__pycache__/
 sdk/node/node_modules/
 *.pyc
 __pycache__/
+
+# --- Never publish (this repo is public) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+secrets/
+credentials*
+*.secret
+*token*.txt
+# client and personal material stays on the Mac
+clients/
+uploads/
+private/
+Agent-Logs/
+*.sqlite3
+*.db
+spool.jsonl
+# heavy media and models
+*.gguf
+*.safetensors
+*.onnx
+.DS_Store
+os/rooms/rooms.private.json

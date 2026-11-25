@@ -1,0 +1,190 @@
+{
+  "_about": "Studex company rooms. Each room has its own computer. An agent lands in a room by (1) the computer it runs on, (2) its herdr workspace name, (3) its agent name. Edit this file to add rooms, computers or agents; the gateway reloads it on every request. Repo, Drive and working-file links for each room live in rooms.private.json (never published) and are merged in by the gateway.",
+  "offline_after_seconds": 90,
+  "rooms": [
+    {
+      "id": "meat",
+      "name": "Studex Meat",
+      "lead": "Naledi",
+      "accent": "#C8553D",
+      "computer": {
+        "id": "meat-desk",
+        "label": "Orgo Auto-Meat",
+        "kind": "cloud",
+        "note": "Shopify, ads and content agents"
+      },
+      "workspaces": [
+        "meat",
+        "auto-meat",
+        "studexmeat",
+        "content"
+      ],
+      "agents": [
+        "naledi",
+        "eddie",
+        "ralf",
+        "content"
+      ],
+      "about": "Premium Wagyu and Ankole beef and biltong, studexmeat.com"
+    },
+    {
+      "id": "global-markets",
+      "name": "Studex Global Markets",
+      "lead": "Katjana",
+      "accent": "#3D7DC8",
+      "computer": {
+        "id": "markets-desk",
+        "label": "Orgo Global Markets (2 CPU / 16 GB)",
+        "kind": "cloud",
+        "note": "RFQs, trading desk, Project Chronos"
+      },
+      "workspaces": [
+        "markets",
+        "global-markets",
+        "chronos",
+        "sgm"
+      ],
+      "agents": [
+        "katjana",
+        "cryptopia",
+        "orgo-gm",
+        "market-lead",
+        "ledger"
+      ],
+      "reel": {
+        "src": "media/ghost-hall.mp4",
+        "poster": "media/ghost-hall.jpg",
+        "title": "Business Ghosts \u00b7 the hall",
+        "sound": false
+      },
+      "about": "B2B commodity trading, Project Chronos"
+    },
+    {
+      "id": "dark-factory",
+      "name": "Super Agents / Dark Factory",
+      "lead": "Product",
+      "accent": "#8B5CF6",
+      "computer": {
+        "id": "factory-desk",
+        "label": "Orgo Super Agents Command",
+        "kind": "cloud",
+        "note": "SaaS build, software factory, Stud-Bot"
+      },
+      "workspaces": [
+        "dark-factory",
+        "factory",
+        "super-agents",
+        "studbot",
+        "orch",
+        "infra"
+      ],
+      "agents": [
+        "product",
+        "adam-smasher",
+        "claudio-cto",
+        "codex",
+        "openclaw",
+        "grok",
+        "hermes-core"
+      ],
+      "reel": {
+        "src": "media/studbot-presenter.mp4",
+        "poster": "media/studbot-presenter.jpg",
+        "title": "StudBot preview \u00b7 WhatsApp AI assistant",
+        "sound": true,
+        "vertical": true
+      },
+      "about": "Studex Super Agents (agent SaaS for SMEs) and the Dark Factory build floor"
+    },
+    {
+      "id": "coffee",
+      "name": "Studex Coffee",
+      "lead": "CashClaw",
+      "accent": "#B8924E",
+      "computer": {
+        "id": "coffee-desk",
+        "label": "Coffee desk (to assign)",
+        "kind": "local",
+        "note": "Caf\u00e9 Noir, Rwanda supply. No dedicated machine yet"
+      },
+      "workspaces": [
+        "coffee",
+        "cafe-noir",
+        "founders-den"
+      ],
+      "agents": [
+        "coffee",
+        "cashclaw"
+      ],
+      "reel": {
+        "src": "media/coffee-tiger.mp4",
+        "poster": "media/coffee-tiger.jpg",
+        "title": "Studex Coffee \u00b7 the tiger pour",
+        "sound": true
+      },
+      "about": "Caf\u00e9 Noir, women-grown coffee trading from Rwanda"
+    },
+    {
+      "id": "wheat",
+      "name": "Studex Wheat",
+      "lead": "\u2014",
+      "accent": "#C8A23D",
+      "about": "Grain trading and distribution (oats and wheat), with Uvelka escrow",
+      "computer": {
+        "id": "wheat-desk",
+        "label": "Not assigned yet",
+        "kind": "cloud",
+        "note": "Join a VM with the one-line join"
+      },
+      "workspaces": [
+        "wheat",
+        "grain",
+        "uvelka"
+      ],
+      "agents": []
+    },
+    {
+      "id": "animal-exchange",
+      "name": "Animal Exchange",
+      "lead": "\u2014",
+      "accent": "#5DA86B",
+      "about": "Wildlife conservation and fractional animal ownership on blockchain",
+      "computer": {
+        "id": "animals-desk",
+        "label": "Not assigned yet",
+        "kind": "cloud",
+        "note": "Join a VM with the one-line join"
+      },
+      "workspaces": [
+        "animal-exchange",
+        "animals",
+        "cryptopia"
+      ],
+      "agents": []
+    },
+    {
+      "id": "nestvm",
+      "name": "NestVM",
+      "lead": "Hermes",
+      "accent": "#8A6AD0",
+      "about": "The VM fleet and the Studex online computer itself",
+      "computer": {
+        "id": "arcade-agents",
+        "label": "arcade-agents (Google Cloud, Johannesburg)",
+        "kind": "cloud",
+        "note": "Always-on node: gateway, Jarvis node, Hermes cron"
+      },
+      "workspaces": [
+        "nest",
+        "nestvm",
+        "vm",
+        "infra",
+        "gateway"
+      ],
+      "agents": [
+        "hermes",
+        "robusca"
+      ]
+    }
+  ]
+}

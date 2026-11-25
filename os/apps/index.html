@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studex OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0805;--panel:#140f07;--panel2:#1f1709;--line:#3a2c10;--amber:#FFB000;--yellow:#FFD21F;--cream:#E8DDBA;--dim:#8a6a1f;--ok:#7FD36B;--bad:#E85D5D}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--amber);font:13px/1.5 'IBM Plex Mono',monospace;text-shadow:0 0 6px rgba(255,176,0,.28)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px)}
+a{color:inherit;text-decoration:none}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;padding:14px clamp(16px,3vw,32px);border-bottom:1px solid var(--line)}
+.brand{font:22px/1 'VT323',monospace;letter-spacing:.18em;padding:3px 8px;background:var(--amber);color:var(--bg);text-shadow:none}
+h1{margin:0;font:400 22px/1 'VT323',monospace;letter-spacing:.14em}
+.state{margin-left:auto;display:flex;gap:14px;font-size:11px;letter-spacing:.1em;color:var(--dim)}
+.state b{color:var(--cream)}
+main{max-width:1200px;margin:0 auto;padding:22px clamp(16px,3vw,32px) 48px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
+.app{display:flex;flex-direction:column;gap:8px;min-height:150px;padding:16px;background:var(--panel);border:1px solid var(--line)}
+.app:hover,.app:focus-visible{border-color:var(--amber);background:var(--panel2);outline:none}
+.app .k{font-size:10.5px;letter-spacing:.16em;color:var(--dim)}
+.app .n{font:400 30px/1 'VT323',monospace;letter-spacing:.06em;color:var(--yellow);text-transform:uppercase}
+.app .d{color:var(--cream);font-size:12px}
+h2{font:400 24px/1 'VT323',monospace;letter-spacing:.14em;margin:30px 0 10px}
+pre{margin:0;padding:12px 14px;background:var(--panel);border:1px solid var(--line);color:var(--cream);white-space:pre-wrap;word-break:break-all;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--dim);font-weight:400;font-size:10.5px;letter-spacing:.1em}
+.wrap{overflow-x:auto}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">STUDEX</span><h1>ONLINE COMPUTER</h1>
+  <span class="state" id="state">CONNECTING…</span>
+</header>
+<main>
+  <div class="grid">
+    <a class="app" href="/"><span class="k">ROOMS</span><span class="n">Company Rooms</span><span class="d">Every agent on every computer, one room per company.</span></a>
+    <a class="app" href="/apps/factory/"><span class="k">FACTORY</span><span class="n">Studex Factory</span><span class="d">The Factory floor, the opening call and the Dark Factory.</span></a>
+    <a class="app" href="/apps/stud-bot/"><span class="k">APP</span><span class="n">Stud-Bot</span><span class="d">Mission control for agents: plan, run, approve. Phone and laptop.</span></a>
+    <a class="app" href="/apps/mission-control/"><span class="k">TRACKER</span><span class="n">Mission Control</span><span class="d">Work tracking across the Studex companies.</span></a>
+    <a class="app" href="/secrets" data-nokey target="_top"><span class="k">VAULT</span><span class="n">Secrets</span><span class="d">Load API keys (OpenAI, Ollama, Freepik, Brevo…) for the gateway. Write-only, admin key needed.</span></a>
+  </div>
+
+  <h2>JOIN A COMPUTER</h2>
+  <pre id="join">On the gateway:  python3 rooms_gateway.py mint &lt;computer-id&gt;
+On the new VM or machine:
+curl -fsSL <span class="gw"></span>/join.sh | STUDEX_COMPUTER=&lt;computer-id&gt; STUDEX_RELAY_TOKEN=&lt;token&gt; bash</pre>
+
+  <h2>MODELS ON THE NETWORK</h2>
+  <div class="wrap"><table>
+    <thead><tr><th scope="col">COMPUTER</th><th scope="col">STATE</th><th scope="col">SERVER</th><th scope="col">MODEL</th><th scope="col">SIZE</th></tr></thead>
+    <tbody id="models"><tr><td colspan="5" style="color:var(--dim)">Waiting for the gateway…</td></tr></tbody>
+  </table></div>
+</main>
+<script>
+(() => {
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const key = new URLSearchParams(location.search).get('key') || (() => { try { return localStorage.getItem('rooms.key') || ''; } catch { return ''; } })();
+  document.querySelectorAll('.gw').forEach(e => e.textContent = location.origin);
+  // A ?key= in the address is read once, then removed; the gateway's session cookie opens the apps.
+  if (new URLSearchParams(location.search).has('key')) history.replaceState(null, '', location.pathname);
+  async function load() {
+    try {
+      const r = await fetch('/rooms', { cache: 'no-store', headers: key ? { 'Authorization': 'Bearer ' + key } : {} }); if (!r.ok) throw new Error(r.status);
+      const d = await r.json(), cs = d.computers;
+      const agents = d.rooms.reduce((n, r) => n + r.agents.length, 0) + d.unassigned.agents.length;
+      const rows = cs.flatMap(c => (c.models || []).flatMap(s => (s.models || []).map(m => ({ c, s, m }))));
+      document.getElementById('state').innerHTML = `<span><b>${cs.filter(c => c.online).length}/${cs.length}</b> COMPUTERS</span><span><b>${agents}</b> AGENTS</span><span><b>${rows.length}</b> MODELS</span>`;
+      document.getElementById('models').innerHTML = rows.length ? rows.map(({ c, s, m }) =>
+        `<tr><td>${esc(c.id)}</td><td style="color:${c.online ? 'var(--ok)' : 'var(--bad)'}">${c.online ? 'ONLINE' : 'OFFLINE'}</td><td>${esc(s.server)}</td><td>${esc(m.name)}</td><td>${m.size_gb ? esc(m.size_gb) + ' GB' : '—'}</td></tr>`).join('')
+        : '<tr><td colspan="5" style="color:var(--dim)">No models reported yet. Ollama and LM Studio are found automatically on joined computers.</td></tr>';
+    } catch { document.getElementById('state').textContent = 'GATEWAY UNREACHABLE'; }
+  }
+  load(); setInterval(load, 10000);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stud-Bot Prototype</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#060606;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#FFD21F}a:hover{color:#FFE46B}
+input::placeholder,textarea::placeholder{color:#6f6b61}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:rgba(255,210,31,.25)}::-webkit-scrollbar-track{background:transparent}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="position:fixed;inset:0;display:flex;background:#060606;color:#ECE8DF;font-family:'JetBrains Mono',monospace;overflow:hidden">
+
+  <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+    <aside style="width:150px;flex:none;display:flex;flex-direction:column;border-right:1px solid rgba(255,210,31,.14);background:#080807">
+      <div style="height:118px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,210,31,.10)">
+        <img src="assets/studex-seal.png" alt="Studex Global Markets" style="width:92px;height:92px;object-fit:cover;border-radius:50%;display:block">
+      </div>
+      <nav style="display:flex;flex-direction:column;padding-top:16px">
+        <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="8">
+          <button onClick="{{ item.onClick }}" style="all:unset;box-sizing:border-box;cursor:pointer;height:54px;display:flex;align-items:center;gap:13px;padding:0 18px;background:{{ item.bg }};box-shadow:{{ item.bar }};color:{{ item.color }};font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase" style-hover="background:rgba(255,210,31,.06)">
+            <span style="width:21px;height:21px;flex:none;background-color:{{ item.color }};-webkit-mask:{{ item.icon }} center/contain no-repeat;mask:{{ item.icon }} center/contain no-repeat"></span>
+            <span>{{ item.label }}</span>
+          </button>
+        </sc-for>
+      </nav>
+      <div style="margin-top:auto;padding:0 22px 28px;font-family:'Chakra Petch',sans-serif;font-size:9.5px;line-height:1.7;letter-spacing:.32em;color:#8D887C">
+        <div>BIGGER</div><div>MARKETS</div><div>BRIGHTER</div><div>HUMANITY</div>
+        <div style="width:26px;height:2px;background:#FFD21F;margin-top:12px"></div>
+      </div>
+    </aside>
+  </sc-if>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <header style="height:44px;flex:none;display:flex;align-items:center;gap:18px;padding:0 18px;border-bottom:1px solid rgba(255,210,31,.14);font-family:'Chakra Petch',sans-serif;font-size:12px;letter-spacing:.16em;white-space:nowrap;overflow:hidden">
+      <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+        <img src="assets/studex-seal.png" alt="" style="width:30px;height:30px;border-radius:50%;object-fit:cover">
+      </sc-if>
+      <div style="display:flex;flex-direction:column;line-height:1">
+        <span style="font-size:19px;font-weight:600;letter-spacing:.2em;color:#ECE8DF">STUDEX</span>
+        <span style="font-size:6.5px;letter-spacing:.34em;color:#8D887C;margin-top:3px">GLOBAL MARKETS</span>
+      </div>
+      <span style="width:1px;height:18px;background:rgba(255,210,31,.25)"></span>
+      <span style="font-weight:600">AGENT OS</span>
+      <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;gap:18px">
+          <span style="width:1px;height:18px;background:rgba(255,210,31,.25)"></span>
+          <span style="color:#B9B4A8">LOCAL + CLOUD</span>
+          <span style="width:1px;height:18px;background:rgba(255,210,31,.25)"></span>
+        </div>
+      </sc-if>
+      <span style="display:flex;align-items:center;gap:8px;color:#B9B4A8"><span style="width:8px;height:8px;border-radius:50%;background:#FFD21F;box-shadow:0 0 10px #FFD21F"></span>{{ systemLabel }}</span>
+      <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+        <span style="margin-left:auto;font-size:10px;letter-spacing:.18em;color:#8D887C">HUMAN INTELLIGENCE <span style="color:#FFD21F">×</span> ARTIFICIAL EXECUTION <span style="color:#FFD21F">=</span> GLOBAL ADVANTAGE</span>
+      </sc-if>
+    </header>
+
+    <div ref="{{ scrollRef }}" style="flex:1;min-height:0;overflow-y:auto;position:relative;padding:10px;display:flex;flex-direction:column;gap:10px">
+
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start">
+        <div id="sec-hero" style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column">
+          <div style="position:relative;border:1px solid rgba(255,210,31,.16);overflow:hidden;aspect-ratio:{{ heroAspect }};background:#0b0b0a">
+            <img src="assets/hero-war-room.jpg" alt="Studex agent war room" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block">
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,6,6,0) 55%,rgba(6,6,6,.75) 100%)"></div>
+          </div>
+
+          <div style="position:relative;z-index:2;margin:{{ composerMargin }};background:rgba(9,9,8,.94);border:1px solid rgba(255,210,31,.22);padding:18px 22px 16px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
+              <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:15px;letter-spacing:.14em">WHAT SHOULD WE BUILD?</span>
+              <sc-if value="{{ hasActiveMission }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:10.5px;color:#8D887C;letter-spacing:.06em">ACTIVE · {{ activeMission }}</span>
+              </sc-if>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <label style="flex:1 1 280px;min-width:0;display:flex;align-items:center;gap:12px;height:46px;padding:0 14px;border:1px solid {{ inputBorder }};background:#060606">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8D887C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11l-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"></path></svg>
+                <input value="{{ mission }}" onChange="{{ onMission }}" onKeyDown="{{ onKey }}" placeholder="Describe your goal, product, research or market opportunity…" style="all:unset;flex:1;min-width:0;font-family:'JetBrains Mono',monospace;font-size:13px;color:#ECE8DF">
+              </label>
+              <button onClick="{{ plan }}" style="all:unset;box-sizing:border-box;cursor:pointer;flex:1 0 170px;max-width:100%;height:46px;display:flex;align-items:center;justify-content:center;gap:12px;background:{{ planBg }};color:#0a0a09;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;transition:transform 160ms" style-active="transform:scale(.98)">
+                <span>{{ planLabel }}</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a09" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+              </button>
+            </div>
+            <sc-if value="{{ showHint }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:11px;color:#FF6A3D;margin-top:-6px">Describe a goal first — or pick one below.</span>
+            </sc-if>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+              <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+                <button onClick="{{ c.onClick }}" style="all:unset;box-sizing:border-box;cursor:pointer;padding:7px 11px;border:1px solid rgba(236,232,223,.18);font-size:11px;line-height:1.3;white-space:nowrap;color:#B9B4A8;transition:border-color 240ms,color 240ms" style-hover="border-color:#FFD21F;color:#ECE8DF">{{ c.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:10px">
+          <section id="sec-agents" style="background:#0b0b0a;border:1px solid rgba(255,210,31,.16)">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,210,31,.12)">
+              <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:13px;letter-spacing:.16em">ACTIVE AGENTS</span>
+              <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:24px;line-height:1">{{ activeCount }}</span>
+            </div>
+            <sc-for list="{{ agents }}" as="a" hint-placeholder-count="6">
+              <button onClick="{{ a.onClick }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:0 14px;border-bottom:1px solid rgba(255,210,31,.08)" style-hover="background:rgba(255,210,31,.05)">
+                <img src="assets/agent-avatar.png" alt="" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,210,31,.5);flex:none">
+                <span style="width:8px;height:8px;border-radius:50%;flex:none;background:{{ a.dot }};box-shadow:{{ a.glow }}"></span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                  <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.12em">{{ a.name }}</span>
+                  <span style="font-size:9.5px;letter-spacing:.14em;color:{{ a.statusColor }}">{{ a.status }}</span>
+                </span>
+                <span style="display:flex;align-items:flex-end;gap:2px;height:16px">
+                  <sc-for list="{{ a.bars }}" as="b" hint-placeholder-count="10">
+                    <span style="width:2px;height:{{ b.h }};background:{{ b.c }}"></span>
+                  </sc-for>
+                </span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D887C" stroke-width="1.6" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg>
+              </button>
+            </sc-for>
+          </section>
+
+          <section style="background:#0b0b0a;border:1px solid rgba(255,210,31,.16)">
+            <div style="padding:12px 14px;border-bottom:1px solid rgba(255,210,31,.12);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;color:#B9B4A8">TASK DEPENDENCY GRAPH</div>
+            <div style="position:relative;height:220px;margin:6px 10px 10px">
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%">
+                <g stroke="rgba(255,210,31,.45)" stroke-width="1" vector-effect="non-scaling-stroke" fill="none">
+                  <path d="M22 22 L50 46" vector-effect="non-scaling-stroke"></path>
+                  <path d="M78 22 L50 46" vector-effect="non-scaling-stroke"></path>
+                  <path d="M50 54 L18 78" vector-effect="non-scaling-stroke"></path>
+                  <path d="M50 54 L50 78" vector-effect="non-scaling-stroke"></path>
+                  <path d="M50 54 L82 78" vector-effect="non-scaling-stroke"></path>
+                </g>
+              </svg>
+              <sc-for list="{{ graphNodes }}" as="n" hint-placeholder-count="6">
+                <div style="position:absolute;left:{{ n.x }};top:{{ n.y }};transform:translate(-50%,-50%);display:flex;align-items:center;gap:7px;padding:7px 9px;background:#0a0a09;border:1px solid {{ n.border }};white-space:nowrap">
+                  <span style="width:8px;height:8px;border-radius:50%;background:{{ n.dot }};box-shadow:{{ n.glow }}"></span>
+                  <span style="display:flex;flex-direction:column;gap:2px;font-family:'Chakra Petch',sans-serif;font-size:9.5px;letter-spacing:.1em;line-height:1">
+                    <span style="color:#ECE8DF;font-weight:600">{{ n.label }}</span>
+                    <span style="color:#8D887C">{{ n.agent }}</span>
+                  </span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:10px">
+        <section id="sec-office" style="background:#0b0b0a;border:1px solid rgba(255,210,31,.16);display:flex;flex-direction:column;min-width:0">
+          <div style="display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,210,31,.12);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;color:#B9B4A8"><span>AGENT STATION</span>
+            <button onClick="{{ toggleNight }}" style="all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:500;color:{{ nightColor }}">
+              <span>NIGHT SHIFT</span>
+              <span style="width:30px;height:16px;border-radius:999px;border:1px solid {{ nightColor }};position:relative;display:block"><span style="position:absolute;top:2px;left:{{ nightKnob }};width:10px;height:10px;border-radius:50%;background:{{ nightColor }};transition:left 160ms"></span></span>
+            </button>
+          </div>
+          <div style="padding:10px">
+            <div style="position:relative;width:100%;aspect-ratio:1039 / 653;background:#060606">
+              <img src="assets/pixel-office.png" alt="Studex pixel office with agents at desks" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;display:block;filter:grayscale(.55) sepia(.45) brightness(.78) contrast(1.15)">
+              <div style="position:absolute;left:4%;top:6%;width:92%;height:88%;background:rgba(255,210,31,.06);mix-blend-mode:overlay;pointer-events:none"></div>
+              <div style="position:absolute;left:75%;top:4.5%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:4px 8px;background:#060606;border:1px solid #FFD21F">
+                <img src="assets/studex-seal.png" alt="" style="width:18px;height:18px;border-radius:50%;object-fit:cover">
+                <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:9px;letter-spacing:.2em;color:#FFD21F">STUDEX HQ</span>
+              </div>
+              <div style="position:absolute;left:29%;top:13.5%;transform:translate(-50%,-50%);width:4.5%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:1px solid #FFD21F;background:#060606">
+                <img src="assets/studex-seal.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+              </div>
+              <div style="position:absolute;left:4%;bottom:6%;padding:3px 7px;background:rgba(6,6,6,.88);font-family:'Chakra Petch',sans-serif;font-size:8.5px;letter-spacing:.22em;color:#8D887C">WAR ROOM</div>
+              <div style="position:absolute;right:4.5%;bottom:20%;padding:3px 7px;background:rgba(6,6,6,.88);font-family:'Chakra Petch',sans-serif;font-size:8.5px;letter-spacing:.22em;color:#8D887C">BOARDROOM</div>
+              <sc-for list="{{ officeAgents }}" as="o" hint-placeholder-count="6">
+                <button onClick="{{ o.onClick }}" style="all:unset;box-sizing:border-box;cursor:pointer;position:absolute;left:{{ o.x }};top:{{ o.y }};transform:translate(-50%,-100%);display:flex;align-items:center;gap:5px;padding:3px 6px;background:rgba(6,6,6,.88);border:1px solid {{ o.border }};font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:9px;letter-spacing:.1em;color:#ECE8DF;white-space:nowrap">
+                  <span style="width:6px;height:6px;border-radius:50%;background:{{ o.dot }};box-shadow:{{ o.glow }}"></span>{{ o.name }}<span style="color:{{ o.color }};font-weight:500">{{ o.status }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <sc-if value="{{ nightOn }}" hint-placeholder-val="{{ false }}">
+            <div style="margin:0 10px 10px;padding:10px 12px;border:1px solid rgba(255,106,61,.45);font-size:10.5px;line-height:1.6;color:#B9B4A8"><span style="color:#FF6A3D;font-family:'Chakra Petch',sans-serif;font-weight:600;letter-spacing:.14em">LEASH ON · </span>Agents keep working while you're away. No sends, no spend over $5, no production deploys. Every action is logged for review.</div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;border-top:1px solid rgba(255,210,31,.08)">
+            <sc-for list="{{ rooms }}" as="r" hint-placeholder-count="2">
+              <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px;border-bottom:1px solid rgba(255,210,31,.06)">
+                <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                  <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:11.5px;letter-spacing:.14em">{{ r.name }} <span style="color:#8D887C;font-weight:500">· {{ r.team }}</span></span>
+                  <span style="font-size:10px;color:#8D887C">{{ r.crew }}</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ r.grants }}" as="g" hint-placeholder-count="3">
+                    <span style="padding:3px 7px;border:1px solid rgba(255,210,31,.28);font-size:10px;color:#FFD21F">{{ g }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="padding:10px 14px;font-size:10.5px;color:#8D887C;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-family:'Chakra Petch',sans-serif;letter-spacing:.14em;color:#B9B4A8">HANDOFF LANE</span>War Room <span style="color:#FFD21F">→</span> Boardroom · finished work moves to approval</div>
+          </div>
+        </section>
+
+        <section id="sec-finance" style="background:#0b0b0a;border:1px solid rgba(255,210,31,.16);display:flex;flex-direction:column;min-width:0">
+          <div style="display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,210,31,.12);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;color:#B9B4A8"><span>FINANCE DESK</span><span style="color:#8D887C;font-weight:500">3 SKILLS · 7 TOOLS</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:1px;background:rgba(255,210,31,.08);border-bottom:1px solid rgba(255,210,31,.08)">
+            <sc-for list="{{ finKpis }}" as="k" hint-placeholder-count="6">
+              <div style="background:#0b0b0a;padding:12px 14px;display:flex;flex-direction:column;gap:5px">
+                <span style="font-family:'Chakra Petch',sans-serif;font-size:9.5px;letter-spacing:.18em;color:#8D887C">{{ k.label }}</span>
+                <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:18px;color:{{ k.color }}">{{ k.val }}</span>
+                <span style="font-size:9.5px;color:#6f6b61">{{ k.src }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;padding:4px 0">
+            <sc-for list="{{ finSkills }}" as="f" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;flex-wrap:wrap;border-bottom:1px solid rgba(255,210,31,.06)">
+                <span style="flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:3px">
+                  <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.12em">{{ f.name }}</span>
+                  <span style="font-size:10.5px;line-height:1.5;color:#8D887C">{{ f.desc }}</span>
+                </span>
+                <button onClick="{{ f.onClick }}" style="all:unset;box-sizing:border-box;cursor:pointer;height:36px;padding:0 12px;display:flex;align-items:center;border:1px solid rgba(255,210,31,.4);font-size:11px;color:#FFD21F" style-hover="border-color:#FFD21F;background:rgba(255,210,31,.06)">{{ f.cmd }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:10px">
+        <section id="sec-machines" style="background:#0b0b0a;border:1px solid rgba(255,210,31,.16);display:flex;flex-direction:column;min-width:0">
+          <div style="display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,210,31,.12);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;color:#B9B4A8"><span>BARE METAL</span><span style="color:#8D887C;font-weight:500">LOCAL · OFFLINE-FIRST</span></div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ machines }}" as="m" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(255,210,31,.06);flex-wrap:wrap">
+                <span style="width:7px;height:7px;border-radius:50%;flex:none;background:{{ m.dot }}"></span>
+                <span style="flex:1 1 160px;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.12em">{{ m.name }} <span style="color:#8D887C;font-weight:500">· {{ m.role }}</span></span>
+                  <span style="font-size:10.5px;color:{{ m.noteColor }}">{{ m.note }}</span>
+                </span>
+                <span style="font-size:10.5px;color:#8D887C;min-width:52px">{{ m.port }}</span>
+                <button onClick="{{ m.onClick }}" style="all:unset;box-sizing:border-box;cursor:pointer;height:34px;padding:0 12px;display:flex;align-items:center;border:1px solid rgba(255,210,31,.4);font-size:11px;color:#FFD21F" style-hover="border-color:#FFD21F;background:rgba(255,210,31,.06)">{{ m.action }}</button>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1px;background:rgba(255,210,31,.08)">
+            <sc-for list="{{ inventory }}" as="k" hint-placeholder-count="4">
+              <div style="background:#0b0b0a;padding:10px 14px;display:flex;flex-direction:column;gap:4px">
+                <span style="font-family:'Chakra Petch',sans-serif;font-size:9.5px;letter-spacing:.18em;color:#8D887C">{{ k.label }}</span>
+                <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:17px;color:{{ k.color }}">{{ k.val }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;padding:10px 14px">
+            <span style="font-family:'Chakra Petch',sans-serif;font-size:10px;letter-spacing:.18em;color:#FF6A3D">RISKS · 3 CRITICAL</span>
+            <sc-for list="{{ risks }}" as="r" hint-placeholder-count="3">
+              <span style="font-size:10.5px;line-height:1.5;color:#B9B4A8"><span style="color:{{ r.color }}">{{ r.tag }}</span> {{ r.text }}</span>
+            </sc-for>
+          </div>
+        </section>
+
+        <section id="sec-worktrees" style="background:#0b0b0a;border:1px solid rgba(255,210,31,.16);display:flex;flex-direction:column;min-width:0">
+          <div style="display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,210,31,.12);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;color:#B9B4A8"><span>PARALLEL WORKTREES</span><span style="color:#8D887C;font-weight:500">ORCA PATTERN</span></div>
+          <div style="padding:10px 14px;font-size:11px;line-height:1.55;color:#B9B4A8;border-bottom:1px solid rgba(255,210,31,.08)">One mission, fanned out to {{ wtCount }} agents. Each works in its own branch. Compare the results and merge the winner.</div>
+          <div style="display:flex;flex-direction:column;flex:1">
+            <sc-for list="{{ worktrees }}" as="w" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid rgba(255,210,31,.06);flex-wrap:wrap;background:{{ w.bg }}">
+                <span style="flex:1 1 180px;min-width:0;display:flex;flex-direction:column;gap:3px">
+                  <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.12em">{{ w.agent }} <span style="color:{{ w.stateColor }};font-weight:500">· {{ w.state }}</span></span>
+                  <span style="font-size:10.5px;color:#8D887C">{{ w.branch }} · {{ w.box }}</span>
+                </span>
+                <span style="font-size:10.5px;color:#B9B4A8;min-width:72px">{{ w.diff }}</span>
+                <button onClick="{{ w.onClick }}" style="all:unset;box-sizing:border-box;cursor:pointer;height:34px;padding:0 12px;display:flex;align-items:center;border:1px solid {{ w.btnBorder }};font-size:11px;color:{{ w.btnColor }}" style-hover="border-color:#FFD21F;background:rgba(255,210,31,.06)">{{ w.btn }}</button>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:8px;padding:10px 14px;flex-wrap:wrap">
+            <button onClick="{{ fanOut }}" style="all:unset;box-sizing:border-box;cursor:pointer;height:36px;padding:0 14px;display:flex;align-items:center;background:#FFD21F;color:#060606;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px;letter-spacing:.14em" style-hover="background:#E8BF1A">FAN OUT MISSION</button>
+            <span style="font-size:10.5px;color:#8D887C;align-self:center">Notifies your phone when an agent finishes.</span>
+          </div>
+        </section>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:10px">
+        <section id="sec-logs" style="background:#0b0b0a;border:1px solid rgba(255,210,31,.16);display:flex;flex-direction:column;min-width:0">
+          <div style="padding:12px 14px;border-bottom:1px solid rgba(255,210,31,.12);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;color:#B9B4A8">LIVE LOGS</div>
+          <div ref="{{ logRef }}" style="height:172px;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:3px;font-size:11px;line-height:1.55">
+            <sc-for list="{{ logs }}" as="l" hint-placeholder-count="7">
+              <div style="display:flex;gap:8px;min-width:0">
+                <span style="color:#6f6b61;flex:none">[{{ l.t }}]</span>
+                <span style="color:{{ l.ac }};flex:none;width:62px">{{ l.a }}</span>
+                <span style="color:{{ l.mc }};min-width:0;overflow-wrap:anywhere">&gt; {{ l.m }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <section id="sec-memory" style="background:#0b0b0a;border:1px solid rgba(255,210,31,.16);display:flex;flex-direction:column;min-width:0">
+          <div style="display:flex;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,210,31,.12);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;color:#B9B4A8"><span>MEMORY GRAPH</span><span style="color:#8D887C;font-weight:500">{{ memCount }} NODES</span></div>
+          <div style="display:flex;align-items:center;gap:6px;padding:8px 12px 10px;flex-wrap:wrap">
+            <div style="position:relative;flex:1 1 170px;min-width:0;height:160px">
+            <sc-if value="{{ memSvg }}" hint-placeholder-val="{{ false }}"><img src="{{ memSvg }}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain"></sc-if>
+            <svg viewBox="0 0 220 160" style="position:absolute;inset:0;width:100%;height:100%">
+              <g transform="translate(110 72)">
+                <rect x="-14" y="-14" width="28" height="28" fill="#0b0b0a" stroke="#FFD21F" stroke-width="1.5" transform="rotate(45)"></rect>
+                <rect x="-7" y="-7" width="14" height="14" fill="#FFD21F" transform="rotate(45)"></rect>
+              </g>
+              <text x="110" y="112" text-anchor="middle" fill="#FFD21F" style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:11px;letter-spacing:.12em">BUSINESS GHOST</text>
+              <text x="110" y="124" text-anchor="middle" fill="#8D887C" style="font-family:'Chakra Petch',sans-serif;font-size:7px;letter-spacing:.2em">LONG TERM MEMORY</text>
+            </svg>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;font-size:10.5px;color:#B9B4A8;flex:none">
+              <sc-for list="{{ legend }}" as="g" hint-placeholder-count="5">
+                <span style="display:flex;align-items:center;gap:8px"><span style="width:7px;height:7px;border-radius:50%;background:{{ g.c }}"></span>{{ g.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+        </section>
+
+        <section style="background:#0b0b0a;border:1px solid rgba(255,210,31,.16);display:flex;flex-direction:column;min-width:0">
+          <div style="padding:12px 14px;border-bottom:1px solid rgba(255,210,31,.12);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;color:#B9B4A8">EVIDENCE &amp; ATTACHMENTS</div>
+          <div style="height:172px;overflow-y:auto;padding:4px 0">
+            <sc-for list="{{ evidence }}" as="f" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:12px;padding:6px 14px">
+                <span style="width:18px;height:18px;flex:none;background-color:{{ f.c }};-webkit-mask:{{ f.icon }} center/contain no-repeat;mask:{{ f.icon }} center/contain no-repeat"></span>
+                <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:11.5px;color:#ECE8DF;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.name }}</span>
+                  <span style="font-size:9.5px;color:#8D887C">{{ f.kind }} · {{ f.agent }}</span>
+                </span>
+                <span style="font-size:10px;color:#8D887C;flex:none">{{ f.ago }}</span>
+                <button onClick="{{ f.onClick }}" title="Download" style="all:unset;box-sizing:border-box;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(255,210,31,.08)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B9B4A8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
+                </button>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+
+        <section id="sec-approvals" style="background:#0b0b0a;border:1px solid rgba(255,210,31,.16);display:flex;flex-direction:column;min-width:0">
+          <div style="display:flex;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,210,31,.12);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.16em;color:#B9B4A8"><span>APPROVALS</span><span style="color:#8D887C;font-weight:500">{{ pendingLabel }}</span></div>
+          <div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:172px">
+            <sc-if value="{{ isIdle }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px">
+                <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:14px">Nothing waiting on you</span>
+                <span style="font-size:11px;line-height:1.6;color:#8D887C">Plan a mission above. Agents draft the work — nothing ships until you approve it here.</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isRunning }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:14px">Mission in progress</span>
+                <span style="font-size:11px;line-height:1.5;color:#B9B4A8">{{ activeMission }}</span>
+                <div style="height:4px;background:rgba(236,232,223,.1)"><div style="height:4px;width:{{ progressPct }};background:#FFD21F;transition:width 400ms"></div></div>
+                <span style="font-size:10.5px;color:#8D887C">{{ doneCount }} of 6 tasks complete · you'll be asked before anything ships</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isReview }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:14px;align-items:flex-start">
+                <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#FFD21F" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="12" cy="12" r="10"></circle><path d="M7.5 12.2l3 3 6-6.4"></path></svg>
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+                  <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:14px">Ready for Review</span>
+                  <span style="font-size:11px;line-height:1.5;color:#B9B4A8">All agent tasks completed. Review the evidence, then approve to deploy.</span>
+                </div>
+              </div>
+              <button onClick="{{ approve }}" style="all:unset;box-sizing:border-box;cursor:pointer;height:40px;display:flex;align-items:center;justify-content:center;background:#FFD21F;color:#0a0a09;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:12px;letter-spacing:.14em;margin-top:auto" style-hover="background:#F0C410" style-active="transform:scale(.98)">APPROVE MISSION</button>
+              <button onClick="{{ requestChanges }}" style="all:unset;box-sizing:border-box;cursor:pointer;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(236,232,223,.22);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.14em;color:#ECE8DF" style-hover="border-color:#ECE8DF">REQUEST CHANGES</button>
+            </sc-if>
+            <sc-if value="{{ isApproved }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px">
+                <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:14px;color:#FFD21F">{{ approvedTitle }}</span>
+                <span style="font-size:11px;line-height:1.6;color:#B9B4A8">{{ approvedBody }}</span>
+              </div>
+              <button onClick="{{ newMission }}" style="all:unset;box-sizing:border-box;cursor:pointer;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,210,31,.4);font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:12px;letter-spacing:.14em;color:#FFD21F" style-hover="border-color:#FFD21F">PLAN NEXT MISSION</button>
+            </sc-if>
+          </div>
+        </section>
+      </div>
+
+      <section id="sec-metrics" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 28px;padding:12px 18px;background:#0b0b0a;border:1px solid rgba(255,210,31,.16)">
+        <sc-for list="{{ metrics }}" as="m" hint-placeholder-count="6">
+          <div style="display:flex;align-items:center;gap:10px;min-height:32px">
+            <span style="width:20px;height:20px;flex:none;background-color:#B9B4A8;-webkit-mask:{{ m.icon }} center/contain no-repeat;mask:{{ m.icon }} center/contain no-repeat"></span>
+            <span style="font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:11.5px;letter-spacing:.14em">{{ m.label }}</span>
+            <span style="display:flex;align-items:flex-end;gap:2px;height:14px">
+              <sc-for list="{{ m.bars }}" as="b" hint-placeholder-count="8">
+                <span style="width:3px;height:{{ b.h }};background:{{ b.c }}"></span>
+              </sc-for>
+            </span>
+            <span style="font-size:10.5px;color:#8D887C">{{ m.val }}</span>
+          </div>
+        </sc-for>
+        <span style="margin-left:auto;display:flex;align-items:center;gap:8px;font-family:'Chakra Petch',sans-serif;font-size:10px;letter-spacing:.16em;color:#8D887C">STUDEX AGENT OS v1.0.0 <span style="width:7px;height:7px;border-radius:50%;background:#FFD21F"></span></span>
+      </section>
+    </div>
+
+    <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+      <nav style="flex:none;height:64px;display:flex;border-top:1px solid rgba(255,210,31,.16);background:#080807">
+        <sc-for list="{{ tabItems }}" as="t" hint-placeholder-count="5">
+          <button onClick="{{ t.onClick }}" style="all:unset;box-sizing:border-box;cursor:pointer;flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:{{ t.color }};font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.12em">
+            <span style="width:22px;height:22px;background-color:{{ t.color }};-webkit-mask:{{ t.icon }} center/contain no-repeat;mask:{{ t.icon }} center/contain no-repeat"></span>
+            <span>{{ t.label }}</span>
+            <sc-if value="{{ t.badge }}" hint-placeholder-val="{{ false }}">
+              <span style="position:absolute;top:9px;left:calc(50% + 8px);min-width:16px;height:16px;border-radius:999px;background:#FFD21F;color:#0a0a09;font-size:9.5px;display:flex;align-items:center;justify-content:center">1</span>
+            </sc-if>
+          </button>
+        </sc-for>
+      </nav>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20"></div>
+    <aside style="position:fixed;top:0;right:0;bottom:0;width:min(400px,100%);z-index:21;background:#0b0b0a;border-left:1px solid rgba(255,210,31,.25);box-shadow:0 24px 60px rgba(0,0,0,.5);display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;gap:14px;padding:18px;border-bottom:1px solid rgba(255,210,31,.14)">
+        <img src="assets/agent-avatar.png" alt="" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:1px solid #FFD21F">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+          <span style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:18px;letter-spacing:.14em">{{ sel.name }}</span>
+          <span style="font-size:10.5px;letter-spacing:.14em;color:{{ sel.statusColor }}">{{ sel.status }}</span>
+        </div>
+        <button onClick="{{ closeDrawer }}" title="Close" style="all:unset;box-sizing:border-box;cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(255,210,31,.08)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ECE8DF" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+      <div style="padding:18px;display:flex;flex-direction:column;gap:18px;overflow-y:auto">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-family:'Chakra Petch',sans-serif;font-size:10px;letter-spacing:.2em;color:#8D887C">ROLE</span>
+          <span style="font-size:12.5px;line-height:1.6">{{ sel.role }}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-family:'Chakra Petch',sans-serif;font-size:10px;letter-spacing:.2em;color:#8D887C">PERMISSIONS</span>
+          <span style="font-size:12.5px;line-height:1.6">{{ sel.perms }}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span style="font-family:'Chakra Petch',sans-serif;font-size:10px;letter-spacing:.2em;color:#8D887C">RECENT ACTIVITY</span>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;line-height:1.5;padding:12px;background:#060606;border:1px solid rgba(255,210,31,.12)">
+            <sc-for list="{{ sel.logs }}" as="l" hint-placeholder-count="3">
+              <div style="display:flex;gap:8px"><span style="color:#6f6b61;flex:none">[{{ l.t }}]</span><span style="color:#ECE8DF">{{ l.m }}</span></div>
+            </sc-for>
+            <sc-if value="{{ sel.noLogs }}" hint-placeholder-val="{{ false }}"><span style="color:#8D887C">No activity this session.</span></sc-if>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:30;padding:11px 16px;background:#141412;border:1px solid rgba(255,210,31,.35);font-size:11.5px;color:#ECE8DF;box-shadow:0 4px 16px rgba(0,0,0,.4);white-space:nowrap">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;simSpeed&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.5,&quot;max&quot;:3,&quot;step&quot;:0.25,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Simulation&quot;},&quot;startInReview&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Simulation&quot;}}">
+const IC = p => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='#000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'>${p}</svg>`)}")`;
+const I = {
+  command: IC("<rect x='3' y='3' width='7' height='7'/><rect x='14' y='3' width='7' height='7'/><rect x='3' y='14' width='7' height='7'/><rect x='14' y='14' width='7' height='7'/>"),
+  companies: IC("<path d='M6 22V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v18'/><path d='M3 22h18'/><path d='M10 7h1M13 7h1M10 11h1M13 11h1M10 15h1M13 15h1'/><path d='M10 22v-3h4v3'/>"),
+  projects: IC("<path d='M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'/>"),
+  agents: IC("<rect x='4' y='8' width='16' height='12' rx='2'/><path d='M12 8V5'/><circle cx='12' cy='3.5' r='1.2'/><path d='M9 13v2M15 13v2'/><path d='M2 14h2M20 14h2'/>"),
+  memory: IC("<ellipse cx='12' cy='5' rx='8' ry='3'/><path d='M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5'/><path d='M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3'/>"),
+  exchange: IC("<path d='M16 3l4 4-4 4'/><path d='M20 7H4'/><path d='M8 21l-4-4 4-4'/><path d='M4 17h16'/>"),
+  approvals: IC("<circle cx='12' cy='12' r='9'/><path d='M8 12l3 3 5-6'/>"),
+  reports: IC("<path d='M3 3v18h18'/><path d='M8 17v-5M13 17V8M18 17v-9'/>"),
+  logs: IC("<path d='M4 6h16M4 12h10M4 18h13'/>"),
+  file: IC("<path d='M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z'/><path d='M14 3v5h5'/><path d='M8 13h8M8 17h5'/>"),
+  workflows: IC("<path d='M3 12h2M7 8v8M11 4v16M15 8v8M19 11v2'/>"),
+  gpu: IC("<rect x='6' y='6' width='12' height='12'/><path d='M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4'/>"),
+  latency: IC("<path d='M4 18a8 8 0 1 1 16 0'/><path d='M12 18l4-5'/>"),
+  audit: IC("<rect x='5' y='3' width='14' height='18' rx='1'/><path d='M9 8h6M9 12h6M9 16h4'/>"),
+};
+const GOLD = '#FFD21F', MUTE = '#8D887C', EMBER = '#FF6A3D';
+const AGENTS = [
+  { id: 'grokbot', name: 'GROKBOT', verb: 'RESEARCHING', node: 'research', role: 'Market and competitor research. Pulls sources, writes briefs with citations attached.', perms: 'Read-only. Cannot write to the vault.' },
+  { id: 'hermes', name: 'HERMES', verb: 'ORCHESTRATING', node: 'orchestrate', role: 'Breaks a mission into tasks, routes them to agents and reports back over WhatsApp.', perms: 'Assigns tasks. No send, publish or spend without your approval.' },
+  { id: 'openclaw', name: 'OPENCLAW', verb: 'BROWSING', node: 'browse', role: 'Browses and crawls the web for the research and build agents.', perms: 'Read-only browsing in an isolated session.' },
+  { id: 'claude', name: 'CLAUDE', verb: 'DESIGNING', node: 'design', role: 'Product design, copy and specs.', perms: 'Writes drafts to projects/. Drafts only.' },
+  { id: 'codex', name: 'CODEX', verb: 'BUILDING', node: 'build', role: 'Writes and tests code on a cloud VM.', perms: 'Writes to the project repo branch. No merge to main.' },
+  { id: 'base44', name: 'BASE44', verb: 'DEPLOYING', node: 'deploy', role: 'Preview and production deployments.', perms: 'Preview freely. Production only after approval.' },
+];
+const NODES = [
+  { id: 'research', label: 'RESEARCH', agent: 'GROKBOT', x: '22%', y: '18%' },
+  { id: 'design', label: 'DESIGN', agent: 'CLAUDE', x: '78%', y: '18%' },
+  { id: 'orchestrate', label: 'ORCHESTRATE', agent: 'HERMES', x: '50%', y: '50%' },
+  { id: 'browse', label: 'BROWSE', agent: 'OPENCLAW', x: '18%', y: '84%' },
+  { id: 'build', label: 'BUILD', agent: 'CODEX', x: '50%', y: '84%' },
+  { id: 'deploy', label: 'DEPLOY', agent: 'BASE44', x: '82%', y: '84%' },
+];
+const LEGEND = [
+  { label: 'Documents', c: '#E5484D' }, { label: 'Insights', c: GOLD }, { label: 'Companies', c: '#4CC38A' },
+  { label: 'Code', c: '#3DD6D0' }, { label: 'Market Data', c: '#F08C2E' },
+];
+const KIND_C = { pdf: '#E5484D', csv: '#4CC38A', png: '#B9B4A8', md: '#B9B4A8', txt: '#B9B4A8' };
+const pad = n => String(n).padStart(2, '0');
+const now = () => { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
+const rnd = s => () => (s = (s * 16807) % 2147483647) / 2147483647;
+
+function memGraph(count) {
+  const r = rnd(7), nodes = [];
+  for (let i = 0; i < count; i++) {
+    const a = r() * Math.PI * 2, d = 26 + r() * 62;
+    nodes.push({ x: +(110 + Math.cos(a) * d * 1.15).toFixed(1), y: +(72 + Math.sin(a) * d * 0.72).toFixed(1), r: +(1.6 + r() * 2.2).toFixed(1), c: LEGEND[Math.floor(r() * 5)].c });
+  }
+  const edges = [];
+  nodes.forEach((n, i) => {
+    let best = null, bd = 1e9;
+    nodes.forEach((m, j) => { if (j === i) return; const dd = (n.x - m.x) ** 2 + (n.y - m.y) ** 2; if (dd < bd) { bd = dd; best = m; } });
+    if (best) edges.push({ x1: n.x, y1: n.y, x2: best.x, y2: best.y });
+    if (i % 3 === 0) edges.push({ x1: n.x, y1: n.y, x2: 110, y2: 72 });
+  });
+  return { nodes, edges };
+}
+
+function steps(mission) {
+  return [
+    { a: 'system', m: `Mission received: "${mission}"`, n: {} },
+    { a: 'hermes', m: 'Decomposing mission into 6 tasks...', n: { orchestrate: 'active' } },
+    { a: 'grokbot', m: 'Fetching market data...', n: { research: 'active' } },
+    { a: 'openclaw', m: 'Crawling sources... 38 pages indexed', n: { browse: 'active' } },
+    { a: 'grokbot', m: 'Research brief written → market-research.pdf', n: { research: 'done' }, ev: ['market-research.pdf', 'Research Report', 'pdf'] },
+    { a: 'openclaw', m: 'Competitor table exported', n: { browse: 'done' }, ev: ['competitor-analysis.csv', 'Dataset', 'csv'] },
+    { a: 'claude', m: 'Generating design... 3 directions', n: { design: 'active' } },
+    { a: 'claude', m: 'Direction locked → product-mockup.png', n: { design: 'done' }, ev: ['product-mockup.png', 'Image', 'png'] },
+    { a: 'codex', m: 'Building components...', n: { build: 'active' } },
+    { a: 'codex', m: 'Build passing · 0 lint errors · tests green', n: { build: 'done' }, ev: ['agent-plan.md', 'Specification', 'md'] },
+    { a: 'base44', m: 'Preparing preview deployment...', n: { deploy: 'active' } },
+    { a: 'base44', m: 'Preview live. Production waits for your approval.', n: { deploy: 'wait' }, ev: ['deployment-notes.txt', 'Notes', 'txt'] },
+    { a: 'hermes', m: 'All tasks complete. Ready for review.', n: { orchestrate: 'done' }, end: true },
+  ];
+}
+
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  scrollRef = React.createRef();
+  logRef = React.createRef();
+
+  constructor(props) {
+    super(props);
+    const review = props.startInReview ?? true;
+    const t0 = Date.now();
+    const done = { research: 'done', design: 'done', orchestrate: 'done', browse: 'done', build: 'done', deploy: 'wait' };
+    const idle = { research: 'idle', design: 'idle', orchestrate: 'idle', browse: 'idle', build: 'idle', deploy: 'idle' };
+    this.state = {
+      mobile: false, width: 1400, tick: 0, nav: 'command',
+      mission: '', showHint: false,
+      phase: review ? 'review' : 'idle',
+      activeMission: review ? 'Launch the Stud-Bot app — phone + laptop' : '',
+      nodes: review ? done : idle,
+      approvedStage: 0,
+      logs: review ? [
+        ['12:14:03', 'grokbot', 'Fetching market data...'], ['12:14:04', 'openclaw', 'Crawling sources...'],
+        ['12:14:05', 'claude', 'Generating design...'], ['12:14:07', 'codex', 'Building components...'],
+        ['12:14:08', 'base44', 'Preparing deployment...'], ['12:14:09', 'hermes', 'Orchestrating workflow...'],
+        ['12:14:09', 'system', 'All agents online.'],
+      ].map(([t, a, m]) => ({ t, a, m })) : [{ t: now(), a: 'system', m: 'All agents online. Waiting for a mission.' }],
+      evidence: review ? [
+        ['market-research.pdf', 'Research Report', 'pdf', 'grokbot', 2], ['competitor-analysis.csv', 'Dataset', 'csv', 'openclaw', 5],
+        ['product-mockup.png', 'Image', 'png', 'claude', 12], ['agent-plan.md', 'Specification', 'md', 'hermes', 18],
+        ['deployment-notes.txt', 'Notes', 'txt', 'base44', 24],
+      ].map(([name, kind, ext, agent, m]) => ({ name, kind, ext, agent, at: t0 - m * 60000 })) : [],
+      mem: review ? 34 : 22,
+      drawer: null, toast: '',
+    };
+  }
+
+  componentDidMount() {
+    const el = this.rootRef.current;
+    if (el && window.ResizeObserver) {
+      this.ro = new ResizeObserver(([e]) => {
+        const w = e.contentRect.width;
+        if ((w < 900) !== this.state.mobile || Math.abs(w - this.state.width) > 40) this.setState({ mobile: w < 900, width: w });
+      });
+      this.ro.observe(el);
+    }
+    this.jit = setInterval(() => this.setState(s => ({ tick: s.tick + 1 })), 800);
+  }
+  componentWillUnmount() { this.ro && this.ro.disconnect(); clearInterval(this.jit); clearTimeout(this.timer); clearTimeout(this.toastT); }
+  componentDidUpdate() {
+    const n = this.state.logs.length;
+    if (n !== this._logLen) { this._logLen = n; if (this.logRef.current) this.logRef.current.scrollTop = 1e6; }
+  }
+
+  speed() { return 950 / (this.props.simSpeed ?? 1); }
+  log(a, m) { this.setState(s => ({ logs: [...s.logs, { t: now(), a, m }].slice(-60) })); }
+
+  run(list, i = 0) {
+    if (i >= list.length) return;
+    const st = list[i];
+    this.setState(s => {
+      const next = { logs: [...s.logs, { t: now(), a: st.a, m: st.m }].slice(-60), nodes: { ...s.nodes, ...st.n } };
+      if (st.ev) { next.evidence = [{ name: st.ev[0], kind: st.ev[1], ext: st.ev[2], agent: st.a, at: Date.now() }, ...s.evidence.filter(e => e.name !== st.ev[0])]; next.mem = s.mem + 3; }
+      if (st.end) next.phase = 'review';
+      return next;
+    });
+    this.timer = setTimeout(() => this.run(list, i + 1), this.speed() * (0.7 + ((i * 37) % 10) / 15));
+  }
+
+  hermes() { const u = (this.props.hermesEndpoint || '').trim().replace(/\/$/, ''); return u || null; }
+  async hx(path, body) {
+    const h = { 'Content-Type': 'application/json' };
+    if (this.props.hermesToken) h.Authorization = 'Bearer ' + this.props.hermesToken;
+    const r = await fetch(this.hermes() + path, { method: body ? 'POST' : 'GET', headers: h, body: body ? JSON.stringify(body) : undefined });
+    if (!r.ok) throw new Error('Hermes ' + r.status);
+    return r.json();
+  }
+  applyEvent(ev) {
+    this.setState(s => {
+      const next = { logs: [...s.logs, { t: ev.time || now(), a: ev.agent || 'hermes', m: ev.message || '' }].slice(-60) };
+      if (ev.node && ev.state) next.nodes = { ...s.nodes, [ev.node]: ev.state };
+      if (ev.evidence) { const e = ev.evidence; next.evidence = [{ name: e.name, kind: e.kind || 'File', ext: (e.name.split('.').pop() || '').toLowerCase(), agent: ev.agent || 'hermes', at: Date.now(), url: e.url }, ...s.evidence.filter(x => x.name !== e.name)]; next.mem = s.mem + 3; }
+      return next;
+    });
+  }
+  async poll(id) {
+    try {
+      const r = await this.hx(`/missions/${id}/events?after=${this.cursor || 0}`);
+      (r.events || []).forEach(ev => this.applyEvent(ev));
+      this.cursor = r.cursor ?? (this.cursor || 0) + (r.events || []).length;
+      if (r.status === 'review') { this.setState({ phase: 'review' }); return; }
+      if (r.status === 'live') { this.setState({ phase: 'approved', approvedStage: 1 }); return; }
+      if (r.status === 'failed') { this.log('system', 'Mission failed — see Hermes logs.'); this.setState({ phase: 'idle' }); return; }
+    } catch (e) { this.log('system', `Lost contact with Hermes (${e.message}). Retrying…`); }
+    this.timer = setTimeout(() => this.poll(id), 1500);
+  }
+
+  plan = async () => {
+    if (this.state.phase === 'running') return;
+    const m = this.state.mission.trim();
+    if (!m) { this.setState({ showHint: true }); return; }
+    clearTimeout(this.timer);
+    this.setState({ phase: 'running', activeMission: m, mission: '', showHint: false, approvedStage: 0,
+      nodes: { research: 'idle', design: 'idle', orchestrate: 'idle', browse: 'idle', build: 'idle', deploy: 'idle' } });
+    if (this.hermes()) {
+      try {
+        const r = await this.hx('/missions', { mission: m, client: this.props.clientId || null });
+        this.missionId = r.id; this.cursor = 0;
+        this.log('system', `Mission ${r.id} sent to Hermes.`);
+        this.poll(r.id);
+      } catch (e) { this.log('system', `Hermes unreachable (${e.message}). Check the endpoint in Tweaks.`); this.setState({ phase: 'idle' }); }
+      return;
+    }
+    this.run(steps(m));
+  };
+
+  approve = async () => {
+    clearTimeout(this.timer);
+    if (this.hermes() && this.missionId) {
+      this.setState({ phase: 'approved', approvedStage: 0 });
+      try { await this.hx(`/missions/${this.missionId}/approve`, {}); this.log('system', 'Approval sent to Hermes.'); this.poll(this.missionId); }
+      catch (e) { this.log('system', `Approval failed (${e.message}).`); this.setState({ phase: 'review' }); }
+      return;
+    }
+    this.setState({ phase: 'approved', approvedStage: 0 });
+    this.log('system', 'Mission approved by you.');
+    this.timer = setTimeout(() => {
+      this.setState(s => ({ nodes: { ...s.nodes, deploy: 'active' } }));
+      this.log('base44', 'Promoting preview to production...');
+      this.timer = setTimeout(() => {
+        this.setState(s => ({ nodes: { ...s.nodes, deploy: 'done' }, approvedStage: 1 }));
+        this.log('base44', 'Live on production. Rollback point saved.');
+      }, this.speed() * 2);
+    }, this.speed());
+  };
+
+  requestChanges = async () => {
+    clearTimeout(this.timer);
+    if (this.hermes() && this.missionId) {
+      this.setState({ phase: 'running' });
+      try { await this.hx(`/missions/${this.missionId}/changes`, { note: 'Changes requested from Agent OS' }); this.poll(this.missionId); }
+      catch (e) { this.log('system', `Request failed (${e.message}).`); this.setState({ phase: 'review' }); }
+      return;
+    }
+    this.setState(s => ({ phase: 'running', nodes: { ...s.nodes, design: 'idle', build: 'idle', deploy: 'idle', orchestrate: 'active' } }));
+    this.log('hermes', 'Changes requested — re-planning design and build.');
+    this.timer = setTimeout(() => this.run(steps(this.state.activeMission).slice(6)), this.speed());
+  };
+
+  newMission = () => {
+    this.setState({ phase: 'idle', activeMission: '', approvedStage: 0,
+      nodes: { research: 'idle', design: 'idle', orchestrate: 'idle', browse: 'idle', build: 'idle', deploy: 'idle' } });
+    const s = this.scrollRef.current; s && s.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  scrollTo(id) {
+    const s = this.scrollRef.current; if (!s) return;
+    const el = s.querySelector('#' + id); if (!el) return;
+    s.scrollTo({ top: id === 'sec-hero' ? 0 : el.offsetTop - 10, behavior: 'smooth' });
+  }
+  showToast(t) { clearTimeout(this.toastT); this.setState({ toast: t }); this.toastT = setTimeout(() => this.setState({ toast: '' }), 2200); }
+
+  agentStatus(nodeState, verb) {
+    if (nodeState === 'active') return { status: verb, dot: GOLD, color: GOLD, live: true };
+    if (nodeState === 'done') return { status: 'DONE', dot: '#C9C3B5', color: MUTE };
+    if (nodeState === 'wait') return { status: 'AWAITING APPROVAL', dot: EMBER, color: EMBER };
+    return { status: 'STANDBY', dot: '#4a473f', color: MUTE };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const desktop = !s.mobile;
+    const ago = at => { const m = Math.floor((Date.now() - at) / 60000); return m < 1 ? 'now' : `${m}m ago`; };
+
+    const navDefs = [
+      ['command', 'Command', 'sec-hero'], ['companies', 'Station', 'sec-office'], ['reports', 'Finance', 'sec-finance'], ['agents', 'Agents', 'sec-agents'],
+      ['memory', 'Memory', 'sec-memory'], ['exchange', 'Machines', 'sec-machines'], ['approvals', 'Approvals', 'sec-approvals'], ['projects', 'Worktrees', 'sec-worktrees'],
+    ];
+    const navItems = navDefs.map(([id, label, sec]) => {
+      const on = s.nav === id;
+      return { label, icon: I[id], color: on ? GOLD : '#C9C3B5', bg: on ? 'rgba(255,210,31,.10)' : 'transparent', bar: on ? `inset 3px 0 0 ${GOLD}` : 'none',
+        onClick: () => { if (sec) { this.setState({ nav: id }); this.scrollTo(sec); } else this.showToast(`${label} — not built yet`); } };
+    });
+    const tabDefs = [['command', 'Command', 'sec-hero'], ['agents', 'Agents', 'sec-agents'], ['approvals', 'Approve', 'sec-approvals'], ['companies', 'Station', 'sec-office'], ['reports', 'Finance', 'sec-finance']];
+    const tabItems = tabDefs.map(([id, label, sec]) => ({ label, icon: I[id], color: s.nav === id ? GOLD : '#9C978B', badge: id === 'approvals' && s.phase === 'review',
+      onClick: () => { this.setState({ nav: id }); this.scrollTo(sec); } }));
+
+    const agents = AGENTS.map((a, i) => {
+      const st = this.agentStatus(s.nodes[a.node], a.verb);
+      const lvl = st.live ? 4 + ((s.tick * 3 + i * 7) % 6) : s.nodes[a.node] === 'done' ? 2 : 1;
+      return { name: a.name, status: st.status, statusColor: st.color, dot: st.dot, glow: st.live ? `0 0 8px ${GOLD}` : 'none',
+        bars: Array.from({ length: 10 }, (_, j) => ({ h: j < lvl ? `${10 + ((j * 5 + i) % 7)}px` : '6px', c: j < lvl ? GOLD : '#34322c' })),
+        onClick: () => this.setState({ drawer: a.id }) };
+    });
+    const activeCount = AGENTS.filter(a => s.nodes[a.node] !== 'idle').length || 6;
+
+    const graphNodes = NODES.map(n => {
+      const v = s.nodes[n.id];
+      return { ...n, border: v === 'active' ? GOLD : v === 'wait' ? EMBER : v === 'done' ? 'rgba(255,210,31,.45)' : 'rgba(236,232,223,.14)',
+        dot: v === 'active' ? GOLD : v === 'wait' ? EMBER : v === 'done' ? '#C9C3B5' : '#4a473f', glow: v === 'active' ? `0 0 8px ${GOLD}` : 'none' };
+    });
+    const doneCount = NODES.filter(n => ['done', 'wait'].includes(s.nodes[n.id])).length;
+
+    const mg = memGraph(s.mem);
+    const sel = AGENTS.find(a => a.id === s.drawer);
+    let selV = { name: '', status: '', statusColor: MUTE, role: '', perms: '', logs: [], noLogs: true };
+    if (sel) {
+      const st = this.agentStatus(s.nodes[sel.node], sel.verb);
+      const logs = s.logs.filter(l => l.a === sel.id).slice(-5);
+      selV = { name: sel.name, status: st.status, statusColor: st.color, role: sel.role, perms: sel.perms, logs, noLogs: logs.length === 0 };
+    }
+
+    const busy = s.phase === 'running';
+    const w = (i, base) => (base + ((s.tick + i) % 3)) ;
+    const mbar = (n, i) => Array.from({ length: 8 }, (_, j) => ({ h: j < n ? `${9 + ((j * 3 + i) % 5)}px` : '6px', c: j < n ? GOLD : '#34322c' }));
+    const metrics = [
+      ['Workflows', I.workflows, busy ? w(0, 5) : 2, busy ? '1 running' : `${s.phase === 'review' ? 1 : 0} queued`],
+      ['Tokens', I.memory, busy ? w(1, 4) : 2, busy ? '41k/min' : '3k/min'],
+      ['GPU', I.gpu, busy ? w(2, 3) : 1, busy ? '38%' : '6%'],
+      ['Latency', I.latency, 2, busy ? '420ms' : '180ms'],
+      ['Memory', I.memory, Math.min(8, Math.round(s.mem / 6)), `${s.mem} nodes`],
+      ['Audit', I.audit, 8, 'logged'],
+    ].map(([label, icon, n, val], i) => ({ label: label.toUpperCase(), icon, bars: mbar(n, i), val }));
+
+    const SEATS = { grokbot: ['19.8%', '31%'], openclaw: ['47.4%', '46%'], claude: ['20.2%', '72%'], codex: ['38.2%', '72%'], hermes: ['66.2%', '34%'], base44: ['79.7%', '41%'] };
+    const officeAgents = AGENTS.map(a => {
+      const st = this.agentStatus(s.nodes[a.node], a.verb);
+      return { name: a.name, status: s.mobile ? '' : st.status, color: st.color, dot: st.dot, glow: st.live ? `0 0 6px ${GOLD}` : 'none',
+        border: st.live ? GOLD : s.nodes[a.node] === 'wait' ? EMBER : 'rgba(255,210,31,.3)', x: SEATS[a.id][0], y: SEATS[a.id][1],
+        onClick: () => this.setState({ drawer: a.id }) };
+    });
+    const rooms = [
+      { name: 'WAR ROOM', team: 'Build team', crew: 'Grokbot · OpenClaw · Claude · Codex', grants: ['web.read', 'files.write projects/', 'repo.branch', 'vm.cloud'] },
+      { name: 'BOARDROOM', team: 'Ops team', crew: 'Hermes · Base44', grants: ['tasks.assign', 'deploy.preview', 'deploy.prod · needs approval', 'whatsapp.report'] },
+    ];
+    const night = !!s.night;
+    const OK = '#6BCF7F', RED = '#E85D5D';
+    const machines = [
+      ['CLAWX / OPENCLAW', 'Main gateway', '—', OK, 'Agents and workspaces not probed', 'Monitor'],
+      ['HERMES', 'Agent gateway', '—', OK, 'LaunchAgent · container', 'Logs'],
+      ['OLLAMA', 'Local LLM', '—', OK, 'Models ~40 GB on disk', 'Models'],
+      ['GITEA', 'Local git', '—', EMBER, 'Sync warning', 'Web UI'],
+      ['ORBSTACK', 'Docker runtime', '—', EMBER, 'Needs repair · helper processes stuck', 'Repair'],
+      ['BUZZ', 'Comms', '—', EMBER, 'Degraded · depends on OrbStack', 'Status'],
+    ].map(([name, role, port, dot, note, action]) => ({ name, role, port, dot, note, noteColor: dot === OK ? MUTE : EMBER, action,
+      onClick: () => this.log('system', `${name}: ${action.toLowerCase()} requested.`) }));
+    const inventory = [['AGENTS DEFINED', '24', EMBER], ['WORKSPACES', '8', '#ECE8DF'], ['SESSIONS', '36', '#ECE8DF'], ['STATE', '1.2 GB', '#ECE8DF']]
+      .map(([label, val, color]) => ({ label, val, color }));
+    const risks = [
+      ['CRIT', 'OrbStack ports stay open after stop.', RED], ['CRIT', 'Data disk nearly full. ~5–10 GB can be freed.', RED],
+      ['CRIT', 'Rotate the gateway credential before remote access.', RED], ['WARN', 'More agents defined than active. Audit.', EMBER],
+    ].map(([tag, text, color]) => ({ tag, text, color }));
+    const pick = s.wtWinner;
+    const WT = [['CLAUDE', 'wt/claude-landing', 'cloud-01', '+412 −38', 'done'], ['CODEX', 'wt/codex-landing', 'cloud-02', '+366 −51', 'done'], ['OPENCLAW', 'wt/openclaw-landing', 'local-01', '+120 −4', 'running']];
+    const worktrees = WT.map(([agent, branch, box, diff, st]) => {
+      const won = pick === agent, done = st === 'done';
+      return { agent, branch, box, diff: done ? diff : '…', state: won ? 'MERGED' : done ? 'READY TO REVIEW' : 'RUNNING', stateColor: won ? OK : done ? GOLD : MUTE,
+        bg: won ? 'rgba(107,207,127,.06)' : 'transparent', btn: won ? 'Merged' : done ? 'Merge' : 'Watch',
+        btnBorder: done && !won ? GOLD : 'rgba(255,210,31,.25)', btnColor: done && !won ? GOLD : MUTE,
+        onClick: () => { if (done && !pick) { this.setState({ wtWinner: agent }); this.log('system', `${branch} merged to main. Other worktrees archived.`); } else this.log('system', `Watching ${agent} in ${branch}.`); } };
+    });
+    const fanOut = () => { this.setState({ wtWinner: null }); this.log('hermes', `Fanned "${(s.mission || 'Build landing page').slice(0, 40)}" to 3 worktrees.`); };
+    const NT = 'not tracked';
+    const finKpis = [
+      ['ACTIVE SEATS', '12', 'sample data', '#ECE8DF'], ['MRR', '$0,000', 'sample data', GOLD], ['SERVICES', '$0,000', 'sample data', '#ECE8DF'],
+      ['CHURN', '—', NT, MUTE], ['CAC', '—', NT, MUTE], ['LTV', '—', NT, MUTE],
+    ].map(([label, val, src, color]) => ({ label, val, src, color }));
+    const finSkills = [
+      ['FINANCIAL ANALYST', 'Ratios, DCF valuation, budget variance, 13-week cash flow forecast.', '/financial-health', 'Run /financial-health on this workspace'],
+      ['SAAS METRICS COACH', 'ARR, MRR, churn, CAC, LTV, NRR, Quick Ratio, 12-month projection.', '/saas-health', 'Run /saas-health on this workspace'],
+      ['INVESTMENT ADVISOR', 'Investment thesis, ROI model and capital allocation.', 'Evaluate', 'Evaluate ROI of adding 10 VMs'],
+    ].map(([name, desc, cmd, m]) => ({ name, desc, cmd, onClick: () => { this.setState({ mission: m, showHint: false }); this.scrollTo('sec-hero'); } }));
+
+    const chipLabels = ['Research a market opportunity', 'Build a trading agent', 'Create a company analysis', 'Design a product', 'Deploy to production'];
+
+    return {
+      rootRef: this.rootRef, scrollRef: this.scrollRef, logRef: this.logRef,
+      desktop, mobile: s.mobile, wide: s.width > 1250,
+      systemLabel: this.hermes() ? (s.mobile ? 'HERMES' : 'HERMES LINKED') : (s.mobile ? 'DEMO' : 'DEMO MODE'),
+      heroAspect: s.mobile ? '4 / 3' : '1250 / 545',
+      composerMargin: s.mobile ? '10px 0 0' : '-104px 5% 0',
+      navItems, tabItems,
+      mission: s.mission, showHint: s.showHint,
+      onMission: e => this.setState({ mission: e.target.value, showHint: false }),
+      onKey: e => { if (e.key === 'Enter') this.plan(); },
+      plan: this.plan, running: busy,
+      planLabel: busy ? 'RUNNING…' : 'PLAN MISSION', planBg: busy ? '#8f7a1c' : GOLD,
+      inputBorder: s.showHint ? EMBER : 'rgba(236,232,223,.18)',
+      hasActiveMission: !!s.activeMission && s.phase !== 'idle', activeMission: s.activeMission,
+      chips: chipLabels.map(label => ({ label, onClick: () => this.setState({ mission: label, showHint: false }) })),
+      agents, activeCount, graphNodes, officeAgents, finKpis, finSkills, rooms, nightOn: night, machines, inventory, risks, worktrees, fanOut, wtCount: WT.length,
+      nightColor: night ? EMBER : MUTE, nightKnob: night ? '16px' : '2px',
+      toggleNight: () => { this.setState({ night: !night }); this.log('system', night ? 'Night Shift off.' : 'Night Shift on. Leash: no sends, $5 cap, no prod deploys.'); },
+      logs: s.logs.map(l => ({ ...l, ac: l.a === 'system' ? '#C9C3B5' : GOLD, mc: l.a === 'system' && /online|approved|Mission/.test(l.m) ? '#4CC38A' : '#C9C3B5' })),
+      memSvg: 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 160'>${mg.edges.map(e => `<line x1='${e.x1}' y1='${e.y1}' x2='${e.x2}' y2='${e.y2}' stroke='rgba(255,210,31,.22)' stroke-width='0.8'/>`).join('')}${mg.nodes.map(n => `<circle cx='${n.x}' cy='${n.y}' r='${n.r}' fill='${n.c}'/>`).join('')}</svg>`), memCount: s.mem, legend: LEGEND,
+      evidence: s.evidence.map(e => ({ ...e, c: KIND_C[e.ext] || '#B9B4A8', icon: I.file, ago: ago(e.at), onClick: () => e.url ? window.open(e.url, '_blank') : this.showToast(`Downloading ${e.name}`) })),
+      isIdle: s.phase === 'idle', isRunning: busy, isReview: s.phase === 'review', isApproved: s.phase === 'approved',
+      pendingLabel: s.phase === 'review' ? '1 PENDING' : '0 PENDING',
+      progressPct: `${Math.round((doneCount / 6) * 100)}%`, doneCount,
+      approvedTitle: s.approvedStage ? 'Live on production' : 'Mission approved',
+      approvedBody: s.approvedStage ? 'Base44 deployed the build and saved a rollback point. The full run is in the audit log.' : 'Base44 is promoting the preview to production.',
+      approve: this.approve, requestChanges: this.requestChanges, newMission: this.newMission,
+      metrics,
+      drawerOpen: !!sel, sel: selV, closeDrawer: () => this.setState({ drawer: null }),
+      toastOn: !!s.toast, toast: s.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

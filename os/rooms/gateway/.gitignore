@@ -1,0 +1,6 @@
+rooms.sqlite3*
+__pycache__/
+tokens.json
+secrets.json
+.secrets.json.*
+admin.key.sha256

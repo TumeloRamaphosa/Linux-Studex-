@@ -1,5 +1,9 @@
 # Linux StudEx — Agent Operating System
 
+> **Studex OS — the online computer.** Every VM and machine joins with one line, and its agents and models show up in one place, served from one gateway address that works as an app on phone and laptop. Start with [OS-PLAN.md](OS-PLAN.md). The code lives in [`os/`](os): `os/rooms` (relay, gateway, Company Rooms) and `os/apps` (launcher, Factory, Stud-Bot, Mission Control).
+>
+> This repo is public. `auto-push.sh` only publishes the folders in its `PUBLISH` list and blocks keys and personal emails.
+
 A multi-VM agent platform running on QEMU/UTM with pixel-agent dashboard, tmux command center, and Obsidian memory logging.
 
 ## Architecture

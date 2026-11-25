@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studex Rooms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=VT323&display=swap" rel="stylesheet">
+<style>
+/* Studex Factory retro palette: charcoal + amber-yellow, CRT glow */
+:root{
+  --bg:#0a0805;--panel:#140f07;--panel2:#1f1709;--line:#3a2c10;--amber:#FFB000;--yellow:#FFD21F;--cream:#E8DDBA;--dim:#8a6a1f;
+  --working:#FFB000;--blocked:#E85D5D;--idle:#8a6a1f;--done:#7FD36B;--offline:#5a4515;--unknown:#8a6a1f;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--amber);font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.5;text-shadow:0 0 6px rgba(255,176,0,.28)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:20;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px)}
+a{color:var(--amber)}
+button,input{font:inherit}
+.top{position:sticky;top:0;z-index:5;background:rgba(7,6,5,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:12px clamp(16px,3vw,32px)}
+.brand{font-family:'VT323',monospace;letter-spacing:.18em;font-size:22px;line-height:1;padding:3px 8px;background:var(--amber);color:var(--bg);text-shadow:none}
+.title{font-family:'VT323',monospace;letter-spacing:.14em;font-size:22px;line-height:1;color:var(--amber)}
+.spacer{flex:1}
+.conn{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.12em}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--offline)}
+.tot{display:flex;gap:14px;font-size:11px;letter-spacing:.08em;color:var(--dim)}
+.tot b{color:var(--cream);font-weight:700}
+.btn{background:transparent;border:1px solid var(--line);color:var(--amber);padding:7px 12px;cursor:pointer;letter-spacing:.1em;font-size:11px;min-height:36px}
+.btn:hover{border-color:var(--amber);background:rgba(255,176,0,.08)}
+.btn:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+main{padding:20px clamp(16px,3vw,32px) 48px;max-width:1500px;margin:0 auto}
+.demo{border:1px dashed var(--amber);color:var(--amber);padding:10px 14px;font-size:12px;margin-bottom:18px;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px}
+.room{background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;min-height:280px}
+.room:hover{border-color:var(--amber)}
+.rh{padding:12px 16px 10px;display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.rn{font-family:'VT323',monospace;font-size:30px;line-height:1;letter-spacing:.06em;color:var(--yellow);text-transform:uppercase}
+.lead{font-size:11px;color:var(--dim);letter-spacing:.08em}
+.pc{display:flex;align-items:center;gap:8px;font-size:11px;padding:7px 9px;border:1px solid var(--line);background:#0B0A07;margin-top:4px}
+.pc .lbl{color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc .st{margin-left:auto;letter-spacing:.1em;white-space:nowrap}
+.bar{display:flex;height:6px;margin:10px 16px 0;background:#1B1913}
+.bar span{display:block;height:100%}
+.counts{display:flex;flex-wrap:wrap;gap:4px 12px;padding:8px 16px 4px;font-size:10.5px;letter-spacing:.08em;color:var(--dim)}
+.agents{list-style:none;margin:0;padding:6px 8px 12px;display:flex;flex-direction:column;gap:2px;overflow:auto;max-height:420px}
+.ag{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center;padding:8px;border-left:2px solid transparent}
+.ag:hover{background:rgba(255,176,0,.05);border-left-color:var(--amber)}
+.ag .nm{color:var(--cream);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ag .sl{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.ag .meta{grid-column:2 / 4;font-size:10.5px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.about{font-size:11.5px;color:var(--cream);opacity:.85}
+.links{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.links a{font-size:10.5px;letter-spacing:.08em;padding:3px 7px;border:1px solid var(--line);color:var(--amber);text-decoration:none}
+.links a:hover,.links a:focus-visible{border-color:var(--amber);background:var(--panel);outline:none}
+.links a b{color:var(--dim);font-weight:400;margin-right:4px}
+.empty{padding:22px 16px;color:var(--dim);font-size:12px;line-height:1.7}
+.section{margin-top:28px}
+.section h2{font-family:'VT323',monospace;font-size:24px;letter-spacing:.14em;color:var(--amber);margin:0 0 10px;font-weight:400}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--dim);font-weight:400;letter-spacing:.1em;font-size:10.5px}
+.wrap{overflow-x:auto}
+dialog{background:var(--panel);color:var(--cream);border:1px solid var(--amber);padding:20px;max-width:min(92vw,460px)}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+dialog label{display:flex;flex-direction:column;gap:6px;font-size:11px;letter-spacing:.1em;margin-bottom:14px;color:var(--dim)}
+dialog input{background:#0B0A07;border:1px solid var(--line);color:var(--cream);padding:9px;font-size:13px}
+.row{display:flex;gap:10px;justify-content:flex-end}
+.reel{margin:0;position:relative;background:#000;border-bottom:1px solid var(--line);aspect-ratio:16/9;overflow:hidden}
+.reel.tall{aspect-ratio:16/9}
+.reel video{display:block;width:100%;height:100%;object-fit:cover;filter:sepia(.18) saturate(1.05)}
+.reel.tall video{object-fit:contain;background:radial-gradient(ellipse at center,#1f1709,#0a0805 70%)}
+.reel figcaption{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;
+  background:linear-gradient(transparent,rgba(10,8,5,.92));font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--yellow)}
+.reel figcaption span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reel .snd{min-height:30px;padding:4px 10px;background:rgba(10,8,5,.7);flex:none}
+@media (max-width:700px){.top{position:static}}
+@media (prefers-reduced-motion:no-preference){.pulse{animation:p 1.6s ease-in-out infinite}@keyframes p{50%{opacity:.35}}}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="brand">STUDEX</span>
+  <span class="title">COMPANY ROOMS</span>
+  <span class="conn" id="conn"><span class="dot" id="connDot"></span><span id="connTxt">CONNECTING</span></span>
+  <span class="spacer"></span>
+  <span class="tot" id="totals"></span>
+  <button class="btn" id="setBtn" type="button">GATEWAY</button>
+</header>
+<main>
+  <div class="demo" id="demo" hidden></div>
+  <div class="grid" id="rooms"></div>
+  <section class="section" id="unSec" hidden>
+    <h2>NOT IN A ROOM YET</h2>
+    <div class="room" style="--accent:#6E6758;min-height:0"><ul class="agents" id="unassigned"></ul></div>
+  </section>
+  <section class="section">
+    <h2>COMPUTERS</h2>
+    <div class="wrap"><table>
+      <thead><tr><th scope="col">COMPUTER</th><th scope="col">STATE</th><th scope="col">HOST</th><th scope="col">LAST REPORT</th><th scope="col">HERDR</th><th scope="col">MODELS</th></tr></thead>
+      <tbody id="comps"></tbody>
+    </table></div>
+  </section>
+</main>
+
+<dialog id="dlg">
+  <form method="dialog" id="setForm">
+    <label>GATEWAY URL<input id="gwIn" type="url" placeholder="https://gateway.studex…" autocomplete="off"></label>
+    <label>VIEW KEY (if your gateway uses one)<input id="keyIn" type="password" autocomplete="off"></label>
+    <div class="row"><button class="btn" value="cancel" type="submit">CANCEL</button><button class="btn" value="save" type="submit">CONNECT</button></div>
+  </form>
+</dialog>
+
+<script>
+(() => {
+  const COL = { working:'var(--working)', blocked:'var(--blocked)', idle:'var(--idle)', done:'var(--done)', offline:'var(--offline)', unknown:'var(--unknown)' };
+  const ORDER = ['working','blocked','idle','done','offline','unknown'];
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const store = { get(k){ try { return localStorage.getItem(k) || ''; } catch { return ''; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} },
+                  del(k){ try { localStorage.removeItem(k); } catch {} } };
+  const params = new URLSearchParams(location.search);
+  let gw = params.get('gateway') || store.get('rooms.gw') || (location.protocol.startsWith('http') ? location.origin : '');
+  // View keys are saved per gateway, one storage entry each ('rooms.key:<origin>'), so tabs and links
+  // never overwrite another gateway's key.
+  const origin = u => { try { return new URL(u).origin; } catch { return ''; } };
+  const slot = g => 'rooms.key:' + origin(g);
+  const keyFor = g => origin(g) ? store.get(slot(g)) : '';
+  const saveKey = (g, k) => { if (!origin(g)) return; if (k) store.set(slot(g), k); else store.del(slot(g)); };
+  // One-time move of older formats, then they are gone (so a cleared key stays cleared).
+  (() => {
+    const legacy = store.get('rooms.key'), home = store.get('rooms.gw') || location.origin;
+    // Per-gateway map first (it was the newer, more specific key), then the shared key only if still empty.
+    try { const m = JSON.parse(store.get('rooms.keys') || '{}') || {}; Object.entries(m).forEach(([o, k]) => { if (!store.get('rooms.key:' + o)) store.set('rooms.key:' + o, k); }); } catch {}
+    if (legacy && !keyFor(home)) saveKey(home, legacy);
+    store.del('rooms.key'); store.del('rooms.keys');
+  })();
+  let key = params.get('key') || keyFor(gw);
+  if (params.has('key')) { saveKey(gw, key); params.delete('key'); history.replaceState(null, '', location.pathname + (params.toString() ? '?' + params : '')); }  // keep the key out of the address bar and history
+
+  const ago = ts => { if (!ts) return 'never'; const s = Math.max(0, Date.now()/1000 - ts);
+    return s < 60 ? `${Math.round(s)}s ago` : s < 3600 ? `${Math.round(s/60)}m ago` : s < 86400 ? `${Math.round(s/3600)}h ago` : `${Math.round(s/86400)}d ago`; };
+
+  function agentRow(a) {
+    const st = a.status || 'unknown';
+    const meta = [a.tool, a.workspace && `ws ${a.workspace}`, a.computer, a.since && `${st === 'offline' ? 'last ' + (a.last_status || '') : st} ${ago(a.since)}`].filter(Boolean).join(' · ');
+    return `<li class="ag"><span class="dot ${st==='working'?'pulse':''}" style="background:${COL[st]}" aria-hidden="true"></span>
+      <span class="nm">${esc(a.name)}</span><span class="sl" style="color:${COL[st]}">${esc(st)}</span>
+      <span class="meta">${esc(meta)}${a.title ? ' · ' + esc(a.title) : ''}</span></li>`;
+  }
+
+  // Reels live in web/media. Served by the gateway at /media/…, or beside this page when opened on its own.
+  const mediaUrl = (src, isDemo) => /^https?:/.test(src) ? src : (!isDemo && gw ? new URL(src, gw.replace(/\/?$/, '/')).href : src);
+  function reelHtml(reel, isDemo) {
+    return `<figure class="reel${reel.vertical ? ' tall' : ''}">
+      <video src="${esc(mediaUrl(reel.src, isDemo))}" poster="${esc(mediaUrl(reel.poster || '', isDemo))}" muted loop playsinline autoplay preload="metadata" aria-label="${esc(reel.title || 'promo reel')}"></video>
+      <figcaption><span>▶ ${esc(reel.title || 'PROMO')}</span>${reel.sound ? '<button class="btn snd" type="button" aria-pressed="false">♪ SOUND OFF</button>' : ''}</figcaption>
+    </figure>`;
+  }
+
+  const modelsText = c => { const ms = (c.models || []).flatMap(sv => (sv.models || []).map(m => m.name)).filter(Boolean);
+    return ms.length ? `${ms.length} · ${ms.slice(0, 3).join(', ')}${ms.length > 3 ? ' …' : ''}` : '—'; };
+
+  function render(d, isDemo) {
+    const all = d.rooms.flatMap(r => r.agents).concat(d.unassigned.agents);
+    const n = s => all.filter(a => a.status === s).length;
+    document.getElementById('totals').innerHTML =
+      `<span><b>${all.length}</b> AGENTS</span><span><b style="color:var(--working)">${n('working')}</b> WORKING</span><span><b style="color:var(--blocked)">${n('blocked')}</b> BLOCKED</span><span><b>${d.computers.filter(c=>c.online).length}/${d.computers.length}</b> COMPUTERS ONLINE</span>`;
+
+    // Each room card is built once (so its promo reel keeps playing); only its live part refreshes.
+    const grid = document.getElementById('rooms');
+    const ids = d.rooms.map(r => r.id).join('|');
+    if (grid.dataset.ids !== ids) { grid.innerHTML = ''; grid.dataset.ids = ids; }
+    d.rooms.forEach(r => {
+      let card = grid.querySelector(`[data-room="${CSS.escape(r.id)}"]`);
+      if (!card) {
+        card = document.createElement('article');
+        card.className = 'room'; card.dataset.room = r.id; card.setAttribute('aria-label', `${r.name} room`);
+        card.innerHTML = `<div class="rh"><div class="rhd" style="display:contents"></div><div class="lk"></div></div>${r.reel ? reelHtml(r.reel, isDemo) : ''}<div class="dyn"></div>`;
+        const btn = card.querySelector('.snd');
+        if (btn) btn.onclick = () => { const v = card.querySelector('video'); v.muted = !v.muted; if (!v.muted) v.play().catch(() => {});
+          btn.textContent = v.muted ? '♪ SOUND OFF' : '♪ SOUND ON'; btn.setAttribute('aria-pressed', String(!v.muted)); };
+        grid.appendChild(card);
+      }
+      const c = r.computer, total = r.agents.length || 1;
+      const pcState = !c.connected ? ['NOT CONNECTED','var(--offline)'] : c.online ? ['ONLINE','var(--done)'] : [`OFFLINE · ${ago(c.last_seen)}`,'var(--blocked)'];
+      const bar = ORDER.filter(s => r.counts[s]).map(s => `<span style="width:${100*r.counts[s]/total}%;background:${COL[s]}" title="${s} ${r.counts[s]}"></span>`).join('');
+      const counts = ORDER.filter(s => r.counts[s]).map(s => `<span><span style="color:${COL[s]}">■</span> ${r.counts[s]} ${s}</span>`).join('');
+      const rhHtml = `<span class="rn">${esc(r.name)}</span><span class="lead">LEAD · ${esc(r.lead || '—')}</span>
+          <div class="pc"><span class="dot" style="background:${pcState[1]}" aria-hidden="true"></span>
+            <span class="lbl" title="${esc(c.note || '')}">${esc(c.label || c.id)}${c.hostname ? ' · ' + esc(c.hostname) : ''}</span>
+            <span class="st" style="color:${pcState[1]}">${pcState[0]}</span></div>${r.about ? `<span class="about">${esc(r.about)}</span>` : ''}`;
+      const rhd = card.querySelector('.rhd');
+      if (rhd.dataset.html !== rhHtml) { rhd.innerHTML = rhHtml; rhd.dataset.html = rhHtml; }
+      // Links live in their own box and are only rewritten when they change, so keyboard focus on one survives the 10-second refresh.
+      const lkHtml = `${(r.links || []).length ? `<nav class="links" aria-label="${esc(r.name)} links">${r.links.filter(l => /^https?:\/\//.test(l.url)).map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer"><b>${esc((l.kind || 'link').toUpperCase())}</b>${esc(l.label)}</a>`).join('')}</nav>` : ''}`, lk = card.querySelector('.lk');
+      if (lk.dataset.html !== lkHtml) { lk.innerHTML = lkHtml; lk.dataset.html = lkHtml; }
+      card.querySelector('.dyn').innerHTML = r.agents.length ? `<div class="bar" aria-hidden="true">${bar}</div><div class="counts">${counts}</div>
+          <ul class="agents">${r.agents.map(agentRow).join('')}</ul>`
+          : `<div class="empty">No agents reporting yet.<br>Run the relay on <b>${esc(c.id)}</b> to bring this room online.</div>`;
+    });
+
+    const un = d.unassigned.agents;
+    document.getElementById('unSec').hidden = !un.length;
+    document.getElementById('unassigned').innerHTML = un.map(agentRow).join('');
+
+    document.getElementById('comps').innerHTML = d.computers.length ? d.computers.map(c =>
+      `<tr><td>${esc(c.id)}</td><td style="color:${c.online ? 'var(--done)' : 'var(--blocked)'}">${c.online ? 'ONLINE' : 'OFFLINE'}</td><td>${esc(c.hostname)}</td><td>${ago(c.last_seen)}</td><td>${c.herdr ? (c.errors.length ? 'error: ' + esc(c.errors[0]) : 'ok') : 'not found'}</td><td>${esc(modelsText(c))}</td></tr>`).join('')
+      : '<tr><td colspan="6" style="color:var(--dim)">No computer has reported yet.</td></tr>';
+
+    const demo = document.getElementById('demo');
+    demo.hidden = !isDemo;
+    if (isDemo) demo.innerHTML = 'DEMO DATA: not connected to a gateway. Press <b>GATEWAY</b> to enter your gateway URL; the rooms then fill from your real computers.';
+    setConn(isDemo ? ['DEMO', 'var(--amber)'] : ['LIVE · ' + new URL(gw).host, 'var(--done)']);
+  }
+
+  function setConn([txt, col]) { document.getElementById('connTxt').textContent = txt; document.getElementById('connDot').style.background = col; }
+
+  async function poll() {
+    if (!gw) { render(demoData(), true); return; }
+    try {
+      // The key goes in a header, never in the address, so it doesn't land in server or proxy logs.
+      const r = await fetch(new URL('/rooms', gw), { cache: 'no-store', headers: key ? { 'Authorization': 'Bearer ' + key } : {} });
+      if (r.status === 401) { setConn(['NEEDS VIEW KEY','var(--blocked)']); return; }
+      if (!r.ok) throw new Error(r.status);
+      render(await r.json(), false);
+    } catch (e) {
+      if (!document.getElementById('rooms').children.length) render(demoData(), true);
+      setConn(['GATEWAY UNREACHABLE','var(--blocked)']);
+    }
+  }
+
+  function demoData() {
+    const t = Date.now()/1000, A = (name, tool, status, ws, computer, mins) => ({ name, tool, status, last_status: status, workspace: ws, computer, since: t - mins*60, title: '' });
+    const room = (id, name, lead, accent, comp, online, agents) => { const counts = {}; ORDER.forEach(s => counts[s] = agents.filter(a => a.status === s).length);
+      return { id, name, lead, accent, computer: { ...comp, connected: true, online, last_seen: online ? t - 4 : t - 3600 }, agents, counts }; };
+    const off = a => ({ ...a, status: 'offline' });
+    const rooms = [
+      room('meat','Studex Meat','Naledi','#C8553D',{ id:'meat-desk', label:'Orgo Auto-Meat', hostname:'orgo-meat' }, true,
+        [A('naledi','claude','working','meat','meat-desk',12), A('eddie','codex','blocked','meat','meat-desk',3), A('ralf','hermes','idle','content','meat-desk',40)]),
+      room('global-markets','Studex Global Markets','Katjana','#3D7DC8',{ id:'markets-desk', label:'Orgo Global Markets (2 CPU / 16 GB)', hostname:'orgo-gm' }, true,
+        [A('katjana','claude','working','markets','markets-desk',25), A('ledger','opencode','done','markets','markets-desk',8)]),
+      room('dark-factory','Super Agents / Dark Factory','Product','#8B5CF6',{ id:'factory-desk', label:'Orgo Super Agents Command', hostname:'orgo-factory' }, true,
+        [A('adam-smasher','claude','working','factory','factory-desk',55), A('claudio-cto','codex','working','factory','factory-desk',18), A('grok','grok','idle','orch','factory-desk',9)]),
+      room('coffee','Studex Coffee','CashClaw','#B8924E',{ id:'coffee-desk', label:'Coffee desk (to assign)', hostname:'macbook' }, false,
+        [off(A('cashclaw','hermes','working','coffee','coffee-desk',61))]),
+    ];
+    const R = {
+      'global-markets': { src: 'media/ghost-hall.mp4', poster: 'media/ghost-hall.jpg', title: 'Business Ghosts · the hall' },
+      'dark-factory': { src: 'media/studbot-presenter.mp4', poster: 'media/studbot-presenter.jpg', title: 'StudBot preview · WhatsApp AI assistant', sound: true, vertical: true },
+      'coffee': { src: 'media/coffee-tiger.mp4', poster: 'media/coffee-tiger.jpg', title: 'Studex Coffee · the tiger pour', sound: true },
+    };
+    rooms.forEach(r => { r.reel = R[r.id] || null; });
+    return { rooms, unassigned: { agents: [], counts: {} },
+      computers: rooms.map(r => ({ id: r.computer.id, hostname: r.computer.hostname, online: r.computer.online, last_seen: r.computer.last_seen, herdr: true, errors: [] })) };
+  }
+
+  const dlg = document.getElementById('dlg');
+  // In the Gateway dialog the key field follows the address: switching to another gateway shows that
+  // gateway's saved key (or blank), unless the key was typed by hand.
+  let keyTyped = false;
+  document.getElementById('keyIn').addEventListener('input', () => { keyTyped = true; });
+  document.getElementById('gwIn').addEventListener('input', () => { if (!keyTyped) document.getElementById('keyIn').value = keyFor(document.getElementById('gwIn').value.trim()); });
+  document.getElementById('setBtn').onclick = () => { keyTyped = false; document.getElementById('gwIn').value = gw; document.getElementById('keyIn').value = keyFor(gw) || key; dlg.showModal(); };
+  dlg.addEventListener('close', () => { if (dlg.returnValue !== 'save') return;
+    gw = document.getElementById('gwIn').value.trim(); key = document.getElementById('keyIn').value.trim();
+    store.set('rooms.gw', gw); saveKey(gw, key); poll(); });
+
+  poll(); setInterval(poll, 5000);
+})();
+</script>
+</body>
+</html>
