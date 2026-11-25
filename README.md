@@ -54,6 +54,49 @@ tmux new-session -s linux-studex -n main \; \
 ./scripts/orbit.sh --status
 ```
 
+## Calling Agents
+
+The full API reference lives in **[`docs/AGENT-CALLING.md`](docs/AGENT-CALLING.md)** —
+every endpoint, the routing rules, and the gotchas.
+
+Tracked work for the calling surface: **[`docs/TASK-SHEET-AGENT-CALLING.md`](docs/TASK-SHEET-AGENT-CALLING.md)**.
+Verified results from a live server: **[`docs/SMOKE-TEST-RESULTS.md`](docs/SMOKE-TEST-RESULTS.md)**.
+
+```bash
+# talk to one agent
+./scripts/agent-call.sh agent "show open positions" cashclaw
+
+# let hermes route the task to the right agent(s)
+./scripts/agent-call.sh task "deploy the new dashboard"
+
+# agent -> agent
+./scripts/agent-call.sh send '{"from":"hermes","to":"cursor","message":"review PR 42"}'
+
+# shared memory across agents
+./scripts/agent-call.sh fact set deploy_target rvs3 hermes
+./scripts/agent-call.sh fact get deploy_target
+
+# everyone at once
+./scripts/agent-call.sh broadcast "status report"
+```
+
+Point it at any node with `STUDEX_HOST`:
+```bash
+STUDEX_HOST=https://rvs2.local ./scripts/agent-call.sh task "run the tests"
+```
+
+The five call shapes:
+
+| You want to | Endpoint |
+|---|---|
+| Chat with one agent | `POST /api/agents/:name/chat` |
+| Route a task to the right agent(s) | `POST /api/orchestrate/task` |
+| Agent → agent message | `POST /api/orchestrate/send` |
+| Tell every agent the same thing | `POST /api/orchestrate/broadcast` |
+| Remember a fact across agents | `POST /api/orchestrate/blackboard` |
+
+> **Note:** no endpoint has authentication. Do not expose port 4000 publicly.
+
 ## Studex Arcade
 
 **Gamer** (Head of Studex Arcade) owns the **Stud-Bot gaming hub** at [`agents/gamer/arcade/`](agents/gamer/arcade/) — retro and new browser games with an **All / Retro / New** library. Open from the dashboard Integrations grid or `python3 -m http.server` → `/agents/gamer/arcade/`.
