@@ -6,3 +6,9 @@ sdk/python/**/__pycache__/
 sdk/node/node_modules/
 *.pyc
 __pycache__/
+
+# Coms private runtime/configuration
+.env
+.env.*
+!**/.env.example
+server/coms/.state/

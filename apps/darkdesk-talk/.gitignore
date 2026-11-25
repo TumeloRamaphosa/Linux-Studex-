@@ -1,0 +1,8 @@
+state/
+preview-running.json
+test-output.txt
+test-receipt.json
+__pycache__/
+*.pyc
+.env
+.env.*
