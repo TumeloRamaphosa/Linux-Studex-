@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://studex.local/schemas/agent-central-v1.schema.json",
+  "title": "Agent Central v1",
+  "description": "Bounded index for agents, data rooms, work submissions, and business lanes. Safe summaries only — no secrets or PII.",
+  "type": "object",
+  "required": ["schemaVersion", "generatedAt", "classification", "central"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "classification": {
+      "type": "string",
+      "enum": ["public-internal-summary", "reference-only"]
+    },
+    "central": { "$ref": "#/$defs/centralIndex" }
+  },
+  "$defs": {
+    "evidenceStatus": {
+      "type": "string",
+      "enum": ["historical", "unverified", "blocked", "tested"]
+    },
+    "businessLaneId": {
+      "type": "string",
+      "enum": ["meat", "coffee", "stud-bot-vm-workplace", "gaming", "platform-engineering"]
+    },
+    "agentId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,62}$"
+    },
+    "centralIndex": {
+      "type": "object",
+      "required": ["title", "agents", "businessLanes", "notionCanons", "workSubmissionCount"],
+      "properties": {
+        "title": { "type": "string" },
+        "agents": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/agentIndexEntry" }
+        },
+        "businessLanes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/businessLane" }
+        },
+        "notionCanons": { "$ref": "#/$defs/notionCanons" },
+        "workSubmissionCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "agentIndexEntry": {
+      "type": "object",
+      "required": ["id", "displayName", "status", "dataRoomPath", "businessLanes"],
+      "properties": {
+        "id": { "$ref": "#/$defs/agentId" },
+        "displayName": { "type": "string" },
+        "roleSummary": { "type": "string" },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "vmAgent": { "type": "boolean" },
+        "rvs": { "type": "string" },
+        "dataRoomPath": { "type": "string" },
+        "apiDetailPath": { "type": "string" },
+        "businessLanes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/businessLaneId" }
+        },
+        "kpiReview": { "$ref": "#/$defs/kpiReviewStub" }
+      }
+    },
+    "agentDetail": {
+      "type": "object",
+      "required": ["id", "displayName", "status", "classification", "dataRoomLinks"],
+      "properties": {
+        "id": { "$ref": "#/$defs/agentId" },
+        "displayName": { "type": "string" },
+        "roleSummary": { "type": "string" },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "classification": { "type": "string" },
+        "owner": { "type": "string" },
+        "dataRoomLinks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/dataRoomLink" }
+        },
+        "dailyFiling": { "$ref": "#/$defs/dailyFilingRef" },
+        "kpiReview": { "$ref": "#/$defs/kpiReviewStub" }
+      }
+    },
+    "dataRoomLink": {
+      "type": "object",
+      "required": ["id", "label", "kind", "status"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "kind": {
+          "type": "string",
+          "enum": ["repo-path", "api", "notion-canon", "external-reference"]
+        },
+        "href": { "type": "string" },
+        "path": { "type": "string" },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "notes": { "type": "string" }
+      }
+    },
+    "dailyFilingRef": {
+      "type": "object",
+      "properties": {
+        "repoLogPattern": { "type": "string" },
+        "obsidianPattern": { "type": "string" },
+        "syncStatus": { "$ref": "#/$defs/evidenceStatus" }
+      }
+    },
+    "businessLane": {
+      "type": "object",
+      "required": ["id", "displayName", "status", "priorityNote"],
+      "properties": {
+        "id": { "$ref": "#/$defs/businessLaneId" },
+        "displayName": { "type": "string" },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "priorityNote": { "type": "string" },
+        "linkedAgents": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/agentId" }
+        }
+      }
+    },
+    "workSubmission": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "source",
+        "project",
+        "owner",
+        "businessLane",
+        "status",
+        "acceptanceEvidence",
+        "approvalGate",
+        "submittedAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^ws-[a-z0-9-]+$" },
+        "title": { "type": "string" },
+        "source": { "type": "string" },
+        "project": { "type": "string" },
+        "owner": { "type": "string" },
+        "businessLane": { "$ref": "#/$defs/businessLaneId" },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "acceptanceEvidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidenceItem" }
+        },
+        "approvalGate": { "$ref": "#/$defs/approvalGate" },
+        "submittedAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "evidenceItem": {
+      "type": "object",
+      "required": ["id", "kind", "status", "summary"],
+      "properties": {
+        "id": { "type": "string" },
+        "kind": {
+          "type": "string",
+          "enum": ["test-run", "pr", "doc", "schema", "manual-review", "notion-canon"]
+        },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "summary": { "type": "string" },
+        "path": { "type": "string" },
+        "href": { "type": "string" }
+      }
+    },
+    "approvalGate": {
+      "type": "object",
+      "required": ["required", "state", "reviewerRole"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "state": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected", "not-applicable"]
+        },
+        "reviewerRole": { "type": "string" },
+        "approvedAt": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "notionCanons": {
+      "type": "object",
+      "properties": {
+        "projectsOwner": { "type": "string" },
+        "workSubmissionsOwner": { "type": "string" },
+        "fleetWikiOwner": { "type": "string" },
+        "links": {
+          "type": "object",
+          "properties": {
+            "projects": { "type": "string", "format": "uri" },
+            "workSubmissions": { "type": "string", "format": "uri" },
+            "fleetWiki": { "type": "string", "format": "uri" },
+            "businessPlanEvidenceIndex": { "type": "string", "format": "uri" }
+          }
+        },
+        "businessPlanEvidenceOwner": { "type": "string" },
+        "syncStatus": { "$ref": "#/$defs/evidenceStatus" }
+      }
+    },
+    "kpiReviewStub": {
+      "type": "object",
+      "required": ["humanReviewRequired", "agentMetricsVerified"],
+      "properties": {
+        "humanReviewRequired": { "type": "boolean" },
+        "agentMetricsVerified": { "type": "boolean" },
+        "fields": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "chiefOfStaffOverview": {
+      "type": "object",
+      "required": ["id", "role", "status", "sections"],
+      "properties": {
+        "id": { "const": "robusca-chief-of-staff" },
+        "role": { "type": "string" },
+        "status": { "$ref": "#/$defs/evidenceStatus" },
+        "classification": { "type": "string" },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["heading", "body"],
+            "properties": {
+              "heading": { "type": "string" },
+              "body": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
