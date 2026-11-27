@@ -7,9 +7,13 @@ Catalogue of agent skills for Studex. **Catalogue only — nothing here installs
 - `notes/` — one markdown note per skill (YAML frontmatter)
 - `README - How to add a skill.md` — intake process
 
-Updated `2026-11-22` on branch `skills-update-2026-11-22`. Open a PR; do not merge without Agent Chief Lord approval.
+Updated `2026-11-27` on branch `skills-update-2026-11-27`. Open a PR; do not merge without Agent Chief Lord approval.
 
 Never store keys, tokens, invite links, or IPs in this tree.
+
+## Update 2026-11-27
+
+Daily sync added **5** catalogue entries (remotion-elements, artifacts, flagship, figma-3d-transforms, figma-weave-workflows). All **Trusted** vendor skills. Catalogue only — no installs. See `catalogue.csv`, `NEW-2026-11-27.csv` and `notes/`.
 
 ## Update 2026-11-07
 

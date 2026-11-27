@@ -7,11 +7,11 @@ tags: [index, studex]
 
 Studex Skills Library catalogue. **Catalogue only — no auto-install.** See [[README - How to add a skill]].
 
-_Last library update: 2026-11-22_
+_Last library update: 2026-11-27_
 
 ## Counts by tier
 
-- **Trusted:** 150
+- **Trusted:** 155
 - **Screen first:** 42
 - **Missing:** 2
 
@@ -27,6 +27,7 @@ _Last library update: 2026-11-22_
 ### Design
 
 - [[brand-guidelines|brand-guidelines]] — Trusted — Apply Anthropic brand colors/typography (reference pattern for brand skills)
+- [[figma-3d-transforms|figma-3d-transforms]] — Trusted — Add/edit 3D transforms in Figma (depth, perspective, isometric, parallax)
 - [[figma-code-connect|figma-code-connect]] — Trusted — Figma Code Connect
 - [[figma-create-new-file|figma-create-new-file]] — Trusted — Create new Figma file
 - [[figma-design-to-code|figma-design-to-code]] — Trusted — Design to code (mandatory prereq)
@@ -41,6 +42,7 @@ _Last library update: 2026-11-22_
 - [[figma-use-figjam|figma-use-figjam]] — Trusted — FigJam boards
 - [[figma-use-motion|figma-use-motion]] — Trusted — Motion/animation context
 - [[figma-use-slides|figma-use-slides]] — Trusted — Figma slides
+- [[figma-weave-workflows|figma-weave-workflows]] — Trusted — Rules for building Figma Weave AI-pipeline workflow graphs via weave_* MCP tools
 - [[frontend-design|frontend-design]] — Trusted — Translate design concepts into polished frontend UI
 - [[ui-ux-pro-max|ui-ux-pro-max]] — Screen first — Design intelligence for professional UI/UX across platforms
 - [[web-design-guidelines|web-design-guidelines]] — Trusted — Modern web design principles (typography, color, spacing)
@@ -109,6 +111,8 @@ _Last library update: 2026-11-22_
 
 ### Backend
 
+- [[artifacts|artifacts]] — Trusted — Cloudflare Artifacts: Git-compatible versioned storage from Workers/REST/Git clients
+- [[flagship|flagship]] — Trusted — Cloudflare Flagship feature flags: OpenFeature SDKs, targeting rules, percentage rollouts, kill switches
 - [[neon-postgres|neon-postgres]] — not yet screened — Neon serverless Postgres guidance for agents - exact scope not verified
 - [[supabase|supabase]] — not yet screened — Supabase product guidance for agents (database, auth, storage, edge functions) - exact scope not verified
 
@@ -182,6 +186,7 @@ _Last library update: 2026-11-22_
 - [[remotion-captions|remotion-captions]] — Trusted — Transcribe, display and animate Remotion captions
 - [[remotion-create|remotion-create]] — Trusted — Create a new Remotion video project
 - [[remotion-docs|remotion-docs]] — Trusted — Search Remotion documentation from the agent
+- [[remotion-elements|remotion-elements]] — Trusted — Install reusable Remotion video components (titles, backgrounds, charts, caption styles)
 - [[remotion-interactivity|remotion-interactivity]] — Trusted — Structure Remotion markup for interactivity
 - [[remotion-license|remotion-license]] — Trusted — Remotion license info, FAQs, terms, and where to buy
 - [[remotion-maps|remotion-maps]] — Trusted — Remotion map animation knowledge
@@ -289,3 +294,15 @@ _Last library update: 2026-11-22_
 | neon-postgres | Screen first | not yet screened |
 | security-and-hardening | Screen first | not yet screened |
 | gsap-core | Screen first | not yet screened |
+
+## Changelog 2026-11-27
+
++5 catalogue entries (catalogue only — no installs; **Trusted** vendor skills):
+
+| Skill | Tier (catalogue) |
+|---|---|
+| remotion-elements | Trusted |
+| artifacts | Trusted |
+| flagship | Trusted |
+| figma-3d-transforms | Trusted |
+| figma-weave-workflows | Trusted |
